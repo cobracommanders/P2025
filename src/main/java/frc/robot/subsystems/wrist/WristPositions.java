@@ -1,7 +1,8 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.wrist;
 
-public class ElevatorPositions {
+public class WristPositions {
     public static final double IDLE = 0;
+    public static final double INVERTED_IDLE = 0;
     public static final double L1 = 0;
     public static final double L2 = 0;
     public static final double L3 = 0;

@@ -52,11 +52,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
       case CAPPED_L4 ->
         MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, 0.1);
       case L4 ->
-        MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, 0.1);
+        MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, 0.1);
       case CORAL_STATION ->
         MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, 0.1);
       case INVERTED_CORAL_STATION ->
-        MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, 0.1);
+        MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, 0.1);
     };
   }
 
@@ -98,7 +98,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           setElevatorPosition(ElevatorPositions.CORAL_STATION, -ElevatorPositions.CORAL_STATION);
         }
         case INVERTED_CORAL_STATION -> {
-          setElevatorPosition(ElevatorPositions.CORAL_STATION, -ElevatorPositions.CORAL_STATION);
+          setElevatorPosition(ElevatorPositions.INVERTED_CORAL_STATION, -ElevatorPositions.CORAL_STATION);
         }
         default -> {}
       }
