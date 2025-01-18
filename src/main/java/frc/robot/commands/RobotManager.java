@@ -27,6 +27,9 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private RobotState state = RobotState.IDLE;
 
+  public boolean isHeightCapped = false;
+  public Timer timer = new Timer();
+
   private final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
   public RobotManager(
@@ -51,41 +54,158 @@ public class RobotManager extends StateMachine<RobotState> {
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
-    return switch (currentState) {
-      case 
-      PREPARE_IDLE,
-      WAIT_IDLE,
-      IDLE,
-      PREPARE_INVERTED_IDLE,
-      WAIT_INVERTED_IDLE,
-      INVERTED_IDLE,
-      PREPARE_DEEP_CLIMB,
-      WAIT_DEEP_CLIMB,
-      DEEP_CLIMB,
-      PREPARE_L1,
-      WAIT_L1,
-      L1,
-      PREPARE_L2,
-      WAIT_L2,
-      L2,
-      PREPARE_L3,
-      WAIT_L3,
-      L3,
-      PREPARE_L4,
-      WAIT_L4,
-      L4,
-      PREPARE_CAPPED_L4,
-      WAIT_CAPPED_L4,
-      CAPPED_L4,
-      PREPARE_CORAL_STATION,
-      WAIT_CORAL_STATION,
-      CORAL_STATION,
-      PREPARE_INVERTED_CORAL_STATION,
-      WAIT_INVERTED_CORAL_STATION,
-      INVERTED_CORAL_STATION ->
-          currentState;
-      };
-    };
+    RobotState nextState = currentState; 
+    for (RobotFlag flag : flags.getChecked()) {
+      switch (flag) {
+        case APPLY_HEIGHT_CAP: isHeightCapped = true;
+          break;
+        case REMOVE_HEIGHT_CAP:
+          isHeightCapped = false;
+          break;
+        case CORAL_STATION:
+          if (!currentState.climbing) {
+            nextState = RobotState.PREPARE_CORAL_STATION;
+          }
+          break;
+        case INVERTED_CORAL_STATION:
+          if (!currentState.climbing) {
+            nextState = RobotState.PREPARE_INVERTED_CORAL_STATION;
+          }
+        break;
+          case L1:
+          if (!currentState.climbing) {
+            nextState = RobotState.PREPARE_L1;
+          }
+          break;
+        case L2:
+          if (!currentState.climbing) {
+            nextState = RobotState.PREPARE_L2;
+          }
+          break;
+        case L3:
+          if (!currentState.climbing) {
+            nextState = RobotState.PREPARE_L3;
+          }
+          break;
+        case L4:
+          if (!currentState.climbing) {
+            nextState = isHeightCapped ? RobotState.PREPARE_CAPPED_L4 : RobotState.PREPARE_L4;
+          }
+          break;
+        case DEEP_CLIMB:
+          if (!currentState.climbing) {
+            nextState = RobotState.DEEP_CLIMB;
+          }
+          break;
+        case SCORE:
+          switch (nextState) {
+            case WAIT_L1:
+              nextState = RobotState.SCORE_L1;
+              break;
+            case WAIT_L2:
+              nextState = RobotState.SCORE_L2;
+              break;
+            case WAIT_L3:
+             nextState = RobotState.SCORE_L3;
+              break;
+            case WAIT_L4:
+              nextState = RobotState.SCORE_L4;
+              break;
+            default:
+              break;
+          }
+      }
+    }
+    //automatic transitions
+    switch (state) {
+      case WAIT_L2:
+      case IDLE:
+      case WAIT_INVERTED_IDLE:
+      case WAIT_DEEP_CLIMB:
+      case WAIT_L4:
+      case WAIT_CORAL_STATION:
+      case WAIT_CAPPED_L4:
+      case WAIT_IDLE:
+      case WAIT_L1:
+      case PREPARE_DEEP_CLIMB:
+      case DEEP_CLIMB:
+      case WAIT_L3:
+      case INVERTED_CORAL_STATION:
+      case WAIT_INVERTED_CORAL_STATION:
+      case CORAL_STATION:
+      case INVERTED_IDLE:
+
+      
+
+      case PREPARE_L1:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_L1;
+        }
+        break;
+      case PREPARE_L2:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_L2;
+        }
+        break;
+      case PREPARE_L3:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_L3;
+        }
+        break;
+      case PREPARE_CAPPED_L4:
+        if (isHeightCapped = false) {
+          nextState = RobotState.PREPARE_L4;
+        }
+        break;
+      case PREPARE_L4:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_L4;
+        }
+        break;
+      case PREPARE_CORAL_STATION:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_CORAL_STATION;
+        }
+        break;
+      case PREPARE_INVERTED_CORAL_STATION:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.WAIT_INVERTED_CORAL_STATION;
+        }
+        break;
+      case PREPARE_IDLE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.IDLE;
+        }
+        break;
+      case PREPARE_INVERTED_IDLE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          nextState = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L1:
+        if (timeout(0)) {
+          nextState = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L2:
+        if (timeout(0)) {
+          nextState = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L3:
+        if (timeout(0)) {
+          nextState = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L4:
+        if (timeout(0)) {
+          nextState = RobotState.INVERTED_IDLE;
+        }
+        break;
+    }
+
+    flags.clear();
+  };
   
 
   @Override
@@ -96,31 +216,47 @@ public class RobotManager extends StateMachine<RobotState> {
         climber.setState(ClimberState.IDLE);
         manipulator.setState(ManipulatorState.IDLE);
         wrist.setState(WristState.IDLE);
+        elbow.setState(ElbowState.IDLE);
         
       }
-      case L1 -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case PREPARE_L1 -> {
+        elevator.setState(ElevatorState.L1);
       }
-      case L2 -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case SCORE_L1 -> {
+        elevator.setState(ElevatorState.L2);
       }
-      case L3 -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case PREPARE_L2 -> {
+        elevator.setState(ElevatorState.L3);
       }
-      case L4 -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case SCORE_L2 -> {
+        elevator.setState(ElevatorState.L4);
       }
-      case CORAL_STATION -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case PREPARE_L3 -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
+      }
+      case SCORE_L3 -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
+      }
+      case PREPARE_L4 -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
+      }
+      case SCORE_L4 -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
       }
       case INVERTED_CORAL_STATION -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+        elevator.setState(ElevatorState.INVERTED_CORAL_STATION);
       }
-      case CAPPED_L4 -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+      case CORAL_STATION -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
+      }
+      case PREPARE_CORAL_STATION -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
+      }
+      case PREPARE_INVERTED_CORAL_STATION -> {
+        elevator.setState(ElevatorState.CORAL_STATION);
       }
       case DEEP_CLIMB -> {
-        elevatorSubsystem.setState(ElevatorState.L1);
+        elevator.setState(ElevatorState.IDLE);
       }
       
       }
@@ -129,6 +265,158 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void periodic() {
     super.periodic(); 
+    for (RobotFlag flag : flags.getChecked()) {
+      switch (flag) {
+        case APPLY_HEIGHT_CAP:
+          isHeightCapped = true;
+          break;
+        case REMOVE_HEIGHT_CAP:
+          isHeightCapped = false;
+          break;
+        case CORAL_STATION:
+          if (!state.climbing) {
+            state = RobotState.PREPARE_CORAL_STATION;
+          }
+          break;
+        case INVERTED_CORAL_STATION:
+          if (!state.climbing) {
+            state = RobotState.PREPARE_INVERTED_CORAL_STATION;
+          }
+        break;
+          case L1:
+          if (!state.climbing) {
+            state = RobotState.PREPARE_L1;
+          }
+          break;
+        case L2:
+          if (!state.climbing) {
+            state = RobotState.PREPARE_L2;
+          }
+          break;
+        case L3:
+          if (!state.climbing) {
+            state = RobotState.PREPARE_L3;
+          }
+          break;
+        case L4:
+          if (!state.climbing) {
+            state = isHeightCapped ? RobotState.PREPARE_CAPPED_L4 : RobotState.PREPARE_L4;
+          }
+          break;
+        case DEEP_CLIMB:
+          if (!state.climbing) {
+            state = RobotState.DEEP_CLIMB;
+          }
+          break;
+        case SCORE:
+          switch (state) {
+            case WAIT_L1:
+              state = RobotState.SCORE_L1;
+              break;
+            case WAIT_L2:
+              state = RobotState.SCORE_L2;
+              break;
+            case WAIT_L3:
+              state = RobotState.SCORE_L3;
+              break;
+            case WAIT_L4:
+              state = RobotState.SCORE_L4;
+              break;
+            default:
+              break;
+          }
+      }
+    }
+    //automatic transitions
+    switch (state) {
+      case WAIT_L2:
+      case IDLE:
+      case WAIT_INVERTED_IDLE:
+      case WAIT_DEEP_CLIMB:
+      case WAIT_L4:
+      case WAIT_CORAL_STATION:
+      case WAIT_CAPPED_L4:
+      case CAPPED_L4:
+      case WAIT_IDLE:
+      case WAIT_L1:
+      case PREPARE_DEEP_CLIMB:
+      case DEEP_CLIMB:
+      case WAIT_L3:
+      case INVERTED_CORAL_STATION:
+      case WAIT_INVERTED_CORAL_STATION:
+      case CORAL_STATION:
+      case INVERTED_IDLE:
+
+      
+
+      case PREPARE_L1:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_L1;
+        }
+        break;
+      case PREPARE_L2:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_L2;
+        }
+        break;
+      case PREPARE_L3:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_L3;
+        }
+        break;
+      case PREPARE_CAPPED_L4:
+        if (isHeightCapped = false) {
+          state = RobotState.PREPARE_L4;
+        }
+        break;
+      case PREPARE_L4:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_L4;
+        }
+        break;
+      case PREPARE_CORAL_STATION:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_CORAL_STATION;
+        }
+        break;
+      case PREPARE_INVERTED_CORAL_STATION:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.WAIT_INVERTED_CORAL_STATION;
+        }
+        break;
+      case PREPARE_IDLE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.IDLE;
+        }
+        break;
+      case PREPARE_INVERTED_IDLE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+          state = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L1:
+        if () {
+          state = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L2:
+        if () {
+          state = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L3:
+        if () {
+          state = RobotState.INVERTED_IDLE;
+        }
+        break;
+      case SCORE_L4:
+        if () {
+          state = RobotState.INVERTED_IDLE;
+        }
+        break;
+    }
+
+    flags.clear();
   }
 
   public void idleRequest() {
@@ -136,8 +424,10 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void scoreRequest() {
-    setStateFromRequest(RobotState.L1);
+    setStateFromRequest(RobotState.SCORE_L1);
   }
+
+
 
 
   public void stopScoringRequest() {

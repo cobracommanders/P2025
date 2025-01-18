@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.RobotCommands;
 import frc.robot.commands.RobotManager;
+import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot{
     public final Timer setupTimer = new Timer();
     public double setupTime  = 0;
 
-    public static RobotManager robotManager = new RobotManager(ElevatorSubsystem.getInstance());
+    public static RobotManager robotManager = new RobotManager(ElevatorSubsystem.getInstance(), ClimberSubsystem.getInstance());
     public static RobotCommands robotCommands = new RobotCommands(robotManager);
     // public static int coordinateFlip = 1;
     // public static int rotationOffset = 0;

@@ -8,10 +8,11 @@ import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.commands.RobotFlag;
 
 public class ClimberSubsystem extends StateMachine<ClimberState>{
     
-  private final SparkMax motor;
+  private final TalonFX motor;
   
   private ClimberState currentState;
   private double setpoint;
@@ -23,7 +24,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
   public ClimberSubsystem() {
       super(ClimberState.IDLE);
       // motor = new LazySparkMax(Ports.IntakePorts.LMOTOR, MotorType.kBrushless);
-      motor = new SparkMax(Ports.ClimberPorts.CLIMBER_MOTOR, MotorType.kBrushless);
+      motor = new TalonFX(Ports.ClimberPorts.CLIMBER_MOTOR);
       
       
       currentState = ClimberState.IDLE;
@@ -48,6 +49,17 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
 
   @Override
   public void periodic() {
+      for (RobotFlag flag : flags.getChecked()) {
+      switch (flag) {
+        case CORAL_STATION:
+          if (!state.climbing) {
+            // Reset note manager state so that we don't instantly think we're done intaking
+            // Need to force set the state, rather than doing a state request, due to order of
+            // subsystems executing
+            noteManager.evilStateOverride(NoteState.IDLE_NO_GP);
+            state = RobotState.INTAKING;
+          }
+          break;
   }
 
   public void set(double speed) {

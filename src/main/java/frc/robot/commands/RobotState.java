@@ -1,34 +1,40 @@
 package frc.robot.commands;
 
 public enum RobotState {
-  PREPARE_IDLE,
-  WAIT_IDLE,
-  IDLE(),
-  PREPARE_INVERTED_IDLE,
-  WAIT_INVERTED_IDLE,
-  INVERTED_IDLE(),
-  PREPARE_DEEP_CLIMB(),
-  WAIT_DEEP_CLIMB(),
-  DEEP_CLIMB(),
-  PREPARE_L1(),
-  WAIT_L1(),
-  L1(),
-  PREPARE_L2(),
-  WAIT_L2(),
-  L2(),
-  PREPARE_L3(),
-  WAIT_L3(),
-  L3(),
-  PREPARE_L4(),
-  WAIT_L4(),
-  L4(),
-  PREPARE_CAPPED_L4(),
-  WAIT_CAPPED_L4(),
-  CAPPED_L4(),
-  PREPARE_CORAL_STATION(),
-  WAIT_CORAL_STATION(),
-  CORAL_STATION(),
-  PREPARE_INVERTED_CORAL_STATION(),
-  WAIT_INVERTED_CORAL_STATION(),
-  INVERTED_CORAL_STATION()
+  PREPARE_IDLE(false),
+  WAIT_IDLE(false),
+  IDLE(false),
+  PREPARE_INVERTED_IDLE(false),
+  WAIT_INVERTED_IDLE(false),
+  INVERTED_IDLE(false),
+  PREPARE_DEEP_CLIMB(true),
+  WAIT_DEEP_CLIMB(true),
+  DEEP_CLIMB(true),
+  PREPARE_L1(false),
+  WAIT_L1(false),
+  SCORE_L1(false),
+  PREPARE_L2(false),
+  WAIT_L2(false),
+  SCORE_L2(false),
+  PREPARE_L3(false),
+  WAIT_L3(false),
+  SCORE_L3(false),
+  PREPARE_L4(false),
+  WAIT_L4(false),
+  SCORE_L4(false),
+  PREPARE_CAPPED_L4(false),
+  WAIT_CAPPED_L4(false),
+  PREPARE_CORAL_STATION(false),
+  WAIT_CORAL_STATION(false),
+  CORAL_STATION(false),
+  PREPARE_INVERTED_CORAL_STATION(false),
+  WAIT_INVERTED_CORAL_STATION(false),
+  INVERTED_CORAL_STATION(false);
+
+  public final boolean climbing;
+
+  RobotState(boolean climbing){
+    this.climbing = climbing;
+  }
+
 }
