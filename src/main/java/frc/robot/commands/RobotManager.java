@@ -27,7 +27,10 @@ public class RobotManager extends StateMachine<RobotState> {
             L1,
             L2,
             L3,
-            L4 ->
+            L4,
+            CAPPED_L4,
+            INVERTED_CORAL_STATION,
+            CORAL_STATION ->
           currentState;
       };
     };
@@ -40,6 +43,27 @@ public class RobotManager extends StateMachine<RobotState> {
         elevatorSubsystem.setState(ElevatorState.IDLE);
       }
       case L1 -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case L2 -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case L3 -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case L4 -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case CORAL_STATION -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case INVERTED_CORAL_STATION -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case CAPPED_L4 -> {
+        elevatorSubsystem.setState(ElevatorState.L1);
+      }
+      case DEEP_CLIMB -> {
         elevatorSubsystem.setState(ElevatorState.L1);
       }
       
