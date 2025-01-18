@@ -1,30 +1,40 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     
-  private final TalonFX motor;
+  private final TalonFX leftMotor;
+  private final TalonFX rightMotor;
+  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private double elevatorPosition;
+
+  private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
   private final PIDController pidController;
   
   private ElevatorState currentState;
   private double setpoint;
-  private double GEAR_RATIO = 224.0/16200.0;
   private double manualSpeed;
   
   private boolean isActivated = true;
   
   public ElevatorSubsystem() {
     super(ElevatorState.IDLE);
-    motor = new TalonFX(Ports.ElevatorPorts.ELEVATOR_MOTOR);
+    leftMotor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
+    rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     currentState = ElevatorState.IDLE;
     pidController = new PIDController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D);
   }
@@ -39,9 +49,13 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, 0.1);
       case L3 ->
         MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, 0.1);
+      case CAPPED_L4 ->
+        MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, 0.1);
       case L4 ->
-        MathUtil.isNear(pidController.set(ElevatorPositions.L4), elevatorPosition, 0.1);
+        MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, 0.1);
       case CORAL_STATION ->
+        MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, 0.1);
+      case INVERTED_CORAL_STATION ->
         MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, 0.1);
     };
   }
@@ -50,30 +64,41 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
       setStateFromRequest(newState);
     }
 
-  public void getPosition(){
-    elevatorPosition = motor.getPosition().getValueAsDouble();
+  public void updatePosition(){
+    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
+  }
+
+  public void setElevatorPosition(double leftPosition, double rightPosition){
+    leftMotor.setControl(motor_request.withPosition(leftPosition));
+    rightMotor.setControl(motor_request.withPosition(rightPosition));
   }
 
     @Override
     protected void afterTransition(ElevatorState newState) {
       switch (newState) {
         case IDLE -> {
-          motor.set(ElevatorPositions.IDLE);
+          setElevatorPosition(ElevatorPositions.IDLE, -ElevatorPositions.IDLE);
         }
         case L1 -> {
-          motor.set(ElevatorPositions.L1);
+          setElevatorPosition(ElevatorPositions.L1, -ElevatorPositions.L1);
         }
         case L2 -> {
-          motor.set(ElevatorPositions.L2);
+          setElevatorPosition(ElevatorPositions.L2, -ElevatorPositions.L2);
         }
         case L3 -> {
-          motor.set(ElevatorPositions.L3);
+          setElevatorPosition(ElevatorPositions.L3, -ElevatorPositions.L3);
+        }
+        case CAPPED_L4 -> {
+          setElevatorPosition(ElevatorPositions.CAPPED_L4, -ElevatorPositions.CAPPED_L4);
         }
         case L4 -> {
-          motor.set(ElevatorPositions.L4);
+          setElevatorPosition(ElevatorPositions.L4, -ElevatorPositions.L4);
         }
         case CORAL_STATION -> {
-          motor.set(ElevatorPositions.CORAL_STATION);
+          setElevatorPosition(ElevatorPositions.CORAL_STATION, -ElevatorPositions.CORAL_STATION);
+        }
+        case INVERTED_CORAL_STATION -> {
+          setElevatorPosition(ElevatorPositions.CORAL_STATION, -ElevatorPositions.CORAL_STATION);
         }
         default -> {}
       }
@@ -81,12 +106,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   @Override
   public void periodic() {
+    updatePosition();
   }
-
-  public void set(double speed) {
-      motor.set(speed);
-  }
-
   private static ElevatorSubsystem instance;
 
   public static ElevatorSubsystem getInstance() {

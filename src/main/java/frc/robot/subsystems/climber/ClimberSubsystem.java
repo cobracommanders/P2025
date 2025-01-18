@@ -23,7 +23,8 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
   public ClimberSubsystem() {
       super(ClimberState.IDLE);
       // motor = new LazySparkMax(Ports.IntakePorts.LMOTOR, MotorType.kBrushless);
-      motor = new SparkMax(Ports.ElevatorPorts.ELEVATOR_MOTOR, MotorType.kBrushless);
+      motor = new SparkMax(Ports.ClimberPorts.CLIMBER_MOTOR, MotorType.kBrushless);
+      
       
       currentState = ClimberState.IDLE;
   }
