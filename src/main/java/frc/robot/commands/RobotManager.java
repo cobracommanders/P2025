@@ -32,20 +32,14 @@ public class RobotManager extends StateMachine<RobotState> {
 
   private final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
-  public RobotManager(
-      ElevatorSubsystem elevator,
-      ClimberSubsystem climber,
-      ManipulatorSubsystem manipulator,
-      WristSubsystem wrist,
-      ElbowSubsystem elbow,
-      CommandSwerveDrivetrain drivetrain) {
+  public RobotManager() {
     super(RobotState.IDLE);
-    this.elevator = elevator;
-    this.climber = climber;
-    this.manipulator = manipulator;
-    this.wrist = wrist;
-    this.elbow = elbow;
-    this.drivetrain = drivetrain;
+    this.elevator = ElevatorSubsystem.getInstance();
+    this.climber = ClimberSubsystem.getInstance();
+    this.manipulator = ManipulatorSubsystem.getInstance();
+    this.wrist = WristSubsystem.getInstance();
+    this.elbow = ElbowSubsystem.getInstance();
+    this.drivetrain = CommandSwerveDrivetrain.getInstance();
   }
 
   @Override
@@ -203,8 +197,8 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
     }
-
     flags.clear();
+    return nextState;
   };
   
 
@@ -336,7 +330,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_L4:
       case WAIT_CORAL_STATION:
       case WAIT_CAPPED_L4:
-      case CAPPED_L4:
       case WAIT_IDLE:
       case WAIT_L1:
       case PREPARE_DEEP_CLIMB:
@@ -395,22 +388,22 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case SCORE_L1:
-        if () {
+        if (timeout(1)) {
           state = RobotState.INVERTED_IDLE;
         }
         break;
       case SCORE_L2:
-        if () {
+        if (timeout(1)) {
           state = RobotState.INVERTED_IDLE;
         }
         break;
       case SCORE_L3:
-        if () {
+        if (timeout(1)) {
           state = RobotState.INVERTED_IDLE;
         }
         break;
       case SCORE_L4:
-        if () {
+        if (timeout(1)) {
           state = RobotState.INVERTED_IDLE;
         }
         break;
@@ -436,4 +429,11 @@ public class RobotManager extends StateMachine<RobotState> {
       default -> setStateFromRequest(RobotState.IDLE);
     }
   }
+  private static RobotManager instance;
+  
+  public static RobotManager getInstance() {
+    if (instance == null) instance = new RobotManager(); // Make sure there is an instance (this will only run once)
+    return instance;
+}
+
 }

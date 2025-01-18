@@ -49,17 +49,6 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
 
   @Override
   public void periodic() {
-      for (RobotFlag flag : flags.getChecked()) {
-      switch (flag) {
-        case CORAL_STATION:
-          if (!state.climbing) {
-            // Reset note manager state so that we don't instantly think we're done intaking
-            // Need to force set the state, rather than doing a state request, due to order of
-            // subsystems executing
-            noteManager.evilStateOverride(NoteState.IDLE_NO_GP);
-            state = RobotState.INTAKING;
-          }
-          break;
   }
 
   public void set(double speed) {

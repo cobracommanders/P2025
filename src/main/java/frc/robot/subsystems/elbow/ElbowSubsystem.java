@@ -69,7 +69,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   }
 
   public void setElbowPosition(double position){
-    motor.setControl(motor_request.withPosition(leftPosition));
+    motor.setControl(motor_request.withPosition(position));
   }
 
     @Override

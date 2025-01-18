@@ -17,6 +17,8 @@ import frc.robot.commands.RobotManager;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
+import frc.robot.subsystems.wrist.WristSubsystem;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +31,7 @@ public class Robot extends TimedRobot{
     public final Timer setupTimer = new Timer();
     public double setupTime  = 0;
 
-    public static RobotManager robotManager = new RobotManager(ElevatorSubsystem.getInstance(), ClimberSubsystem.getInstance());
+    public static RobotManager robotManager = RobotManager.getInstance();
     public static RobotCommands robotCommands = new RobotCommands(robotManager);
     // public static int coordinateFlip = 1;
     // public static int rotationOffset = 0;
