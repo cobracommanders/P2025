@@ -39,7 +39,7 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
       return switch (getState()) {
         case IDLE -> 
           MathUtil.isNear(ManipulatorPositions.IDLE, manipulatorPosition, 0.1);
-          case INTAKE_CORAL -> 
+        case INTAKE_CORAL -> 
           MathUtil.isNear(ManipulatorPositions.IDLE, manipulatorPosition, 0.1);
         case L1 ->
           MathUtil.isNear(ManipulatorPositions.L1, manipulatorPosition, 0.1);
@@ -48,7 +48,7 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
         case L3 ->
           MathUtil.isNear(ManipulatorPositions.L3, manipulatorPosition, 0.1);
         case L4 ->
-          MathUtil.isNear(ManipulatorPositions.L3, manipulatorPosition, 0.1);
+          MathUtil.isNear(ManipulatorPositions.L4, manipulatorPosition, 0.1);
       };
     }
   

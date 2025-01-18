@@ -9,6 +9,9 @@ public class Ports {
     public static class WristPorts {
         public static final int WRIST_MOTOR = 0;
     }
+    public static class ManipulatorPorts {
+        public static final int MANIPULATOR_MOTOR = 0;
+    }
 
     public static class ClimberPorts {
         public static final int CLIMBER_MOTOR = 43;
