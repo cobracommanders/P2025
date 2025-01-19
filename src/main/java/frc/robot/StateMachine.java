@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Set;
 
+import dev.doglog.DogLog;
+
 /** A state machine backed by {@link LifecycleSubsystem}. */
 public abstract class StateMachine<S extends Enum<S>> extends SubsystemBase {
   private S state;
@@ -126,6 +128,7 @@ public abstract class StateMachine<S extends Enum<S>> extends SubsystemBase {
   private void doTransition() {
 
     lastTransitionTimestamp = Timer.getFPGATimestamp();
+    DogLog.log(this.getName() + "/State", state);
 
     afterTransition(state);
   }

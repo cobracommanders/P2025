@@ -16,6 +16,8 @@ import frc.robot.commands.RobotCommands;
 import frc.robot.commands.RobotManager;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.elbow.ElbowPositions;
+import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
@@ -25,31 +27,43 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
+
 
 public class Robot extends TimedRobot{
     public static final double DEFAULT_PERIOD = 0.02;
-    public final Timer setupTimer = new Timer();
-    public double setupTime  = 0;
 
     public static RobotManager robotManager = RobotManager.getInstance();
-    public static RobotCommands robotCommands = new RobotCommands(robotManager);
+    public static RobotCommands robotCommands = new RobotCommands();
     // public static int coordinateFlip = 1;
     // public static int rotationOffset = 0;
 
     public static Optional<Alliance> alliance = Optional.empty();
     public static final Controls controls = new Controls();
 
-    private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
+    // private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
+    // private final ClimberSubsystem climber = ClimberSubsystem.getInstance();
+    // private final ElevatorSubsystem elevator = ElevatorSubsystem.getInstance();
+    // private final ElbowSubsystem elbow = ElbowSubsystem.getInstance();
+    // private final ManipulatorSubsystem manipulator = ManipulatorSubsystem.getInstance();
+    // private final WristSubsystem wrist = WristSubsystem.getInstance();
 
     private SendableChooser<Command> autoChooser;
 
+    public Robot() {
+      //  DogLog.setOptions(new DogLogOptions().withCaptureNt(false).withNtPublish(true));
+    }
 
     @Override
     public void robotInit() {
         controls.configureDefaultCommands();
         controls.configureDriverCommands();
+        controls.configureOperatorCommands();
 
         autoChooser = AutoBuilder.buildAutoChooser();
+
+        // DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
         // Limelight.getInstance();
         
@@ -81,10 +95,6 @@ public class Robot extends TimedRobot{
     @Override
     public void teleopPeriodic() {
         
-        
-    if(RobotState.isEnabled()){
-      //LED Code goes here
-        }
       }
 
 
@@ -95,44 +105,12 @@ public class Robot extends TimedRobot{
 
     @Override
     public void disabledInit() {
-        setupTimer.restart();
-        // drivetrain.enableBrakeMode(false);
     }
     @Override
     public void autonomousInit() {
-        // new FullScore().schedule();
-        // drivetrain.enableBrakeMode(true);
-        // matchStarted = true;
         ElevatorSubsystem.getInstance();
-
-        // if (autoToRun == null)
-            // autoToRun = defaultAuto;
         if (autoChooser.getSelected() != null)
             autoChooser.getSelected().schedule();
-        //autoToRun = new HighHighCone();
-
-        // if (alliance.get() == Alliance.Blue) {
-        //     CommandSwerveDrivetrain.getInstance().(autoToRun.getInitialPose().getRotation().getDegrees());
-        //     Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
-        // } else {
-        //     Drivetrain.getInstance().setYaw(PoseUtil.flipAngleDegrees(autoToRun.getInitialPose().getRotation().getDegrees()));
-        //     Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
-        // }
-        //SmartDashboard.putData((Sendable) autoToRun.getInitialPose());
-
-        // autoToRun.getCommand().schedule();
-        //new LongTaxi().getCommand().schedule();
-
-        // CommandScheduler.getInstance().run();
-
-        // if (alliance.get() == Alliance.Blue) {
-        //     Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
-        //     Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
-        // } else {
-        //     Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
-        //     Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
-        // }
-        //Sets the LEDs to a pattern for auto, this could be edited to include code for if vision is aligned for auto diagnosis
     }
 
     @Override

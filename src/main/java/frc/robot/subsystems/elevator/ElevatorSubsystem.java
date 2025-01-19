@@ -23,17 +23,10 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
-  private ElevatorState currentState;
-  private double setpoint;
-  private double manualSpeed;
-  
-  private boolean isActivated = true;
-  
   public ElevatorSubsystem() {
     super(ElevatorState.IDLE);
     leftMotor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
-    currentState = ElevatorState.IDLE;
   }
 
    public boolean atGoal() {
@@ -61,7 +54,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
       setStateFromRequest(newState);
     }
 
-  public void updatePosition(){
+  @Override
+  public void collectInputs(){
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
   }
 
@@ -101,10 +95,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
       }
     }
 
-  @Override
-  public void periodic() {
-    updatePosition();
-  }
   private static ElevatorSubsystem instance;
 
   public static ElevatorSubsystem getInstance() {

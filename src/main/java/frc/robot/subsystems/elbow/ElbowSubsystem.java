@@ -22,17 +22,11 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
-  private ElbowState currentState;
-  private double setpoint;
-  private double manualSpeed;
-  
-  private boolean isActivated = true;
-  
   public ElbowSubsystem() {
     super(ElbowState.IDLE);
     motor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
-    currentState = ElbowState.IDLE;
-    }
+    motor.getConfigurator().apply(motor_config);
+  }
 
    public boolean atGoal() {
     return switch (getState()) {
@@ -61,7 +55,8 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
       setStateFromRequest(newState);
     }
 
-  public void updatePosition(){
+  @Override
+  public void collectInputs(){
     elbowPosition = motor.getPosition().getValueAsDouble();
   }
 
@@ -100,10 +95,6 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
       }
     }
 
-  @Override
-  public void periodic() {
-    updatePosition();
-  }
   private static ElbowSubsystem instance;
 
   public static ElbowSubsystem getInstance() {

@@ -1,5 +1,7 @@
 package frc.robot.commands;
+import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.FlagManager;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.climber.ClimberState;
 import frc.robot.subsystems.climber.ClimberSubsystem;
@@ -12,7 +14,6 @@ import frc.robot.subsystems.manipulator.ManipulatorState;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.util.FlagManager;
 
 public class RobotManager extends StateMachine<RobotState> {
   public final ElevatorSubsystem elevator;
@@ -25,9 +26,10 @@ public class RobotManager extends StateMachine<RobotState> {
   private RobotState state = RobotState.IDLE;
 
   public boolean isHeightCapped = false;
+  public boolean isInverted = false;
   public Timer timer = new Timer();
 
-  private final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
+  public final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
   public RobotManager() {
     super(RobotState.IDLE);
@@ -45,6 +47,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   @Override
   protected RobotState getNextState(RobotState currentState) {
+    flags.log();
     RobotState nextState = currentState;
     for (RobotFlag flag : flags.getChecked()) {
       switch (flag) {
@@ -357,8 +360,12 @@ public class RobotManager extends StateMachine<RobotState> {
     super.periodic(); 
   }
 
-  public void idleRequest() {
+  public void prepareIdleRequest() {
     flags.check(RobotFlag.IDLE);
+  }
+
+  public void prepareInvertedIdleRequest(){
+    flags.check(RobotFlag.INVERTED_IDLE);
   }
 
   public void prepareL1Request() {
@@ -393,6 +400,17 @@ public class RobotManager extends StateMachine<RobotState> {
     flags.check(RobotFlag.SCORE);
   }
 
+  public void climbRequest(){
+    flags.check(RobotFlag.DEEP_CLIMB);
+  }
+
+  public void applyHeightCapRequest(){
+    flags.check(RobotFlag.APPLY_HEIGHT_CAP);
+  }
+
+  public void removeHeightCapRequest(){
+    flags.check(RobotFlag.REMOVE_HEIGHT_CAP);
+  }
 
 
 

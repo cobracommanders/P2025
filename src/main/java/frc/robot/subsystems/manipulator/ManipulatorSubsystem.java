@@ -56,7 +56,8 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
         setStateFromRequest(newState);
       }
   
-    public void updatePosition(){
+    @Override
+    public void collectInputs(){
       manipulatorPosition = manipulatorMotor.getPosition().getValueAsDouble();
     }
   
@@ -89,10 +90,6 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
         }
       }
   
-    @Override
-    public void periodic() {
-      updatePosition();
-    }
     private static ManipulatorSubsystem instance;
   
     public static ManipulatorSubsystem getInstance() {

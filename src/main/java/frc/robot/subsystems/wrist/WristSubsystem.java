@@ -61,7 +61,8 @@ public class WristSubsystem extends StateMachine<WristState>{
       setStateFromRequest(newState);
     }
 
-  public void updatePosition(){
+  @Override
+  public void collectInputs(){
     wristPosition = wristMotor.getPosition().getValueAsDouble();
   }
 
@@ -103,10 +104,6 @@ public class WristSubsystem extends StateMachine<WristState>{
       }
     }
 
-  @Override
-  public void periodic() {
-    updatePosition();
-  }
   private static WristSubsystem instance;
 
   public static WristSubsystem getInstance() {

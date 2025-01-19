@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.RobotCommands;
+import frc.robot.commands.RobotFlag;
 import frc.robot.commands.RobotManager;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
@@ -61,7 +62,25 @@ public class Controls {
 
     public void configureDriverCommands() {
         driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
-        driver.rightTrigger().onTrue(Robot.robotCommands.climbCommand());
-        driver.rightTrigger().onFalse(Robot.robotCommands.climbCommand());
+        driver.leftTrigger().onTrue(Robot.robotCommands.intakeCommand() );
+            driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
+        driver.A().and(driver.leftTrigger().onTrue(Robot.robotCommands.invertedIntakeCommand()));
+            // driver.A().and(driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand()));
+        driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
+            driver.rightTrigger().onFalse(Robot.robotCommands.idleCommand());
+        driver.leftBumper().onTrue(Robot.robotCommands.applyHeightCapCommand());
+            driver.leftBumper().onFalse(Robot.robotCommands.removeHeightCapCommand());
+    }
+
+    public void configureOperatorCommands(){
+        operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
+        operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
+        operator.Y().onTrue(Robot.robotCommands.L4Command());
+        operator.B().onTrue(Robot.robotCommands.L3Command());
+        operator.X().onTrue(Robot.robotCommands.L2Command());
+        operator.A().onTrue(Robot.robotCommands.L1Command());
+        operator.leftTrigger().and(operator.rightTrigger()).onTrue(Robot.robotCommands.climbCommand());
+        // operator.leftTrigger().and(operator.rightTrigger()).onFalse(Robot.robotCommands.idleCommand());
+        //operator.POV90().onTrue(remove algea);
     }
 }

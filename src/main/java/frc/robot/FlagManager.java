@@ -1,10 +1,11 @@
 
-package frc.robot.util;
+package frc.robot;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import dev.doglog.DogLog;
 
 public class FlagManager<T extends Enum<T>> {
   private final String loggerCategory;
@@ -17,7 +18,7 @@ public class FlagManager<T extends Enum<T>> {
   }
 
   public void log() {
-    //DogLog.log(loggerCategory + "/Flags", checked.stream().map(Enum::name).toArray(String[]::new));
+    DogLog.log(loggerCategory + "/Flags", checked.stream().map(Enum::name).toArray(String[]::new));
   }
 
   public void check(T flag) {
