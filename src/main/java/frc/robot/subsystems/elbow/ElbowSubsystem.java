@@ -22,8 +22,6 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
-  private final PIDController pidController;
-  
   private ElbowState currentState;
   private double setpoint;
   private double manualSpeed;
@@ -34,8 +32,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
     super(ElbowState.IDLE);
     motor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
     currentState = ElbowState.IDLE;
-    pidController = new PIDController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D);
-  }
+    }
 
    public boolean atGoal() {
     return switch (getState()) {

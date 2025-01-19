@@ -23,8 +23,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
-  private final PIDController pidController;
-  
   private ElevatorState currentState;
   private double setpoint;
   private double manualSpeed;
@@ -36,7 +34,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     leftMotor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     currentState = ElevatorState.IDLE;
-    pidController = new PIDController(ElevatorConstants.P, ElevatorConstants.I, ElevatorConstants.D);
   }
 
    public boolean atGoal() {

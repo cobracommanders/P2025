@@ -51,6 +51,10 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
   public void periodic() {
   }
 
+  public boolean atGoal(){
+    return true;
+  }
+
   public void set(double speed) {
       motor.set(speed);
   }
