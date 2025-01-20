@@ -23,7 +23,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public final ElbowSubsystem elbow;
   public final CommandSwerveDrivetrain drivetrain;
 
-  private RobotState state = RobotState.IDLE;
+  // private RobotState state = RobotState.IDLE;
 
   public boolean isHeightCapped = false;
   public boolean isInverted = false;
@@ -123,7 +123,8 @@ public class RobotManager extends StateMachine<RobotState> {
       }
     }
     //automatic transitions
-    switch (state) {
+    DogLog.log(getName() + "/State After Flags", currentState);
+    switch (currentState) {
       case WAIT_L2:
       case IDLE:
       case WAIT_INVERTED_IDLE:
@@ -140,17 +141,17 @@ public class RobotManager extends StateMachine<RobotState> {
       
 
       case PREPARE_L1:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L1;
         }
         break;
       case PREPARE_L2:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L2;
         }
         break;
       case PREPARE_L3:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L3;
         }
         break;
@@ -160,7 +161,10 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_L4:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if(isHeightCapped == true) {
+          nextState = RobotState.PREPARE_CAPPED_L4;
+        }
+        else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L4;
         }
         break;
@@ -170,22 +174,22 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_CORAL_STATION:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.INTAKE_CORAL_STATION;
         }
         break;
       case PREPARE_INVERTED_CORAL_STATION:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.INVERTED_INTAKE_CORAL_STATION;
         }
         break;
       case PREPARE_IDLE:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.IDLE;
         }
         break;
       case PREPARE_INVERTED_IDLE:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.INVERTED_IDLE;
         }
         break;
@@ -210,21 +214,23 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_INVERTED_FROM_IDLE:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.PREPARE_INVERTED_IDLE;
         }
         break;
       case PREPARE_IDLE_FROM_INVERTED:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
-          nextState = RobotState.PREPARE_IDLE_FROM_INVERTED;
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+          nextState = RobotState.IDLE;
         }
         break;
       case PREPARE_DEEP_CLIMB:
         if (climber.atGoal()) {
           nextState = RobotState.WAIT_DEEP_CLIMB;
         }
+
         break;
     }
+    DogLog.log(getName() + "/AtGoal", elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal());
     flags.clear();
     return nextState;
   };
@@ -338,12 +344,47 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
           }
+
+          case PREPARE_CAPPED_L4 -> {
+            elevator.setState(ElevatorState.CAPPED_L4);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.L4);
+            wrist.setState(WristState.CAPPED_L4);
+            elbow.setState(ElbowState.CAPPED_L4);
+          }
+
+          case PREPARE_IDLE -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.IDLE);
+            elbow.setState(ElbowState.IDLE);
+          }
+
+          case PREPARE_IDLE_FROM_INVERTED -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.IDLE);
+            elbow.setState(ElbowState.IDLE);
+          }
+
+          case PREPARE_INVERTED_FROM_IDLE -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.INVERTED_IDLE);
+            elbow.setState(ElbowState.INVERTED_IDLE);
+          }
+
+          case PREPARE_INVERTED_IDLE -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.INVERTED_IDLE);
+            elbow.setState(ElbowState.INVERTED_IDLE);
+          }
           case INVERTED_IDLE,
-            PREPARE_CAPPED_L4,
-            PREPARE_IDLE,
-            PREPARE_IDLE_FROM_INVERTED,
-            PREPARE_INVERTED_FROM_IDLE,
-            PREPARE_INVERTED_IDLE, 
             WAIT_CAPPED_L4,
             WAIT_DEEP_CLIMB, 
             WAIT_IDLE, 

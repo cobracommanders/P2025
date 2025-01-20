@@ -64,16 +64,17 @@ public class Controls {
         driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
         driver.leftTrigger().onTrue(Robot.robotCommands.intakeCommand() );
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
-        driver.A().and(driver.leftTrigger().onTrue(Robot.robotCommands.invertedIntakeCommand()));
+        driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             // driver.A().and(driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand()));
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.idleCommand());
-        driver.leftBumper().onTrue(Robot.robotCommands.applyHeightCapCommand());
-            driver.leftBumper().onFalse(Robot.robotCommands.removeHeightCapCommand());
+        driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
+            driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
     }
 
     public void configureOperatorCommands(){
-        operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
+        operator.leftBumper().and(driver.A().negate()).onTrue(Robot.robotCommands.invertIdleCommand());
+        //operator.leftBumper().onFalse(Robot.robotCommands.idleCommand());
         operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
         operator.Y().onTrue(Robot.robotCommands.L4Command());
         operator.B().onTrue(Robot.robotCommands.L3Command());

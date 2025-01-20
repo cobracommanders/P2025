@@ -36,7 +36,11 @@ public class RobotCommands {
   }
 
   public Command L4Command() {
+    if (RobotManager.getInstance().isHeightCapped == true)
     return Commands.runOnce(robot::prepareL4Request, requirements)
+        .andThen(robot.waitForState(RobotState.PREPARE_CAPPED_L4));
+    else
+      return Commands.runOnce(robot::prepareL4Request, requirements)
         .andThen(robot.waitForState(RobotState.WAIT_L4));
   }
 
