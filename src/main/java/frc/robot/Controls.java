@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -16,6 +17,8 @@ import frc.robot.commands.RobotManager;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.TunerConstants;
+import frc.robot.subsystems.elevator.ElevatorState;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -66,6 +69,8 @@ public class Controls {
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             // driver.A().and(driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand()));
+        driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setState(ElevatorState.HOME_ELEVATOR), ElevatorSubsystem.getInstance()));
+            driver.B().onFalse(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setState(ElevatorState.IDLE), ElevatorSubsystem.getInstance()));
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
