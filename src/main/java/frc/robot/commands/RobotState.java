@@ -4,6 +4,7 @@ public enum RobotState {
   PREPARE_IDLE(false, false),
   WAIT_IDLE(false, false),
   IDLE(false, false),
+  HOME_ELEVATOR(false, false),
   PREPARE_INVERTED_IDLE(false, true),
   WAIT_INVERTED_IDLE(false, true),
   INVERTED_IDLE(false, true),

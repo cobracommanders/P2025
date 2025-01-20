@@ -7,6 +7,7 @@ public class ElevatorPositions {
     public static final double L3 = 0;
     public static final double L4 = 0;
     public static final double CAPPED_L4 = 0;
+    public static final double HOME_ELEVATOR = 0;
     public static final double CORAL_STATION = 0;
     public static final double INVERTED_CORAL_STATION = 0;
 }

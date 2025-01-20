@@ -122,10 +122,11 @@ public abstract class StateMachine<S extends Enum<S>> extends SubsystemBase {
     var currentStateDuration = Timer.getFPGATimestamp() - lastTransitionTimestamp;
 
     return currentStateDuration > duration;
-  }
+  } 
 
   /** Run side effects that occur when a state transition happens. */
   private void doTransition() {
+
 
     lastTransitionTimestamp = Timer.getFPGATimestamp();
     DogLog.log(this.getName() + "/State", state);
