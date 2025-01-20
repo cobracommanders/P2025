@@ -23,33 +23,27 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
   
     private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
     
-    private ManipulatorState currentState;
-    private double setpoint;
-    private double manualSpeed;
-    
-    private boolean isActivated = true;
-    
     public ManipulatorSubsystem() {
       super(ManipulatorState.IDLE);
       manipulatorMotor = new TalonFX(Ports.ManipulatorPorts.MANIPULATOR_MOTOR);
-      currentState = ManipulatorState.IDLE;
     }
   
      public boolean atGoal() {
-      return switch (getState()) {
-        case IDLE -> 
-          MathUtil.isNear(ManipulatorPositions.IDLE, manipulatorPosition, 0.1);
-        case INTAKE_CORAL -> 
-          MathUtil.isNear(ManipulatorPositions.INTAKE_CORAL, manipulatorPosition, 0.1);
-        case L1 ->
-          MathUtil.isNear(ManipulatorPositions.L1, manipulatorPosition, 0.1);
-        case L2 ->
-          MathUtil.isNear(ManipulatorPositions.L2, manipulatorPosition, 0.1);
-        case L3 ->
-          MathUtil.isNear(ManipulatorPositions.L3, manipulatorPosition, 0.1);
-        case L4 ->
-          MathUtil.isNear(ManipulatorPositions.L4, manipulatorPosition, 0.1);
-      };
+      return true;
+      // switch (getState()) {
+      //   case IDLE -> 
+      //     MathUtil.isNear(ManipulatorPositions.IDLE, manipulatorPosition, 0.1);
+      //   case INTAKE_CORAL -> 
+      //     MathUtil.isNear(ManipulatorPositions.INTAKE_CORAL, manipulatorPosition, 0.1);
+      //   case L1 ->
+      //     MathUtil.isNear(ManipulatorPositions.L1, manipulatorPosition, 0.1);
+      //   case L2 ->
+      //     MathUtil.isNear(ManipulatorPositions.L2, manipulatorPosition, 0.1);
+      //   case L3 ->
+      //     MathUtil.isNear(ManipulatorPositions.L3, manipulatorPosition, 0.1);
+      //   case L4 ->
+      //     MathUtil.isNear(ManipulatorPositions.L4, manipulatorPosition, 0.1);
+      // };
     }
   
     public void setState(ManipulatorState newState) {

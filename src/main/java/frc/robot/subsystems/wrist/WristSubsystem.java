@@ -22,16 +22,9 @@ public class WristSubsystem extends StateMachine<WristState>{
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
-  private WristState currentState;
-  private double setpoint;
-  private double manualSpeed;
-  
-  private boolean isActivated = true;
-  
   public WristSubsystem() {
     super(WristState.IDLE);
     wristMotor = new TalonFX(Ports.WristPorts.WRIST_MOTOR);
-    currentState = WristState.IDLE;
   }
 
    public boolean atGoal() {

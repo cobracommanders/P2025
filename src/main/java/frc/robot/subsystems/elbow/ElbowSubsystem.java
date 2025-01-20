@@ -24,32 +24,31 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   
   public ElbowSubsystem() {
     super(ElbowState.IDLE);
-    motor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
+    motor = new TalonFX(Ports.ElbowPorts.MOTOR);
     motor.getConfigurator().apply(motor_config);
   }
 
    public boolean atGoal() {
-    return true;
-    // switch (getState()) {
-    //   case IDLE -> 
-    //     MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
-    //   case INVERTED_IDLE -> 
-    //     MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
-    //   case L1 ->
-    //     MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.1);
-    //   case L2 ->
-    //     MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.1);
-    //   case L3 ->
-    //     MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
-    //   case CAPPED_L4 ->
-    //     MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, 0.1);
-    //   case L4 ->
-    //     MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
-    //   case CORAL_STATION ->
-    //     MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
-    //   case INVERTED_CORAL_STATION ->
-    //     MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
-    // };
+    return switch (getState()) {
+      case IDLE -> 
+        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
+      case INVERTED_IDLE -> 
+        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
+      case L1 ->
+        MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.1);
+      case L2 ->
+        MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.1);
+      case L3 ->
+        MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
+      case CAPPED_L4 ->
+        MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, 0.1);
+      case L4 ->
+        MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
+      case CORAL_STATION ->
+        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
+      case INVERTED_CORAL_STATION ->
+        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
+    };
   }
 
   public void setState(ElbowState newState) {
