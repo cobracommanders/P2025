@@ -8,4 +8,5 @@ public class ElbowPositions {
     public static final double L4 = 0;
     public static final double CAPPED_L4 = 0;
     public static final double CORAL_STATION = 0;
+    public static final double INVERTED_CORAL_STATION = 0;
 }

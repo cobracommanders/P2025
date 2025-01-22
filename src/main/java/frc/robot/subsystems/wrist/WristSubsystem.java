@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
@@ -53,6 +54,7 @@ public class WristSubsystem extends StateMachine<WristState>{
 
   public void setState(WristState newState) {
       setStateFromRequest(newState);
+      DogLog.log(getName() + "/Wrist State", newState);
     }
 
   @Override

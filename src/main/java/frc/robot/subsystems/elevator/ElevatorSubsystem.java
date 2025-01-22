@@ -45,7 +45,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
-    if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) {
+    if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
       rightMotor.setPosition(0);
       leftMotor.setPosition(0);
       return ElevatorState.IDLE;
@@ -55,28 +55,29 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   }
 
   public boolean atGoal() {
-    return
-      switch (getState()) {
-        case IDLE -> 
-          MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
-        case L1 ->
-          MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
-        case L2 ->
-          MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, tolerance);
-        case L3 ->
-          MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, tolerance);
-        case CAPPED_L4 ->
-          MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, tolerance);
-        case L4 ->
-          MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, tolerance);
-        case CORAL_STATION ->
-          MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
-        case HOME_ELEVATOR ->
-          rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent;
-        case INVERTED_CORAL_STATION ->
-          MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
-      };
-    };
+      // switch (getState()) {
+      return true;
+        // case IDLE -> 
+        //   MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
+        // case L1 ->
+        //   MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
+        // case L2 ->
+        //   MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, tolerance);
+        // case L3 ->
+        //   MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, tolerance);
+        // case CAPPED_L4 ->
+        //   MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, tolerance);
+        // case L4 ->
+        //   MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, tolerance);
+        // case CORAL_STATION ->
+        //   MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
+        // case MANUAL_ELEVATOR_UP ->
+        //   MathUtil.isNear(ElevatorPositions.MANUAL_ELEVATOR_UP, elevatorPosition, tolerance);
+        // case HOME_ELEVATOR ->
+        //   rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent;
+        // case INVERTED_CORAL_STATION ->
+        //   MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
+  }
 
   public void setState(ElevatorState newState) {
       setStateFromRequest(newState);

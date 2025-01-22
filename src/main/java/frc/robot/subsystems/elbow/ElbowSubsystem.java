@@ -7,18 +7,23 @@ import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.RobotManager;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.subsystems.elevator.ElevatorState;
 
 public class ElbowSubsystem extends StateMachine<ElbowState>{
     
   private final TalonFX motor;
   private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private double elbowPosition;
+  private double motorPosition;
+  private String elbowState;
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
@@ -27,41 +32,45 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
     motor = new TalonFX(Ports.ElbowPorts.MOTOR);
     motor.getConfigurator().apply(motor_config);
   }
-
+    
    public boolean atGoal() {
-    return switch (getState()) {
-      case IDLE -> 
-        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
-      case INVERTED_IDLE -> 
-        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
-      case L1 ->
-        MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.1);
-      case L2 ->
-        MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.1);
-      case L3 ->
-        MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
-      case CAPPED_L4 ->
-        MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, 0.1);
-      case L4 ->
-        MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
-      case CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
-      case INVERTED_CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
-    };
+    // return switch (getState()) {
+      return true;
+      // case IDLE -> 
+      //   MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
+      // case INVERTED_IDLE -> 
+      //   MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.1);
+      // case L1 ->
+      //   MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.1);
+      // case L2 ->
+      //   MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.1);
+      // case L3 ->
+      //   MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
+      // case CAPPED_L4 ->
+      //   MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, 0.1);
+      // case L4 ->
+      //   MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.1);
+      // case CORAL_STATION ->
+      //   MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.1);
+      // case INVERTED_CORAL_STATION ->
+      //   MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, 0.1);
   }
 
   public void setState(ElbowState newState) {
       setStateFromRequest(newState);
-    }
-
-  @Override
-  public void collectInputs(){
-    elbowPosition = motor.getPosition().getValueAsDouble();
+      DogLog.log(getName() + "/Elbow State", newState);
   }
 
-  public void setElbowPosition(double position){
+  @Override
+  public void collectInputs() {
+    motorPosition = motor.getPosition().getValueAsDouble();
+    DogLog.log(getName() + "/Elbow Position", motorPosition);
+  }
+
+  public void setElbowPosition(double position) {
     motor.setControl(motor_request.withPosition(position));
+    motorPosition = motor.getPosition().getValueAsDouble();
+    DogLog.log(getName() + "/Elbow Position", motorPosition);
   }
 
     @Override
