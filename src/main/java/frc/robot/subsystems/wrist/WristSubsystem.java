@@ -29,27 +29,26 @@ public class WristSubsystem extends StateMachine<WristState>{
   }
 
    public boolean atGoal() {
-    return true;
-    // switch (getState()) {
-    //   case IDLE -> 
-    //     MathUtil.isNear(WristPositions.IDLE, wristPosition, 0.1);
-    //   case INVERTED_IDLE -> 
-    //     MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, 0.1);
-    //   case L1 ->
-    //     MathUtil.isNear(WristPositions.L1, wristPosition, 0.1);
-    //   case L2 ->
-    //     MathUtil.isNear(WristPositions.L2, wristPosition, 0.1);
-    //   case L3 ->
-    //     MathUtil.isNear(WristPositions.L3, wristPosition, 0.1);
-    //   case CAPPED_L4 ->
-    //     MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, 0.1);
-    //   case L4 ->
-    //     MathUtil.isNear(WristPositions.L4, wristPosition, 0.1);
-    //   case CORAL_STATION ->
-    //     MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, 0.1);
-    //   case INVERTED_CORAL_STATION ->
-    //     MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, 0.1);
-    // };
+    return switch (getState()) {
+      case IDLE -> 
+        MathUtil.isNear(WristPositions.IDLE, wristPosition, 0.1);
+      case INVERTED_IDLE -> 
+        MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, 0.1);
+      case L1 ->
+        MathUtil.isNear(WristPositions.L1, wristPosition, 0.1);
+      case L2 ->
+        MathUtil.isNear(WristPositions.L2, wristPosition, 0.1);
+      case L3 ->
+        MathUtil.isNear(WristPositions.L3, wristPosition, 0.1);
+      case CAPPED_L4 ->
+        MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, 0.1);
+      case L4 ->
+        MathUtil.isNear(WristPositions.L4, wristPosition, 0.1);
+      case CORAL_STATION ->
+        MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, 0.1);
+      case INVERTED_CORAL_STATION ->
+        MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, 0.1);
+    };
   }
 
   public void setState(WristState newState) {

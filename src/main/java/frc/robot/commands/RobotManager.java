@@ -1,5 +1,6 @@
 package frc.robot.commands;
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.FlagManager;
 import frc.robot.StateMachine;
@@ -111,7 +112,7 @@ public class RobotManager extends StateMachine<RobotState> {
               nextState = RobotState.SCORE_L2;
               break;
             case WAIT_L3:
-             nextState = RobotState.SCORE_L3;
+              nextState = RobotState.SCORE_L3;
               break;
             case WAIT_L4:
               nextState = RobotState.SCORE_L4;
@@ -129,7 +130,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case IDLE:
       case WAIT_INVERTED_IDLE:
       case WAIT_DEEP_CLIMB:
-      case WAIT_CAPPED_L4:
       case WAIT_IDLE:
       case WAIT_L1:
       case DEEP_CLIMB:
@@ -156,21 +156,25 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_CAPPED_L4:
-        if (isHeightCapped == false) {
+        if (isHeightCapped == true) {
           nextState = RobotState.PREPARE_L4;
         }
         break;
       case PREPARE_L4:
         if(isHeightCapped == true) {
           nextState = RobotState.PREPARE_CAPPED_L4;
-        }
-        else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        } else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L4;
         }
         break;
+      case WAIT_CAPPED_L4:
+        if(isHeightCapped == false) {
+          nextState = RobotState.PREPARE_L4;
+        }
+        break;
       case WAIT_L4:
-        if(isHeightCapped == true) {
-          nextState = RobotState.PREPARE_CAPPED_L4;
+        if(isHeightCapped == false) {
+          nextState = RobotState.SCORE_L4;
         }
         break;
       case PREPARE_CORAL_STATION:
@@ -227,7 +231,6 @@ public class RobotManager extends StateMachine<RobotState> {
         if (climber.atGoal()) {
           nextState = RobotState.WAIT_DEEP_CLIMB;
         }
-
         break;
     }
     DogLog.log(getName() + "/AtGoal", elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal());

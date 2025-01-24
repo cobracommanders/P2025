@@ -44,40 +44,42 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     tolerance = 0.2;
   }
 
-  protected ElevatorState getNextState(ElevatorState currentState) {
-    if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
-      rightMotor.setPosition(0);
-      leftMotor.setPosition(0);
-      return ElevatorState.IDLE;
-    } else {
-      return currentState;
-    }
-  }
+  // protected ElevatorState getNextState(ElevatorState currentState) {
+  //   if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
+  //     rightMotor.setPosition(0);
+  //     leftMotor.setPosition(0);
+  //     return ElevatorState.IDLE;
+  //   } else {
+  //    //  return currentState;
+  //   }
+  // }
 
   public boolean atGoal() {
-      // switch (getState()) {
-      return true;
-        // case IDLE -> 
-        //   MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
-        // case L1 ->
-        //   MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
-        // case L2 ->
-        //   MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, tolerance);
-        // case L3 ->
-        //   MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, tolerance);
-        // case CAPPED_L4 ->
-        //   MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, tolerance);
-        // case L4 ->
-        //   MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, tolerance);
-        // case CORAL_STATION ->
-        //   MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
-        // case MANUAL_ELEVATOR_UP ->
-        //   MathUtil.isNear(ElevatorPositions.MANUAL_ELEVATOR_UP, elevatorPosition, tolerance);
-        // case HOME_ELEVATOR ->
-        //   rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent;
-        // case INVERTED_CORAL_STATION ->
-        //   MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
+  return true;
   }
+  //     return switch (getState()) {
+  //       case IDLE -> 
+  //         MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
+  //       case L1 ->
+  //         MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
+  //       case L2 ->
+  //         MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, tolerance);
+  //       case L3 ->
+  //         MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, tolerance);
+  //       case CAPPED_L4 ->
+  //         MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, tolerance);
+  //       case L4 ->
+  //         MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, tolerance);
+  //       case CORAL_STATION ->
+  //         MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
+  //       // case MANUAL_ELEVATOR_UP ->
+  //       //   MathUtil.isNear(ElevatorPositions.MANUAL_ELEVATOR_UP, elevatorPosition, tolerance);
+  //       // case HOME_ELEVATOR ->
+  //       //   rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent;
+  //       case INVERTED_CORAL_STATION ->
+  //         MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
+  //     };
+  // }
 
   public void setState(ElevatorState newState) {
       setStateFromRequest(newState);
@@ -88,16 +90,16 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     elevatorPosition = rightMotor.getPosition().getValueAsDouble();
     leftMotorPosition = leftMotor.getPosition().getValueAsDouble();
     rightMotorPosition = rightMotor.getPosition().getValueAsDouble();
-    DogLog.log(getName() + "/Position", elevatorPosition);
+    //DogLog.log(getName() + "/Elevator Position", elevatorPosition);
     //DogLog.log(getName() + "/Left Motor Position", leftMotorPosition);
-    DogLog.log(getName() + "/Right Motor Position", rightMotorPosition);
+    //DogLog.log(getName() + "/Right Motor Position", rightMotorPosition);
   }
 
   public void setElevatorPosition(double rightPosition){
     rightMotor.setControl(right_motor_request.withPosition(rightPosition));
     leftMotor.setControl(left_motor_request);
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/Right Motor Setpoint", rightPosition);
+    //DogLog.log(getName() + "/Right Motor Setpoint", rightPosition);
   }
 
     @Override
@@ -121,9 +123,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         case L4 -> {
           setElevatorPosition(ElevatorPositions.L4);
         }
-        case HOME_ELEVATOR -> {
-          rightMotor.set(-0.02);
-        }
+        // case HOME_ELEVATOR -> {
+        //   rightMotor.set(-0.02);
+        // }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);
         }

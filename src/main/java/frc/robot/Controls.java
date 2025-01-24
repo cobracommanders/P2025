@@ -17,6 +17,8 @@ import frc.robot.commands.RobotManager;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.TunerConstants;
+import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
@@ -69,8 +71,10 @@ public class Controls {
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             // driver.A().and(driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand()));
-        driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.HOME_ELEVATOR), ElevatorSubsystem.getInstance()));
+    //    driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.HOME_ELEVATOR), ElevatorSubsystem.getInstance()));
             driver.B().onFalse(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.IDLE), ElevatorSubsystem.getInstance()));
+            driver.X().onTrue(Commands.runOnce(()-> ElbowSubsystem.getInstance().setStateFromRequest(ElbowState.HOME_ELBOW), ElbowSubsystem.getInstance()));
+            driver.X().onFalse(Commands.runOnce(()-> ElbowSubsystem.getInstance().setStateFromRequest(ElbowState.IDLE), ElbowSubsystem.getInstance()));
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
