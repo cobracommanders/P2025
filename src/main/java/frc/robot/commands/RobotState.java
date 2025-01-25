@@ -23,7 +23,7 @@ public enum RobotState {
   WAIT_L4(false, false),
   SCORE_L4(false, false),
   PREPARE_CAPPED_L4(false, false),
-  WAIT_CAPPED_L4(false, false),
+  // WAIT_CAPPED_L4(false, false),
   PREPARE_CORAL_STATION(false, false),
   INTAKE_CORAL_STATION(false, false),
   PREPARE_INVERTED_CORAL_STATION(false, true),
@@ -34,8 +34,8 @@ public enum RobotState {
   public final boolean ignoreRequests;
   public final boolean inverted;
 
-  RobotState(boolean climbing, boolean inverted){
-    this.ignoreRequests = climbing;
+  RobotState(boolean ignoreRequests, boolean inverted){
+    this.ignoreRequests = ignoreRequests;
     this.inverted = inverted;
   }
 

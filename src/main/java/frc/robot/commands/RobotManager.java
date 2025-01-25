@@ -26,7 +26,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   // private RobotState state = RobotState.IDLE;
 
-  public boolean isHeightCapped = false;
+  public boolean isHeightCapped = true;
   public boolean isInverted = false;
   public Timer timer = new Timer();
 
@@ -156,25 +156,20 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_CAPPED_L4:
-        if (isHeightCapped == true) {
+        if (!isHeightCapped) {
           nextState = RobotState.PREPARE_L4;
         }
         break;
       case PREPARE_L4:
-        if(isHeightCapped == true) {
+        if(isHeightCapped) {
           nextState = RobotState.PREPARE_CAPPED_L4;
         } else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L4;
         }
         break;
-      case WAIT_CAPPED_L4:
-        if(isHeightCapped == false) {
-          nextState = RobotState.PREPARE_L4;
-        }
-        break;
       case WAIT_L4:
-        if(isHeightCapped == false) {
-          nextState = RobotState.SCORE_L4;
+        if(isHeightCapped) {
+          nextState = RobotState.PREPARE_CAPPED_L4;
         }
         break;
       case PREPARE_CORAL_STATION:
@@ -388,7 +383,6 @@ public class RobotManager extends StateMachine<RobotState> {
             elbow.setState(ElbowState.INVERTED_IDLE);
           }
           case INVERTED_IDLE,
-            WAIT_CAPPED_L4,
             WAIT_DEEP_CLIMB, 
             WAIT_IDLE, 
             WAIT_INVERTED_IDLE, 
@@ -402,6 +396,7 @@ public class RobotManager extends StateMachine<RobotState> {
   @Override
   public void periodic() {
     super.periodic(); 
+    DogLog.log(getName() + "/Is capped", isHeightCapped);
   }
 
   public void prepareIdleRequest() {

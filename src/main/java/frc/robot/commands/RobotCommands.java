@@ -56,15 +56,15 @@ public class RobotCommands {
 
   public Command climbCommand() {
     return Commands.runOnce(robot::climbRequest, requirements)
-        .andThen(robot.waitForState(RobotState.DEEP_CLIMB));
+        .andThen(robot.waitForState(RobotState.DEEP_CLIMB));    
   }
 
   public Command removeHeightCapCommand() {
-    return Commands.runOnce(robot::removeHeightCapRequest, requirements);
+    return Commands.runOnce(robot::removeHeightCapRequest);
   }
 
   public Command applyHeightCapCommand() {
-    return Commands.runOnce(robot::applyHeightCapRequest, requirements);
+    return Commands.runOnce(robot::applyHeightCapRequest);
   }
 
   // public Command intakeCommand() {

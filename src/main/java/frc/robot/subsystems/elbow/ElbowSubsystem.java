@@ -50,7 +50,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
       case INVERTED_IDLE -> 
         MathUtil.isNear(ElbowPositions.INVERTED_IDLE, elbowPosition, 0.2);
       case L1 ->
-        MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.1);
+        MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.2);
       case L2 ->
         MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.2);
       case L3 ->
@@ -89,6 +89,9 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
         case IDLE -> {
           setElbowPosition(ElbowPositions.IDLE);
         }
+        case INVERTED_IDLE -> {
+          setElbowPosition(ElbowPositions.INVERTED_IDLE);
+        }
         case L1 -> {
           setElbowPosition(ElbowPositions.L1);
         }
@@ -108,7 +111,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
           setElbowPosition(ElbowPositions.CORAL_STATION);
         }
         case INVERTED_CORAL_STATION -> {
-          setElbowPosition(ElbowPositions.CORAL_STATION);
+          setElbowPosition(ElbowPositions.INVERTED_CORAL_STATION);
         }
         default -> {}
       }

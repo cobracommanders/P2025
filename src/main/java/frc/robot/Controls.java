@@ -67,12 +67,12 @@ public class Controls {
 
     public void configureDriverCommands() {
         driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
-        driver.leftTrigger().onTrue(Robot.robotCommands.intakeCommand() );
+        driver.leftTrigger().and(driver.A().negate()).onTrue(Robot.robotCommands.intakeCommand() );
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             // driver.A().and(driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand()));
     //    driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.HOME_ELEVATOR), ElevatorSubsystem.getInstance()));
-            driver.B().onFalse(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.IDLE), ElevatorSubsystem.getInstance()));
+        driver.B().onFalse(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setStateFromRequest(ElevatorState.IDLE), ElevatorSubsystem.getInstance()));
             driver.X().onTrue(Commands.runOnce(()-> ElbowSubsystem.getInstance().setStateFromRequest(ElbowState.HOME_ELBOW), ElbowSubsystem.getInstance()));
             driver.X().onFalse(Commands.runOnce(()-> ElbowSubsystem.getInstance().setStateFromRequest(ElbowState.IDLE), ElbowSubsystem.getInstance()));
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
@@ -82,7 +82,7 @@ public class Controls {
     }
 
     public void configureOperatorCommands(){
-        operator.leftBumper().and(driver.A().negate()).onTrue(Robot.robotCommands.invertIdleCommand());
+        operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
         //operator.leftBumper().onFalse(Robot.robotCommands.idleCommand());
         operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
         operator.Y().onTrue(Robot.robotCommands.L3Command());
