@@ -7,31 +7,26 @@ public final class Constants {
   }
 
 public static final class ElevatorConstants{
-  public static final double homingStallCurrent = 3.5;
-  public static final double P = 3;
+  public static final double homingStallCurrent = 2.5;
+  public static final double P = 1;
   public static final double I = 0;
   public static final double D = 0;
 }
 
 public static final class WristConstants{
-  public static final double homingStallCurrent = 3.5;
-  public static final double P = 3;
+  public static final double homingStallCurrent = 2;
+  public static final double P = 1;
   public static final double I = 0;
   public static final double D = 0;
 }
 
 public static final class ElbowConstants{
-  public static final double homingStallCurrent = 3.5;
-  public static final double P = 3;
+  public static final double homingStallCurrent = 2.5;
+  public static final double P = 1;
   public static final double I = 0;
   public static final double D = 0;
 }
 
-public static final class ManipulatorConstants{
-  public static final double P = 3;
-  public static final double I = 0;
-  public static final double D = 0;
-}
 
 public static final class OIConstants {
     public static final int DRIVER_CONTROLLER_ID = 0;

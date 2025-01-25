@@ -23,13 +23,16 @@ public enum RobotState {
   WAIT_L4(false, false),
   SCORE_L4(false, false),
   PREPARE_CAPPED_L4(false, false),
-  // WAIT_CAPPED_L4(false, false),
   PREPARE_CORAL_STATION(false, false),
   INTAKE_CORAL_STATION(false, false),
   PREPARE_INVERTED_CORAL_STATION(false, true),
   INVERTED_INTAKE_CORAL_STATION(false, true),
+  REMOVE_ALGAE(false, false),
   PREPARE_INVERTED_FROM_IDLE(true, true),
-  PREPARE_IDLE_FROM_INVERTED(true, true);
+  PREPARE_IDLE_FROM_INVERTED(true, true),
+  HOMING_STAGE_1_ELEVATOR(true, true),
+  HOMING_STAGE_2_ELBOW(true, true),
+  HOMING_STAGE_3_WRIST(true, true);
 
   public final boolean ignoreRequests;
   public final boolean inverted;

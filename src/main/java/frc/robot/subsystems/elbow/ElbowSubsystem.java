@@ -21,10 +21,9 @@ import frc.robot.subsystems.elevator.ElevatorState;
 public class ElbowSubsystem extends StateMachine<ElbowState>{
     
   private final TalonFX motor;
-  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElbowConstants.P).withKI(ElbowConstants.I).withKD(ElbowConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElbowConstants.P).withKI(ElbowConstants.I).withKD(ElbowConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((54.0179 / 1.0)));
   private double elbowPosition;
-  private double motorPosition;
-  private String elbowState;
+  private final double tolerance;
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
@@ -32,12 +31,13 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
     super(ElbowState.IDLE);
     motor = new TalonFX(Ports.ElbowPorts.MOTOR);
     motor.getConfigurator().apply(motor_config);
+    tolerance = 0.2;
   }
   
   protected ElbowState getNextState(ElbowState currentState) {
     if (getState() == ElbowState.HOME_ELBOW && this.atGoal()) { 
       motor.setPosition(0);
-      return ElbowState.IDLE;
+      return ElbowState.INVERTED_IDLE;
     } else {
       return currentState;
     }
@@ -46,25 +46,25 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
    public boolean atGoal() {
     return switch (getState()) {
       case IDLE -> 
-        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, tolerance);
       case INVERTED_IDLE -> 
-        MathUtil.isNear(ElbowPositions.INVERTED_IDLE, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.INVERTED_IDLE, elbowPosition, tolerance);
       case L1 ->
-        MathUtil.isNear(ElbowPositions.L1, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.L1, elbowPosition, tolerance);
       case L2 ->
-        MathUtil.isNear(ElbowPositions.L2, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.L2, elbowPosition, tolerance);
       case L3 ->
-        MathUtil.isNear(ElbowPositions.L3, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.L3, elbowPosition, tolerance);
       case CAPPED_L4 ->
-        MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, tolerance);
       case L4 ->
-        MathUtil.isNear(ElbowPositions.L4, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
       case CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, tolerance);
       case HOME_ELBOW ->
         motor.getStatorCurrent().getValueAsDouble() > ElbowConstants.homingStallCurrent;
       case INVERTED_CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, 0.2);
+        MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, tolerance);
     };
   }
 
@@ -75,12 +75,19 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
 
   @Override
   public void collectInputs() {
-    motorPosition = motor.getPosition().getValueAsDouble();
-    DogLog.log(getName() + "/Elbow Position", motorPosition);
+    elbowPosition = motor.getPosition().getValueAsDouble();
+    DogLog.log(getName() + "/Elbow Position", elbowPosition);
+  }
+
+  @Override
+  public void periodic() {
+    super.periodic();
+    DogLog.log(getName() + "/Elbow AtGoal", atGoal());
   }
 
   public void setElbowPosition(double position) {
     motor.setControl(motor_request.withPosition(position));
+    DogLog.log(getName() + "/Elbow Setpoint", position);
   }
 
     @Override
@@ -113,7 +120,9 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
         case INVERTED_CORAL_STATION -> {
           setElbowPosition(ElbowPositions.INVERTED_CORAL_STATION);
         }
-        default -> {}
+        case HOME_ELBOW -> {
+          motor.set(-0.02);
+        }
       }
     }
 

@@ -11,7 +11,7 @@ public class RobotCommands {
 
   public RobotCommands() {
     this.robot = RobotManager.getInstance();
-    var requirementsList = List.of(robot.elevator, robot.climber, robot.wrist, robot.elbow, robot.manipulator);
+    var requirementsList = List.of(robot.elevator, robot.climber, robot.wrist, robot.elbow, robot.manipulator, robot.kicker);
     requirements = requirementsList.toArray(Subsystem[]::new);
   }
 
@@ -97,5 +97,10 @@ public class RobotCommands {
       return Commands.runOnce(robot::prepareInvertedCoralStationRequest, requirements)
           .andThen(robot.waitForState(RobotState.INVERTED_IDLE));
     }
+  }
+
+  public Command homeCommand(){
+    return Commands.runOnce(robot::homeRequest, requirements)
+      .andThen(robot.waitForState(RobotState.HOMING_STAGE_1_ELEVATOR));    
   }
 }
