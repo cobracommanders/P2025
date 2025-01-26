@@ -80,8 +80,8 @@ public class Controls {
         operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
         operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
         operator.start().and(operator.back()).onTrue(Robot.robotCommands.homeCommand());
-        operator.Y().onTrue(Robot.robotCommands.L3Command());
-        operator.B().onTrue(Robot.robotCommands.L4Command());
+        operator.Y().onTrue(Robot.robotCommands.L4Command());
+        operator.B().onTrue(Robot.robotCommands.L3Command());
         operator.X().onTrue(Robot.robotCommands.L2Command());
         operator.A().onTrue(Robot.robotCommands.L1Command());
         operator.leftTrigger().and(operator.rightTrigger()).onTrue(Robot.robotCommands.climbCommand());
