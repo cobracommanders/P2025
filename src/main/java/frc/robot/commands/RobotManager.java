@@ -99,7 +99,7 @@ public class RobotManager extends StateMachine<RobotState> {
           break;
         case L4:
           if (!currentState.ignoreRequests && !currentState.inverted) {
-            nextState = isHeightCapped ? RobotState.PREPARE_CAPPED_L4 : RobotState.PREPARE_L4;
+            nextState = isHeightCapped ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4;
           }
           break;
         case DEEP_CLIMB:
@@ -140,7 +140,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_IDLE:
       case WAIT_L1:
       case DEEP_CLIMB:
-      case WAIT_L3:
       case INVERTED_INTAKE_CORAL_STATION:
       case INTAKE_CORAL_STATION:
       case INVERTED_IDLE:
@@ -158,26 +157,38 @@ public class RobotManager extends StateMachine<RobotState> {
           nextState = RobotState.WAIT_L2;
         }
         break;
+      case CAPPED_L3:
+        if (!isHeightCapped){
+          nextState = RobotState.PREPARE_L3;
+        }
+      break;
       case PREPARE_L3:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        if(isHeightCapped){
+          nextState = RobotState.CAPPED_L3;
+        } else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L3;
         }
         break;
-      case PREPARE_CAPPED_L4:
+      case WAIT_L3:
+        if(isHeightCapped) {
+          nextState = RobotState.CAPPED_L3;
+        }
+        break;
+      case CAPPED_L4:
         if (!isHeightCapped) {
           nextState = RobotState.PREPARE_L4;
         }
         break;
       case PREPARE_L4:
         if(isHeightCapped) {
-          nextState = RobotState.PREPARE_CAPPED_L4;
+          nextState = RobotState.CAPPED_L4;
         } else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L4;
         }
         break;
       case WAIT_L4:
         if(isHeightCapped) {
-          nextState = RobotState.PREPARE_CAPPED_L4;
+          nextState = RobotState.CAPPED_L4;
         }
         break;
       case PREPARE_CORAL_STATION:
@@ -381,12 +392,21 @@ public class RobotManager extends StateMachine<RobotState> {
             kicker.setState(KickerState.IDLE);
           }
 
-          case PREPARE_CAPPED_L4 -> {
+          case CAPPED_L4 -> {
             elevator.setState(ElevatorState.CAPPED_L4);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.IDLE);
             wrist.setState(WristState.CAPPED_L4);
             elbow.setState(ElbowState.CAPPED_L4);
+            kicker.setState(KickerState.REMOVE_ALGAE);
+          }
+
+          case CAPPED_L3 -> {
+            elevator.setState(ElevatorState.CAPPED_L3);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.CAPPED_L3);
+            elbow.setState(ElbowState.CAPPED_L3);
             kicker.setState(KickerState.REMOVE_ALGAE);
           }
 
@@ -463,7 +483,7 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void prepareInvertedIdleRequest(){
-    if (getState() == RobotState.PREPARE_CAPPED_L4){
+    if (getState() == RobotState.CAPPED_L4){
     }
     else {
       flags.check(RobotFlag.INVERTED_IDLE);

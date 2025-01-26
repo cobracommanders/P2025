@@ -11,6 +11,7 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.WristConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
@@ -22,6 +23,8 @@ public class WristSubsystem extends StateMachine<WristState>{
   private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(WristConstants.P).withKI(WristConstants.I).withKD(WristConstants.D).withKG(WristConstants.G)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((18.0 / 1.0)));
   private double wristPosition;
   private final double tolerance;
+  private boolean preMatchHomingOccured = false;
+  private double lowestSeenHeight = 0.0;
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
@@ -51,6 +54,8 @@ public class WristSubsystem extends StateMachine<WristState>{
         MathUtil.isNear(WristPositions.L2, wristPosition, tolerance);
       case L3 ->
         MathUtil.isNear(WristPositions.L3, wristPosition, tolerance);
+      case CAPPED_L3 ->
+        MathUtil.isNear(WristPositions.CAPPED_L3, wristPosition, tolerance);
       case CAPPED_L4 ->
         MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, tolerance);
       case L4 ->
@@ -76,6 +81,23 @@ public class WristSubsystem extends StateMachine<WristState>{
   public void collectInputs(){
     wristPosition = wristMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Wrist Position", wristPosition);
+  }
+
+  @Override
+  public void periodic(){
+    super.periodic();
+
+     if (DriverStation.isDisabled()) {
+        } else {
+
+    if (!preMatchHomingOccured) {
+      double homingEndPosition = 0;
+      double homedPosition = homingEndPosition + (wristPosition - lowestSeenHeight);
+      wristMotor.setPosition(homedPosition);
+
+      preMatchHomingOccured = true;
+      }
+    }
   }
 
   public void setWristPosition(double position){

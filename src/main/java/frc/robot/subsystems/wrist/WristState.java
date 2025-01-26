@@ -8,6 +8,7 @@ public enum WristState {
     L3,
     L4,
     CAPPED_L4,
+    CAPPED_L3,
     CORAL_STATION,
     HOME_WRIST,
     INVERTED_CORAL_STATION

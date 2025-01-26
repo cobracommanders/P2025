@@ -9,6 +9,7 @@ public enum ElbowState {
     L4,
     CAPPED_L4,
     CORAL_STATION,
+    CAPPED_L3,
     HOME_ELBOW,
     INVERTED_CORAL_STATION
 }

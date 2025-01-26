@@ -7,6 +7,7 @@ public enum ElevatorState {
     L3,
     CAPPED_L4,
     L4,
+    CAPPED_L3,
     HOME_ELEVATOR,
     CORAL_STATION,
     INVERTED_CORAL_STATION;

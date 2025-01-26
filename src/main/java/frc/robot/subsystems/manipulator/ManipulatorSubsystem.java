@@ -11,8 +11,11 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.Constants.ElbowConstants;
+import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.subsystems.elbow.ElbowState;
 
 
 
@@ -26,6 +29,15 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
       manipulatorMotor = new TalonFX(Ports.ManipulatorPorts.MANIPULATOR_MOTOR);
       manipulatorMotor.getConfigurator().apply(motor_config);
     }
+
+    protected ManipulatorState getNextState(ManipulatorState currentState) {
+    if (getState() == ManipulatorState.INTAKE_CORAL && this.atGoal() && manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent) { 
+      manipulatorMotor.set(0);
+      return ManipulatorState.IDLE;
+    } else {
+      return currentState;
+    }
+  }
 
     @Override
     public void collectInputs(){

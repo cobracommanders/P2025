@@ -29,6 +29,10 @@ public static final class ElbowConstants{
   public static final double G = 0;
 }
 
+public static final class ManipulatorConstants{
+  public static final double coralStallCurrent = 7;
+}
+
 
 public static final class OIConstants {
     public static final int DRIVER_CONTROLLER_ID = 0;

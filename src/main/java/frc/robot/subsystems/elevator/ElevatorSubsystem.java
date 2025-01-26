@@ -15,6 +15,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ElevatorConstants;
@@ -32,6 +33,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final double tolerance;
   private PositionVoltage right_motor_request = new PositionVoltage(0).withSlot(0);
   private Follower left_motor_request = new Follower(Ports.ElevatorPorts.RMOTOR, true);
+  private boolean preMatchHomingOccured = false;
+  private double lowestSeenHeight = 0.0;
 
   public ElevatorSubsystem() {
     super(ElevatorState.IDLE);
@@ -90,8 +93,24 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public void collectInputs(){
     elevatorPosition = rightMotor.getPosition().getValueAsDouble();
     //leftMotorPosition = leftMotor.getPosition().getValueAsDouble();
-    rightMotorPosition = rightMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Elevator Position", elevatorPosition);
+  }
+
+  @Override
+  public void periodic(){
+    super.periodic();
+
+    if (DriverStation.isDisabled()) {
+        } else {
+
+    if (!preMatchHomingOccured) {
+      double homingEndPosition = 0;
+      double homedPosition = homingEndPosition + (elevatorPosition - lowestSeenHeight);
+      rightMotor.setPosition(homedPosition);
+
+      preMatchHomingOccured = true;
+      }
+    }
   }
 
   public void setElevatorPosition(double rightPosition){
@@ -115,6 +134,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         }
         case L3 -> {
           setElevatorPosition(ElevatorPositions.L3);
+        }
+        case CAPPED_L3 -> {
+          setElevatorPosition(ElevatorPositions.CAPPED_L3);
         }
         case CAPPED_L4 -> {
           setElevatorPosition(ElevatorPositions.CAPPED_L4);

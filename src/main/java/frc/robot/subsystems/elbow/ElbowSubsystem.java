@@ -6,11 +6,14 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.pathplanner.lib.config.RobotConfig;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.ElbowConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.RobotManager;
@@ -24,6 +27,8 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElbowConstants.P).withKI(ElbowConstants.I).withKD(ElbowConstants.D).withKG(ElbowConstants.G)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((54.0179 / 1.0)));
   private double elbowPosition;
   private final double tolerance;
+  private boolean preMatchHomingOccured = false;
+  private double lowestSeenHeight = 0.0;
 
   private PositionVoltage motor_request = new PositionVoltage(0).withSlot(0);
   
@@ -84,6 +89,19 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   public void periodic() {
     super.periodic();
     DogLog.log(getName() + "/Elbow AtGoal", atGoal());
+
+     if (DriverStation.isDisabled()) {
+          // Wait until enable to do homing code
+        } else {
+
+        if (!preMatchHomingOccured) {
+            double homingEndPosition = 0;
+            double homedPosition = homingEndPosition + (elbowPosition - lowestSeenHeight);
+            motor.setPosition(homedPosition);
+
+            preMatchHomingOccured = true;
+          }
+        }
   }
 
   public void setElbowPosition(double position) {
@@ -108,6 +126,9 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
         }
         case L3 -> {
           setElbowPosition(ElbowPositions.L3);
+        }
+        case CAPPED_L3 -> {
+          setElbowPosition(ElbowPositions.CAPPED_L3);
         }
         case CAPPED_L4 -> {
           setElbowPosition(ElbowPositions.CAPPED_L4);

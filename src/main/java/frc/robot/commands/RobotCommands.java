@@ -31,14 +31,18 @@ public class RobotCommands {
   }
 
   public Command L3Command() {
+    if (RobotManager.getInstance().isHeightCapped == true)
     return Commands.runOnce(robot::prepareL3Request, requirements)
-        .andThen(robot.waitForState(RobotState.WAIT_L3));
+        .andThen(robot.waitForState(RobotState.CAPPED_L3));
+    else
+      return Commands.runOnce(robot::prepareL3Request, requirements)
+        .andThen(robot.waitForState(RobotState.PREPARE_L3));
   }
 
   public Command L4Command() {
     if (RobotManager.getInstance().isHeightCapped == true)
     return Commands.runOnce(robot::prepareL4Request, requirements)
-        .andThen(robot.waitForState(RobotState.PREPARE_CAPPED_L4));
+        .andThen(robot.waitForState(RobotState.CAPPED_L4));
     else
       return Commands.runOnce(robot::prepareL4Request, requirements)
         .andThen(robot.waitForState(RobotState.PREPARE_L4));
