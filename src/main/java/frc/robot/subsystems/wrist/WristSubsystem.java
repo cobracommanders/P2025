@@ -19,7 +19,7 @@ import frc.robot.subsystems.elevator.ElevatorState;
 public class WristSubsystem extends StateMachine<WristState>{
     
   private final TalonFX wristMotor;
-  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(WristConstants.P).withKI(WristConstants.I).withKD(WristConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(WristConstants.P).withKI(WristConstants.I).withKD(WristConstants.D).withKG(WristConstants.G)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((18.0 / 1.0)));
   private double wristPosition;
   private final double tolerance;
 
@@ -40,29 +40,28 @@ public class WristSubsystem extends StateMachine<WristState>{
     }
   }
    public boolean atGoal() {
-    return true;
-    // return switch (getState()) {
-    //   case IDLE -> 
-    //     MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
-    //   case INVERTED_IDLE -> 
-    //     MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
-    //   case L1 ->
-    //     MathUtil.isNear(WristPositions.L1, wristPosition, tolerance);
-    //   case L2 ->
-    //     MathUtil.isNear(WristPositions.L2, wristPosition, tolerance);
-    //   case L3 ->
-    //     MathUtil.isNear(WristPositions.L3, wristPosition, tolerance);
-    //   case CAPPED_L4 ->
-    //     MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, tolerance);
-    //   case L4 ->
-    //     MathUtil.isNear(WristPositions.L4, wristPosition, tolerance);
-    //   case CORAL_STATION ->
-    //     MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, tolerance);
-    //   case HOME_WRIST ->
-    //     wristMotor.getStatorCurrent().getValueAsDouble() > WristConstants.homingStallCurrent;
-    //   case INVERTED_CORAL_STATION ->
-    //     MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
-    // };
+    return switch (getState()) {
+      case IDLE -> 
+        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
+      case INVERTED_IDLE -> 
+        MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
+      case L1 ->
+        MathUtil.isNear(WristPositions.L1, wristPosition, tolerance);
+      case L2 ->
+        MathUtil.isNear(WristPositions.L2, wristPosition, tolerance);
+      case L3 ->
+        MathUtil.isNear(WristPositions.L3, wristPosition, tolerance);
+      case CAPPED_L4 ->
+        MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, tolerance);
+      case L4 ->
+        MathUtil.isNear(WristPositions.L4, wristPosition, tolerance);
+      case CORAL_STATION ->
+        MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, tolerance);
+      case HOME_WRIST ->
+        wristMotor.getStatorCurrent().getValueAsDouble() > WristConstants.homingStallCurrent;
+      case INVERTED_CORAL_STATION ->
+        MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
+    };
   }
 
   public void setState(WristState newState) {
@@ -115,7 +114,7 @@ public class WristSubsystem extends StateMachine<WristState>{
           setWristPosition(WristPositions.INVERTED_CORAL_STATION);
         }
         case HOME_WRIST -> {
-          wristMotor.set(-0.02);
+          wristMotor.set(0.02);
         }
         default -> {}
       }

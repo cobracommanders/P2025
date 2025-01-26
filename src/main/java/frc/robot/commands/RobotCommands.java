@@ -67,16 +67,6 @@ public class RobotCommands {
     return Commands.runOnce(robot::applyHeightCapRequest);
   }
 
-  // public Command intakeCommand() {
-  //   Command intakeCommand = Commands.none();
-  //   if (robot.getState().inverted) {
-  //     intakeCommand = idleCommand();
-  //   }
-  //   intakeCommand = intakeCommand.andThen(Commands.runOnce(robot::prepareCoralStationRequest, requirements))
-  //     .andThen(robot.waitForState(RobotState.IDLE));
-  //   return intakeCommand;
-  // }
-
   public Command intakeCommand() {
     if (robot.getState().inverted) {
       return idleCommand() // go to non-inverted idle

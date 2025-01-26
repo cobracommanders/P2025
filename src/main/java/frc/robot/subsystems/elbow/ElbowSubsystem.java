@@ -21,7 +21,7 @@ import frc.robot.subsystems.elevator.ElevatorState;
 public class ElbowSubsystem extends StateMachine<ElbowState>{
     
   private final TalonFX motor;
-  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElbowConstants.P).withKI(ElbowConstants.I).withKD(ElbowConstants.D)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((54.0179 / 1.0)));
+  private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElbowConstants.P).withKI(ElbowConstants.I).withKD(ElbowConstants.D).withKG(ElbowConstants.G)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((54.0179 / 1.0)));
   private double elbowPosition;
   private final double tolerance;
 
@@ -44,28 +44,29 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   }
 
    public boolean atGoal() {
-    return switch (getState()) {
-      case IDLE -> 
-        MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, tolerance);
-      case INVERTED_IDLE -> 
-        MathUtil.isNear(ElbowPositions.INVERTED_IDLE, elbowPosition, tolerance);
-      case L1 ->
-        MathUtil.isNear(ElbowPositions.L1, elbowPosition, tolerance);
-      case L2 ->
-        MathUtil.isNear(ElbowPositions.L2, elbowPosition, tolerance);
-      case L3 ->
-        MathUtil.isNear(ElbowPositions.L3, elbowPosition, tolerance);
-      case CAPPED_L4 ->
-        MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, tolerance);
-      case L4 ->
-        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
-      case CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, tolerance);
-      case HOME_ELBOW ->
-        motor.getStatorCurrent().getValueAsDouble() > ElbowConstants.homingStallCurrent;
-      case INVERTED_CORAL_STATION ->
-        MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, tolerance);
-    };
+    return true;
+    // return switch (getState()) {
+    //   case IDLE -> 
+    //     MathUtil.isNear(ElbowPositions.IDLE, elbowPosition, tolerance);
+    //   case INVERTED_IDLE -> 
+    //     MathUtil.isNear(ElbowPositions.INVERTED_IDLE, elbowPosition, tolerance);
+    //   case L1 ->
+    //     MathUtil.isNear(ElbowPositions.L1, elbowPosition, tolerance);
+    //   case L2 ->
+    //     MathUtil.isNear(ElbowPositions.L2, elbowPosition, tolerance);
+    //   case L3 ->
+    //     MathUtil.isNear(ElbowPositions.L3, elbowPosition, tolerance);
+    //   case CAPPED_L4 ->
+    //     MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, tolerance);
+    //   case L4 ->
+    //     MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
+    //   case CORAL_STATION ->
+    //     MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, tolerance);
+    //   case HOME_ELBOW ->
+    //     motor.getStatorCurrent().getValueAsDouble() > ElbowConstants.homingStallCurrent;
+    //   case INVERTED_CORAL_STATION ->
+    //     MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, tolerance);
+    // };
   }
 
   public void setState(ElbowState newState) {
