@@ -1,5 +1,8 @@
 package frc.robot;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+
 public final class Constants {
   public static final class DrivetrainConstants{
     public static final double MAX_VELOCITY_METERS_PER_SECOND = 5.94;
@@ -7,30 +10,39 @@ public final class Constants {
   }
 
 public static final class ElevatorConstants{
-  public static final double homingStallCurrent = 2.5;
-  public static final double P = 0;
+  public static final double homingStallCurrent = 15;
+  public static final double P = 7;
   public static final double I = 0;
   public static final double D = 0;
+  public static final double G = 0.5;
+  public static final double MotionMagicAcceleration = 64;
+  public static final double MotionMagicCruiseVelocity = 128;
+  public static final double MotionMagicJerk = 350;
 }
 
 public static final class WristConstants{
-  public static final double homingStallCurrent = 2;
-  public static final double P = 1;
+  public static final double homingStallCurrent = 10;
+  public static final double P = 25;
   public static final double I = 0;
   public static final double D = 0;
-  public static final double G = 0;
+  public static final double G = 0.15;
+  public static final double MotionMagicAcceleration = 19.2;
+  public static final double MotionMagicCruiseVelocity = 40;
+  public static final double MotionMagicJerk = 160;
 }
-
 public static final class ElbowConstants{
-  public static final double homingStallCurrent = 2.5;
-  public static final double P = 0;
+  public static final double homingStallCurrent = 15;
+  public static final double P = 30;
   public static final double I = 0;
   public static final double D = 0;
-  public static final double G = 0;
+  public static final double G = 0.2;
+  public static final double MotionMagicAcceleration = 25.6;
+  public static final double MotionMagicCruiseVelocity = 50;
+ public static final double MotionMagicJerk = 200;
 }
 
 public static final class ManipulatorConstants{
-  public static final double coralStallCurrent = 7;
+  public static final double coralStallCurrent = 100;
 }
 
 

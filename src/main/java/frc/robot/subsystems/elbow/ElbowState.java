@@ -11,5 +11,6 @@ public enum ElbowState {
     CORAL_STATION,
     CAPPED_L3,
     HOME_ELBOW,
+    DISABLED,
     INVERTED_CORAL_STATION
 }

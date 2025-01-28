@@ -21,6 +21,8 @@ import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.wrist.WristState;
+import frc.robot.subsystems.wrist.WristSubsystem;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -67,13 +69,14 @@ public class Controls {
 
     public void configureDriverCommands() {
         driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
-        driver.leftTrigger().and(driver.A().negate()).onTrue(Robot.robotCommands.intakeCommand() );
+        driver.leftTrigger().and(driver.A().negate()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
-        driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.invertedIntakeCommand());
+        driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
             driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
+        driver.B().onTrue(Commands.runOnce(()-> WristSubsystem.getInstance().setState(WristState.HOME_WRIST), WristSubsystem.getInstance()));
     }
 
     public void configureOperatorCommands(){

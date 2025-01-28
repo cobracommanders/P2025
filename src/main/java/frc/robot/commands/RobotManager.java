@@ -36,7 +36,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
   public RobotManager() {
-    super(RobotState.IDLE);
+    super(RobotState.PREPARE_HOMING);
     this.elevator = ElevatorSubsystem.getInstance();
     this.climber = ClimberSubsystem.getInstance();
     this.manipulator = ManipulatorSubsystem.getInstance();
@@ -54,6 +54,9 @@ public class RobotManager extends StateMachine<RobotState> {
   protected RobotState getNextState(RobotState currentState) {
     flags.log();
     RobotState nextState = currentState;
+    if (DriverStation.isDisabled()) {
+      nextState = RobotState.PREPARE_HOMING;
+    }
     for (RobotFlag flag : flags.getChecked()) {
       switch (flag) {
         case APPLY_HEIGHT_CAP: 
@@ -238,7 +241,7 @@ public class RobotManager extends StateMachine<RobotState> {
         break;
       case PREPARE_IDLE_FROM_INVERTED:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
-          nextState = RobotState.IDLE;
+          nextState = RobotState.PREPARE_IDLE;
         }
         break;
       case PREPARE_DEEP_CLIMB:
@@ -246,18 +249,23 @@ public class RobotManager extends StateMachine<RobotState> {
           nextState = RobotState.WAIT_DEEP_CLIMB;
         }
         break;
+      case PREPARE_HOMING:
+          if (DriverStation.isEnabled()) {
+            nextState = RobotState.HOMING_STAGE_1_ELEVATOR;
+          }
+        break;
       case HOMING_STAGE_1_ELEVATOR:
         if (elevator.isIdle()) {
           nextState = RobotState.HOMING_STAGE_2_ELBOW;
         }
         break;
       case HOMING_STAGE_2_ELBOW:
-        if (elbow.atGoal()) {
+        if (elbow.isIdle()) {//change to isIdle
           nextState = RobotState.HOMING_STAGE_3_WRIST;
         }
         break;
       case HOMING_STAGE_3_WRIST:
-        if (wrist.atGoal()) {
+        if (wrist.isIdle()) {
           nextState = RobotState.INVERTED_IDLE;
         }
         break;
@@ -423,8 +431,8 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.IDLE);
-            wrist.setState(WristState.IDLE);
-            elbow.setState(ElbowState.IDLE);
+            wrist.setState(WristState.INVERTED_IDLE);
+            elbow.setState(ElbowState.INVERTED_IDLE);
             kicker.setState(KickerState.IDLE);
           }
 
@@ -432,8 +440,8 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.IDLE);
-            wrist.setState(WristState.INVERTED_IDLE);
-            elbow.setState(ElbowState.INVERTED_IDLE);
+            wrist.setState(WristState.IDLE);
+            elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
           }
 
@@ -447,9 +455,12 @@ public class RobotManager extends StateMachine<RobotState> {
           }
           case HOMING_STAGE_1_ELEVATOR -> {
             elevator.setState(ElevatorState.HOME_ELEVATOR);
+            wrist.setState(WristState.DISABLED);
+            elbow.setState(ElbowState.DISABLED);
           }
           case HOMING_STAGE_2_ELBOW -> {
             elbow.setState(ElbowState.HOME_ELBOW);
+            wrist.setState(WristState.DISABLED);
           }
           case HOMING_STAGE_3_WRIST -> {
             wrist.setState(WristState.HOME_WRIST);
@@ -468,6 +479,7 @@ public class RobotManager extends StateMachine<RobotState> {
             WAIT_IDLE, 
             WAIT_INVERTED_IDLE, 
             WAIT_L1,
+            PREPARE_HOMING,
             REMOVE_ALGAE -> {}
           }
       }
@@ -483,11 +495,7 @@ public class RobotManager extends StateMachine<RobotState> {
   }
 
   public void prepareInvertedIdleRequest(){
-    if (getState() == RobotState.CAPPED_L4){
-    }
-    else {
-      flags.check(RobotFlag.INVERTED_IDLE);
-    }
+    flags.check(RobotFlag.INVERTED_IDLE);
   }
 
   public void prepareL1Request() {

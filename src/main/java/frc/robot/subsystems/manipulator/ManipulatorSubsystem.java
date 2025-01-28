@@ -31,7 +31,7 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
     }
 
     protected ManipulatorState getNextState(ManipulatorState currentState) {
-    if (getState() == ManipulatorState.INTAKE_CORAL && this.atGoal() && manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent) { 
+    if (getState() == ManipulatorState.INTAKE_CORAL && manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent) { 
       manipulatorMotor.set(0);
       return ManipulatorState.IDLE;
     } else {

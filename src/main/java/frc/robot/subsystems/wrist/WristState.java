@@ -11,5 +11,6 @@ public enum WristState {
     CAPPED_L3,
     CORAL_STATION,
     HOME_WRIST,
-    INVERTED_CORAL_STATION
+    INVERTED_CORAL_STATION,
+    DISABLED
 }

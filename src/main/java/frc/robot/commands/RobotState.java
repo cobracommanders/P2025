@@ -33,7 +33,8 @@ public enum RobotState {
   PREPARE_IDLE_FROM_INVERTED(true, true),
   HOMING_STAGE_1_ELEVATOR(true, true),
   HOMING_STAGE_2_ELBOW(true, true),
-  HOMING_STAGE_3_WRIST(true, true);
+  HOMING_STAGE_3_WRIST(true, true),
+  PREPARE_HOMING(true, true);
 
   public final boolean ignoreRequests;
   public final boolean inverted;

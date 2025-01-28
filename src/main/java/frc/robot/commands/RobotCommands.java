@@ -21,31 +21,47 @@ public class RobotCommands {
   }
 
   public Command L1Command() {
-    return Commands.runOnce(robot::prepareL1Request, requirements)
-        .andThen(robot.waitForState(RobotState.WAIT_L1));
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL1Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotState.WAIT_L1)); // Goes back to idle when we're done intaking
+    }else {
+      return Commands.runOnce(robot::prepareL1Request, requirements)
+          .andThen(robot.waitForState(RobotState.WAIT_L1));
+    }
   }
   
   public Command L2Command() {
-    return Commands.runOnce(robot::prepareL2Request, requirements)
-        .andThen(robot.waitForState(RobotState.WAIT_L2));
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL2Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotState.WAIT_L2)); // Goes back to idle when we're done intaking
+    }else {
+      return Commands.runOnce(robot::prepareL2Request, requirements)
+          .andThen(robot.waitForState(RobotState.WAIT_L2));
+    }
   }
 
   public Command L3Command() {
-    if (RobotManager.getInstance().isHeightCapped == true)
-    return Commands.runOnce(robot::prepareL3Request, requirements)
-        .andThen(robot.waitForState(RobotState.CAPPED_L3));
-    else
-      return Commands.runOnce(robot::prepareL3Request, requirements)
-        .andThen(robot.waitForState(RobotState.PREPARE_L3));
+      if (robot.getState().inverted) {
+          return idleCommand() // go to non-inverted idle
+            .andThen(Commands.runOnce(robot::prepareL3Request, requirements)) // Prepare CS (non-inverted)
+            .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L3 : RobotState.PREPARE_L3)); // Goes back to idle when we're done intaking
+        }else {
+        return Commands.runOnce(robot::prepareL3Request, requirements)
+          .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L3 : RobotState.PREPARE_L3));
+        }
   }
 
   public Command L4Command() {
-    if (RobotManager.getInstance().isHeightCapped == true)
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL4Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4)); // Goes back to idle when we're done intaking
+    }else {
     return Commands.runOnce(robot::prepareL4Request, requirements)
-        .andThen(robot.waitForState(RobotState.CAPPED_L4));
-    else
-      return Commands.runOnce(robot::prepareL4Request, requirements)
-        .andThen(robot.waitForState(RobotState.PREPARE_L4));
+      .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4));
+    }
   }
 
   public Command idleCommand() {
