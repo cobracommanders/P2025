@@ -21,6 +21,7 @@ public enum RobotState {
   SCORE_L3(false, false),
   PREPARE_L4(false, false),
   WAIT_L4(false, false),
+  L4_ELBOW(false, false),
   SCORE_L4(false, false),
   CAPPED_L4(false, false),
   CAPPED_L3(false, false),

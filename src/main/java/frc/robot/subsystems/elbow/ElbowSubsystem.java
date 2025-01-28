@@ -83,6 +83,8 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
         MathUtil.isNear(ElbowPositions.INVERTED_CORAL_STATION, elbowPosition, tolerance);
       case CAPPED_L3 ->
         MathUtil.isNear(ElbowPositions.CAPPED_L3, elbowPosition, tolerance);
+      case L4_ELBOW ->
+        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
       case DISABLED ->
         true;
     };
