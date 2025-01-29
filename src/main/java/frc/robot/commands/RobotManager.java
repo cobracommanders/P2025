@@ -2,11 +2,14 @@ package frc.robot.commands;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.FlagManager;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.climber.ClimberState;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorState;
@@ -24,7 +27,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public final ManipulatorSubsystem manipulator;
   public final WristSubsystem wrist;
   public final ElbowSubsystem elbow;
-  public final CommandSwerveDrivetrain drivetrain;
+  public final DrivetrainSubsystem drivetrain;
   public final KickerSubsystem kicker;
 
   // private RobotState state = RobotState.IDLE;
@@ -42,8 +45,8 @@ public class RobotManager extends StateMachine<RobotState> {
     this.manipulator = ManipulatorSubsystem.getInstance();
     this.wrist = WristSubsystem.getInstance();
     this.elbow = ElbowSubsystem.getInstance();
-    this.drivetrain = CommandSwerveDrivetrain.getInstance();
     this.kicker = KickerSubsystem.getInstance();
+    this.drivetrain = DrivetrainSubsystem.getInstance();
   }
 
   @Override
@@ -113,6 +116,8 @@ public class RobotManager extends StateMachine<RobotState> {
         case HOMING:
           nextState = RobotState.HOMING_STAGE_1_ELEVATOR;
           break;
+        case STILL:
+          nextState = RobotState.DRIVETRAIN_IDLE;
         case SCORE:
           switch (nextState) {
             case WAIT_L1:
@@ -147,6 +152,7 @@ public class RobotManager extends StateMachine<RobotState> {
       case INTAKE_CORAL_STATION:
       case INVERTED_IDLE:
       case REMOVE_ALGAE:
+      case DRIVETRAIN_IDLE:
         break;
       
 
@@ -293,6 +299,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
+            drivetrain.setState(RobotState.DRIVETRAIN_IDLE);
           }
           case PREPARE_L1 -> {
             elevator.setState(ElevatorState.L1);
