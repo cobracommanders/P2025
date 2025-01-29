@@ -30,6 +30,7 @@ public enum RobotState {
   PREPARE_INVERTED_CORAL_STATION(false, true),
   INVERTED_INTAKE_CORAL_STATION(false, true),
   REMOVE_ALGAE(false, false),
+  DRIVETRAIN_IDLE(false, false),
   PREPARE_INVERTED_FROM_IDLE(true, true),
   PREPARE_IDLE_FROM_INVERTED(true, true),
   HOMING_STAGE_1_ELEVATOR(true, true),
