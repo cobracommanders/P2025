@@ -108,7 +108,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
   @Override
   public void periodic() {
     super.periodic();
-    DogLog.log(getName() + "/elbow current", motor.getStatorCurrent().getValueAsDouble());
+    DogLog.log(getName() + "/Elbow current", motor.getStatorCurrent().getValueAsDouble());
     DogLog.log(getName() + "/Elbow AtGoal", atGoal());
 
     if (DriverStation.isDisabled() && brakeModeEnabled == true) {
