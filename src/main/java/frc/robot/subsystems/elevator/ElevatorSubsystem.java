@@ -54,7 +54,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     leftMotor.getConfigurator().apply(left_motor_config);
     rightMotor.getConfigurator().apply(right_motor_config);
-    tolerance = 0.05;
+    tolerance = 1;
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
@@ -110,7 +110,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   @Override
   public void periodic(){
     super.periodic();
-
+    DogLog.log(getName() + "/Elevator AtGoal", atGoal());
     // if (DriverStation.isDisabled()) {
     //  if (lowestSeenHeight > elevatorPosition) {
     //   lowestSeenHeight = elevatorPosition;
