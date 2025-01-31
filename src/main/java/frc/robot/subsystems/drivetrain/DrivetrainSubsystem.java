@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.StateMachine;
+import frc.robot.commands.RobotState;
 import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.kicker.KickerState;
@@ -51,6 +52,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   public static final double MaxSpeed = 4.75;
   private static final double MaxAngularRate = Units.rotationsToRadians(4);
   private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
+  private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
 
   private static final double leftXDeadband = 0.05;
   private static final double rightXDeadband = 0.15;
@@ -58,15 +60,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
 
   private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
 
-  private static SwerveModuleConstants constantsForModuleNumber(int moduleNumber) {
-    return switch (moduleNumber) {
-      case 0 -> TunerConstants.FrontLeft;
-      case 1 -> TunerConstants.FrontRight;
-      case 2 -> TunerConstants.BackLeft;
-      case 3 -> TunerConstants.BackRight;
-      default -> throw new InvalidParameterException("Expected an ID from [0, 3]");
-    };
-  }
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
 
@@ -108,54 +101,17 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     return drivetrainState;
   }
 
-  public void setSnapToAngle(double angle) {
-    goalSnapAngle = angle;
-
-    // We don't necessarily set auto swerve speeds every loop, so this ensures we are always snapped
-    // to the right angle during auto. Teleop doesn't need this since teleop speeds are constantly
-    // fed into swerve.
-    switch (getState()) {
-      case AUTO_REEF_SNAP -> {
-        sendSwerveRequest();
-      }
-      case AUTO_CS_SNAP ->  
-        sendSwerveRequest();
-    }
-  }
-
   public DrivetrainSubsystem() {
-    driveToAngle.HeadingController = RobotConfig.get().swerve().snapController();
-    driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
-    driveToAngle.HeadingController.setTolerance(0.02);
+    super(DrivetrainState.BRAKE);
   }
-
-  public void setFieldRelativeAutoSpeeds(ChassisSpeeds speeds) {
-    autoSpeeds = speeds;
-    sendSwerveRequest();
-  }
-
-  public void setRobotRelativeAutoSpeeds(ChassisSpeeds speeds) {
-    setFieldRelativeAutoSpeeds(
-        ChassisSpeeds.fromRobotRelativeSpeeds(
-            speeds, Rotation2d.fromDegrees(drivetrainPigeon.getYaw().getValueAsDouble())));
-  }
-
-  @Override
-  protected DrivetrainState getNextState(DrivetrainState currentState) {
-    // Ensure that we are in an auto state during auto, and a teleop state during teleop
-    return switch (currentState) {
-      case AUTO, TELEOP -> 
-          DriverStation.isAutonomous() ? DrivetrainStates.AUTO : DrivetrainStates.TELEOP;
-      case AUTO_SNAPS, TELEOP_SNAPS ->
-          DriverStation.isAutonomous() ? SwerveState.AUTO_SNAPS : SwerveState.TELEOP_SNAPS;
-    };
-  }
+  
 
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
+  }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(
@@ -164,14 +120,14 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
 
   private void sendSwerveRequest() {
     switch (getState()) {
-      case TELEOP ->
+      case DRIVE ->
           drivetrain.setControl(
               drive
                   .withVelocityX(teleopSpeeds.vxMetersPerSecond)
                   .withVelocityY(teleopSpeeds.vyMetersPerSecond)
                   .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-      case TELEOP_SNAPS -> {
+      case BRAKE -> {
         if (teleopSpeeds.omegaRadiansPerSecond == 0) {
           drivetrain.setControl(
               driveToAngle
@@ -189,14 +145,14 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
                   .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
-      case AUTO ->
+      case CORAL_STATION_ALIGN ->
           drivetrain.setControl(
               drive
                   .withVelocityX(autoSpeeds.vxMetersPerSecond)
                   .withVelocityY(autoSpeeds.vyMetersPerSecond)
                   .withRotationalRate(autoSpeeds.omegaRadiansPerSecond)
                   .withDriveRequestType(DriveRequestType.Velocity));
-      case AUTO_SNAPS ->
+      case REEF_ALIGN ->
           drivetrain.setControl(
               driveToAngle
                   .withVelocityX(autoSpeeds.vxMetersPerSecond)
@@ -208,15 +164,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
 
   public void setState(DrivetrainState newState) {
         setStateFromRequest(newState);
-    }
-
-  public void setSnapsEnabled(boolean newValue) {
-    switch (getState()) {
-      case TELEOP ->
-          setStateFromRequest(newValue ? SwerveState.TELEOP_SNAPS : SwerveState.TELEOP);
-      case AUTO ->
-          setStateFromRequest(DrivetrainStates.AUTO);
-    }
   }
 
   @Override
@@ -225,10 +172,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
 
     }
 
-    private static ElbowSubsystem instance;
+    private static DrivetrainSubsystem instance;
 
     public static DrivetrainSubsystem getInstance() {
-      if (instance == null) instance = new ElbowSubsystem(); // Make sure there is an instance (this will only run once)
+      if (instance == null) instance = new DrivetrainSubsystem(); // Make sure there is an instance (this will only run once)
       return instance;
   }
 }

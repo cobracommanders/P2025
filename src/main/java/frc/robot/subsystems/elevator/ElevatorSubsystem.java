@@ -30,7 +30,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private final TalonFXConfiguration right_motor_config =new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private double elevatorPosition;
   private double leftMotorPosition;
   private double rightMotorPosition;
@@ -128,7 +128,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public void setElevatorPosition(double rightPosition){
     rightMotor.setControl(right_motor_request.withPosition(rightPosition));
     leftMotor.setControl(left_motor_request);
-    //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
     DogLog.log(getName() + "/Right Motor Setpoint", rightPosition);
   }
 
@@ -167,11 +166,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         }
       }
     }
-    // @Override
-    // public void periodic() {
-    //   super.periodic();
-      
-    // }
   
   private static ElevatorSubsystem instance;
 

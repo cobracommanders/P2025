@@ -299,7 +299,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(RobotState.DRIVETRAIN_IDLE);
+            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L1 -> {
             elevator.setState(ElevatorState.L1);
