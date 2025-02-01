@@ -30,13 +30,13 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private final TalonFXConfiguration right_motor_config =new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private double elevatorPosition = 0;
   private double leftMotorPosition;
   private double rightMotorPosition;
   private final double tolerance;
-  private MotionMagicVoltage right_motor_request = new MotionMagicVoltage(0).withSlot(0);
-  private Follower left_motor_request = new Follower(Ports.ElevatorPorts.RMOTOR, true);
+  private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
+  private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
@@ -86,7 +86,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         case CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
         case HOME_ELEVATOR ->
-          (rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
+          (leftMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
         case INVERTED_CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
       };
@@ -102,10 +102,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   @Override
   public void collectInputs(){
-    elevatorPosition = rightMotor.getPosition().getValueAsDouble();
-    //leftMotorPosition = leftMotor.getPosition().getValueAsDouble();
+    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Elevator Position", elevatorPosition);
-    DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
+    DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
   }
 
   @Override
@@ -126,11 +125,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     // }
   }
 
-  public void setElevatorPosition(double rightPosition){
-    rightMotor.setControl(right_motor_request.withPosition(rightPosition));
-    leftMotor.setControl(left_motor_request);
+  public void setElevatorPosition(double leftPosition){
+    leftMotor.setControl(left_motor_request.withPosition(leftPosition));
+    rightMotor.setControl(right_motor_request);
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/Right Motor Setpoint", rightPosition);
+    DogLog.log(getName() + "/LEFTMotor Setpoint", leftPosition);
   }
 
     @Override
@@ -158,7 +157,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           setElevatorPosition(ElevatorPositions.L4);
         }
         case HOME_ELEVATOR -> {
-          rightMotor.setControl(new VoltageOut(-0.4));
+          leftMotor.setControl(new VoltageOut(-0.4));
         }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);
