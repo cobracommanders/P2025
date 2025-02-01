@@ -3,6 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+
 import java.util.List;
 
 public class RobotCommands {
@@ -13,6 +15,7 @@ public class RobotCommands {
     this.robot = RobotManager.getInstance();
     var requirementsList = List.of(robot.elevator, robot.climber, robot.wrist, robot.elbow, robot.manipulator, robot.kicker);
     requirements = requirementsList.toArray(Subsystem[]::new);
+
   }
 
   public Command scoreCommand() {
@@ -58,7 +61,7 @@ public class RobotCommands {
       return idleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareL4Request, requirements)) // Prepare CS (non-inverted)
         .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4)); // Goes back to idle when we're done intaking
-    }else {
+    } else {
     return Commands.runOnce(robot::prepareL4Request, requirements)
       .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4));
     }
@@ -80,7 +83,8 @@ public class RobotCommands {
   }
 
   public Command removeHeightCapCommand() {
-    return Commands.runOnce(robot::removeHeightCapRequest);
+    return Commands.runOnce(robot::removeHeightCapRequest)
+        .andThen(CommandSwerveDrivetrain.getInstance().applyRequest(() -> CommandSwerveDrivetrain.getInstance().brake));
   }
 
   public Command applyHeightCapCommand() {

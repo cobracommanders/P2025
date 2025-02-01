@@ -142,7 +142,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_IDLE:
       case WAIT_L1:
       case DRIVE:
-      case BRAKE:
       case CORAL_STATION_ALIGN:
       case REEF_ALIGN:
       case DEEP_CLIMB:
@@ -314,7 +313,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L1);
             elbow.setState(ElbowState.L1);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.BRAKE);
+            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L2 -> {
             elevator.setState(ElevatorState.L2);
@@ -332,7 +331,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.BRAKE);
+            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L3 -> {
             elevator.setState(ElevatorState.L3);
@@ -350,7 +349,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L3);
             elbow.setState(ElbowState.L3);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.BRAKE);
+            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L4 -> {
             elevator.setState(ElevatorState.L4);
@@ -421,7 +420,7 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.BRAKE);
+            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case CAPPED_L4 -> {
@@ -527,7 +526,6 @@ public class RobotManager extends StateMachine<RobotState> {
             WAIT_INVERTED_IDLE, 
             WAIT_L1,
             DRIVE,
-            BRAKE,
             CORAL_STATION_ALIGN,
             REEF_ALIGN,
             PREPARE_HOMING,

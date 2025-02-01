@@ -7,6 +7,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
@@ -39,9 +40,13 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Controls;
+import frc.robot.Robot;
 import frc.robot.StateMachine;
 import frc.robot.commands.RobotState;
+import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.kicker.KickerState;
 import frc.robot.subsystems.wrist.WristState;
@@ -49,16 +54,10 @@ import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightLocalization;
 
 public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
-  public static final double MaxSpeed = 4.75;
-  private static final double MaxAngularRate = Units.rotationsToRadians(4);
-  private static final Rotation2d TELEOP_MAX_ANGULAR_RATE = Rotation2d.fromRotations(2);
+  private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
+  private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
-
-  private static final double leftXDeadband = 0.05;
-  private static final double rightXDeadband = 0.15;
-  private static final double leftYDeadband = 0.05;
-
-  private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
+  private Xbox controller = Robot.controls.driver;
 
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
@@ -75,34 +74,18 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
           .withDeadband(MaxSpeed * 0.03);
 
-  private double lastSimTime;
-  private Notifier simNotifier = null;
-
   private SwerveDriveState drivetrainState = new SwerveDriveState();
   private ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
   private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
   private boolean moving = false;
   private double goalSnapAngle = 0;
 
-  /** The latest requested teleop speeds. */
-  private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
-
-  private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
-
-  public ChassisSpeeds getRobotRelativeSpeeds() {
-    return robotRelativeSpeeds;
-  }
-
-  public ChassisSpeeds getFieldRelativeSpeeds() {
-    return fieldRelativeSpeeds;
-  }
-
   public SwerveDriveState getDrivetrainState() {
     return drivetrainState;
   }
 
   public DrivetrainSubsystem() {
-    super(DrivetrainState.BRAKE);
+    super(DrivetrainState.DRIVE);
   }
   
   public void setSnapToAngle(double angle) {
@@ -112,64 +95,44 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
-    robotRelativeSpeeds = drivetrainState.Speeds;
-    fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
     if (CommandSwerveDrivetrain.getInstance().isMoving()) {
       moving = true;
     }
   }
 
-  private ChassisSpeeds calculateFieldRelativeSpeeds() {
-    return ChassisSpeeds.fromRobotRelativeSpeeds(
-        robotRelativeSpeeds, drivetrainState.Pose.getRotation());
-  }
-
-  private void sendSwerveRequest() {
-    switch (getState()) {
-      case DRIVE ->
-          drivetrain.setControl(
+    protected void afterTransition(DrivetrainState newState) {
+      switch (newState) {
+      case DRIVE -> {
+      if (moving) {
+        drivetrain.setControl(
               drive
-                  .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-                  .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
-                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-      case BRAKE -> {
-        if (teleopSpeeds.omegaRadiansPerSecond == 0) {
-          drivetrain.setControl(
-              driveToAngle
-                  .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-                  .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-
-        } else {
-          drivetrain.setControl(
-              drive
-                  .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-                  .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
-                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        }
+              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
+              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
+              .withRotationalRate(controller.rightX() * MaxAngularRate)
+              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      } else {
+         drivetrain.applyRequest(() -> CommandSwerveDrivetrain.getInstance().brake);
       }
+    }
       case CORAL_STATION_ALIGN ->
           drivetrain.setControl(
-              drive
-                  .withVelocityX(autoSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoSpeeds.vyMetersPerSecond)
-                  .withRotationalRate(autoSpeeds.omegaRadiansPerSecond)
-                  .withDriveRequestType(DriveRequestType.Velocity));
+              driveToAngle
+              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
+              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
+                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
+                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       case REEF_ALIGN ->
           drivetrain.setControl(
               driveToAngle
-                  .withVelocityX(autoSpeeds.vxMetersPerSecond)
-                  .withVelocityY(autoSpeeds.vyMetersPerSecond)
+              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
+              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
                   .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.Velocity));
+                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
     }
   }
 
   public void setState(DrivetrainState newState) {
-        setStateFromRequest(newState);
+    setStateFromRequest(newState);
   }
 
   @Override

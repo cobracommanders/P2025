@@ -31,7 +31,6 @@ public enum RobotState {
   INVERTED_INTAKE_CORAL_STATION(false, true),
   REMOVE_ALGAE(false, false),
   DRIVE(false, false),
-  BRAKE(false, false),
   CORAL_STATION_ALIGN(false, false),
   REEF_ALIGN(false, false),
   PREPARE_INVERTED_FROM_IDLE(true, true),
