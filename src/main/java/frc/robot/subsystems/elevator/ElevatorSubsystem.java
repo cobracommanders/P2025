@@ -30,8 +30,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private double elevatorPosition = 0;
+  private final TalonFXConfiguration right_motor_config =new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private double elevatorPosition;
+  private double leftElevatorPosition;
   private double leftMotorPosition;
   private double rightMotorPosition;
   private final double tolerance;
@@ -54,7 +55,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     leftMotor.getConfigurator().apply(left_motor_config);
     rightMotor.getConfigurator().apply(right_motor_config);
-    tolerance = 1;
+    tolerance = 0.05;
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
@@ -70,7 +71,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public boolean atGoal() {
     return switch (getState()) {
         case IDLE -> 
-          MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
+        (rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
         case L1 ->
           MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
         case L2 ->
@@ -104,7 +105,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public void collectInputs(){
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Elevator Position", elevatorPosition);
-    DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
+    //DogLog.log(getName() + "/Elevator Position", leftElevatorPosition);
+    DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
   }
 
   @Override

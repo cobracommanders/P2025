@@ -28,6 +28,7 @@ public enum RobotState {
   PREPARE_CORAL_STATION(false, false),
   INTAKE_CORAL_STATION(false, false),
   PREPARE_INVERTED_CORAL_STATION(false, true),
+  PREPARE_INVERTED_IDLE_FROM_CORAL_STATION(false, true),
   INVERTED_INTAKE_CORAL_STATION(false, true),
   REMOVE_ALGAE(false, false),
   PREPARE_INVERTED_FROM_IDLE(true, true),
