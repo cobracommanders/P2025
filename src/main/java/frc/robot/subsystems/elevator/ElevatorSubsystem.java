@@ -30,14 +30,14 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private final TalonFXConfiguration right_motor_config =new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private double elevatorPosition;
   private double leftElevatorPosition;
   private double leftMotorPosition;
   private double rightMotorPosition;
   private final double tolerance;
-  private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
-  private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
+  private MotionMagicVoltage right_motor_request = new MotionMagicVoltage(0).withSlot(0);
+  private Follower left_motor_request = new Follower(Ports.ElevatorPorts.RMOTOR, true);
   private boolean preMatchHomingOccured = false;
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
@@ -55,7 +55,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     leftMotor.getConfigurator().apply(left_motor_config);
     rightMotor.getConfigurator().apply(right_motor_config);
-    tolerance = 0.05;
+    tolerance = 0.1;
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
@@ -71,7 +71,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public boolean atGoal() {
     return switch (getState()) {
         case IDLE -> 
-        (rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
+          MathUtil.isNear(ElevatorPositions.IDLE, elevatorPosition, tolerance);
         case L1 ->
           MathUtil.isNear(ElevatorPositions.L1, elevatorPosition, tolerance);
         case L2 ->
@@ -87,7 +87,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         case CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
         case HOME_ELEVATOR ->
-          (leftMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
+          (rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
         case INVERTED_CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
       };
@@ -103,7 +103,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   @Override
   public void collectInputs(){
-    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
+    elevatorPosition = rightMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Elevator Position", elevatorPosition);
     //DogLog.log(getName() + "/Elevator Position", leftElevatorPosition);
     DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
@@ -127,11 +127,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     // }
   }
 
-  public void setElevatorPosition(double leftPosition){
-    leftMotor.setControl(left_motor_request.withPosition(leftPosition));
-    rightMotor.setControl(right_motor_request);
+  public void setElevatorPosition(double rightPosition){
+    leftMotor.setControl(left_motor_request);
+    rightMotor.setControl(right_motor_request.withPosition(rightPosition));
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/LEFTMotor Setpoint", leftPosition);
+    DogLog.log(getName() + "/right Motor Setpoint", rightPosition);
   }
 
     @Override
@@ -159,7 +159,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           setElevatorPosition(ElevatorPositions.L4);
         }
         case HOME_ELEVATOR -> {
-          leftMotor.setControl(new VoltageOut(-0.4));
+          rightMotor.setControl(new VoltageOut(-0.4));
         }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);

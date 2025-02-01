@@ -59,7 +59,7 @@ public class WristSubsystem extends StateMachine<WristState>{
     return switch (getState()) {
       case IDLE -> 
         MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
-      case INVERTED_IDLE -> 
+      case INVERTED_IDLE ->
         MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
       case L1 ->
         MathUtil.isNear(WristPositions.L1, wristPosition, tolerance);
@@ -79,6 +79,8 @@ public class WristSubsystem extends StateMachine<WristState>{
         wristMotor.getStatorCurrent().getValueAsDouble() > WristConstants.homingStallCurrent;
       case INVERTED_CORAL_STATION ->
         MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
+      case AFTER_INTAKE ->
+        MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
       case DISABLED->
         true;
     };
@@ -166,6 +168,9 @@ public class WristSubsystem extends StateMachine<WristState>{
         }
         case DISABLED-> {
           wristMotor.setControl(new VoltageOut(0));
+        }
+        case AFTER_INTAKE -> {
+          setWristPosition(WristPositions.AFTER_INTAKE);
         }
         default -> {}
       }

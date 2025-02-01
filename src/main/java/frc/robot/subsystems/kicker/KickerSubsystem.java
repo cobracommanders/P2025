@@ -33,13 +33,13 @@ public class KickerSubsystem extends StateMachine<KickerState>{
     }
   
      public boolean atGoal() {
-      return switch (getState()) {
-        case IDLE -> 
-          KickerSpeeds.IDLE == kickerSpeed;
-        case REMOVE_ALGAE -> 
-          KickerSpeeds.REMOVE_ALGAE == kickerSpeed;
+      return true;
+      // switch (getState()) {
+      //   case IDLE -> 
+      //     KickerSpeeds.IDLE == kickerSpeed;
+      //   case REMOVE_ALGAE -> 
+      //     KickerSpeeds.REMOVE_ALGAE == kickerSpeed;
       };
-    }
   
     public void setState(KickerState newState) {
         setStateFromRequest(newState);

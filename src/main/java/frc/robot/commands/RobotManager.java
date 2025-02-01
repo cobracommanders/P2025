@@ -86,7 +86,7 @@ public class RobotManager extends StateMachine<RobotState> {
           }
           break;
         case L1:
-          if (!currentState.ignoreRequests && !currentState.inverted) {
+          if (!currentState.ignoreRequests) {
             nextState = RobotState.PREPARE_L1;
           }
           break;
@@ -223,7 +223,7 @@ public class RobotManager extends StateMachine<RobotState> {
         break;
       case SCORE_L1:
         if (timeout(1)) {
-          nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+          nextState = RobotState.PREPARE_INVERTED_IDLE;
         }
         break;
       case SCORE_L2:
@@ -446,8 +446,8 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_IDLE_FROM_INVERTED -> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
-            wrist.setState(WristState.INVERTED_IDLE);
+            manipulator.setState(ManipulatorState.AFTER_INTAKE);
+            wrist.setState(WristState.AFTER_INTAKE);
             elbow.setState(ElbowState.INVERTED_IDLE);
             kicker.setState(KickerState.IDLE);
           }
@@ -455,7 +455,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_INVERTED_FROM_IDLE -> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.AFTER_INTAKE);
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);

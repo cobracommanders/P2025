@@ -56,7 +56,7 @@ public class Controls {
     private void newControlStyle () {
         controlStyle = () -> drive.withVelocityX(-driver.leftY() * driver.leftY() * driver.leftY() * MaxSpeed) // Drive forward -Y
             .withVelocityY(-driver.leftX() * driver.leftX() * driver.leftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(driver.rightX() * AngularRate); // Drive counterclockwise with negative X (left)
+            .withRotationalRate(driver.rightX() * driver.rightX() * driver.rightX() * AngularRate); // Drive counterclockwise with negative X (left)
     }
 
 
@@ -68,10 +68,10 @@ public class Controls {
   }
 
     public void configureDriverCommands() {
-        driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
+        driver.A().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
         driver.leftTrigger().and(driver.A().negate()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
-        driver.A().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());
+        driver.rightBumper().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
@@ -83,8 +83,8 @@ public class Controls {
         operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
         operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
         operator.start().and(operator.back()).onTrue(Robot.robotCommands.homeCommand());
-        operator.Y().onTrue(Robot.robotCommands.L4Command());
-        operator.B().onTrue(Robot.robotCommands.L3Command());
+        operator.Y().onTrue(Robot.robotCommands.L3Command());
+        operator.B().onTrue(Robot.robotCommands.L4Command());
         operator.X().onTrue(Robot.robotCommands.L2Command());
         operator.A().onTrue(Robot.robotCommands.L1Command());
         operator.leftTrigger().and(operator.rightTrigger()).onTrue(Robot.robotCommands.climbCommand());
