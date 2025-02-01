@@ -105,12 +105,18 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     super(DrivetrainState.BRAKE);
   }
   
+  public void setSnapToAngle(double angle) {
+    goalSnapAngle = angle;
+  }
 
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
     robotRelativeSpeeds = drivetrainState.Speeds;
     fieldRelativeSpeeds = calculateFieldRelativeSpeeds();
+    if (CommandSwerveDrivetrain.getInstance().isMoving()) {
+      moving = true;
+    }
   }
 
   private ChassisSpeeds calculateFieldRelativeSpeeds() {
