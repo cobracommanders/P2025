@@ -75,9 +75,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDeadband(MaxSpeed * 0.03);
 
   private SwerveDriveState drivetrainState = new SwerveDriveState();
-  private ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds fieldRelativeSpeeds = new ChassisSpeeds();
-  private boolean moving = false;
   private double goalSnapAngle = 0;
 
   public SwerveDriveState getDrivetrainState() {
@@ -95,15 +92,12 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   @Override
   protected void collectInputs() {
     drivetrainState = drivetrain.getState();
-    if (CommandSwerveDrivetrain.getInstance().isMoving()) {
-      moving = true;
-    }
   }
 
     protected void afterTransition(DrivetrainState newState) {
       switch (newState) {
       case DRIVE -> {
-      if (moving) {
+      if (CommandSwerveDrivetrain.getInstance().isMoving()) {
         drivetrain.setControl(
               drive
               .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
