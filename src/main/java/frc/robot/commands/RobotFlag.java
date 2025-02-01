@@ -13,6 +13,5 @@ public enum RobotFlag {
   SCORE,
   APPLY_HEIGHT_CAP,
   REMOVE_HEIGHT_CAP,
-  HOMING,
-  STILL
+  HOMING
 }
