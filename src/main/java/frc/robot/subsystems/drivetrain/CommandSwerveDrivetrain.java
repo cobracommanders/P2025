@@ -49,7 +49,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Field2d field = new Field2d();
     public SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 
-    private LimelightLocalization limelightLocalization = new LimelightLocalization();
 
     public void setYaw(Rotation2d rotation) {
         // this.getPigeon2().setYaw(angle);
@@ -157,7 +156,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
     @Override
     public void periodic() {
-        limelightLocalization.update();
         field.setRobotPose(this.getState().Pose);
         SmartDashboard.putData(field);
         /* Periodically try to apply the operator perspective */

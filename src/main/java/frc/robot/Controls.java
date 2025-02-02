@@ -21,6 +21,7 @@ import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.kicker.KickerSubsystem;
 import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
@@ -47,25 +48,11 @@ public class Controls {
     public final Xbox operator = new Xbox(OIConstants.OPERATOR_CONTROLLER_ID);
 
     public Controls() {
-        driver.setDeadzone(0.15);
         driver.setTriggerThreshold(0.2);
-        operator.setDeadzone(0.2);
+        driver.setDeadzone(0.15);
         operator.setTriggerThreshold(0.2);
+        operator.setDeadzone(0.2);
     }
-    private Supplier<SwerveRequest> controlStyle;
-    private void newControlStyle () {
-        controlStyle = () -> drive.withVelocityX(-driver.leftY() * driver.leftY() * driver.leftY() * MaxSpeed) // Drive forward -Y
-            .withVelocityY(-driver.leftX() * driver.leftX() * driver.leftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(driver.rightX() * AngularRate); // Drive counterclockwise with negative X (left)
-    }
-
-
-     
-    public void configureDefaultCommands() {
-        newControlStyle();
-         CommandSwerveDrivetrain.getInstance().setDefaultCommand(repeatingSequence( // Drivetrain will execute this command periodically
-         runOnce(()-> CommandSwerveDrivetrain.getInstance().driveFieldRelative(new ChassisSpeeds(-driver.leftY() * driver.leftY() * driver.leftY() * MaxSpeed, -driver.leftX() * driver.leftX() * driver.leftX() * MaxSpeed, driver.rightX() * AngularRate)), CommandSwerveDrivetrain.getInstance())));
-  }
 
     public void configureDriverCommands() {
         driver.rightBumper().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
@@ -88,5 +75,7 @@ public class Controls {
         operator.X().onTrue(Robot.robotCommands.L2Command());
         operator.A().onTrue(Robot.robotCommands.L1Command());
         operator.leftTrigger().and(operator.rightTrigger()).onTrue(Robot.robotCommands.climbCommand());
+        operator.POV0().onTrue(runOnce(() -> KickerSubsystem.getInstance().disabled = true));
+        operator.POV180().onTrue(runOnce(() -> KickerSubsystem.getInstance().disabled = false));
     }
 }

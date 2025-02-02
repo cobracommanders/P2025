@@ -1,64 +1,29 @@
 package frc.robot.subsystems.drivetrain;
 
-import java.security.InvalidParameterException;
-import java.util.function.Supplier;
-
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
-import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModule;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants;
 import frc.robot.Controls;
 import frc.robot.Robot;
 import frc.robot.StateMachine;
+import frc.robot.commands.RobotManager;
 import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
-import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.elbow.ElbowState;
-import frc.robot.subsystems.elbow.ElbowSubsystem;
-import frc.robot.subsystems.kicker.KickerState;
-import frc.robot.subsystems.wrist.WristState;
-import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightLocalization;
 
 public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
+  private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
   private final double MaxAngularRate = Math.PI * 3.5;
-  private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
-  private Xbox controller = Robot.controls.driver;
-
+  private final CommandSwerveDrivetrain drivetrain;
+  private LimelightLocalization limelightLocalization = new LimelightLocalization();
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
 
@@ -82,58 +47,111 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   }
 
   public DrivetrainSubsystem() {
-    super(DrivetrainState.DRIVE);
+    super(DrivetrainState.TELEOP);
+    drivetrain = CommandSwerveDrivetrain.getInstance();
+  }
+
+  @Override
+  protected DrivetrainState getNextState(DrivetrainState currentState) {
+    DrivetrainState nextState = currentState;
+     switch (currentState) {
+      case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN -> {
+        switch (RobotManager.getInstance().getState()) {
+          case IDLE, INVERTED_IDLE, PREPARE_IDLE, PREPARE_INVERTED_IDLE, PREPARE_INVERTED_FROM_IDLE, PREPARE_IDLE_FROM_INVERTED-> {
+            nextState = DrivetrainState.TELEOP;
+          }
+          default -> {}
+        }
+      }
+      case TELEOP -> {
+        switch (RobotManager.getInstance().getState()) {
+          case PREPARE_CORAL_STATION, PREPARE_INVERTED_CORAL_STATION, INVERTED_INTAKE_CORAL_STATION, INTAKE_CORAL_STATION-> {
+            nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
+          }
+          case PREPARE_L1, PREPARE_L2, PREPARE_L3, PREPARE_L4, WAIT_L1, WAIT_L2, WAIT_L3, WAIT_L4, SCORE_L1, SCORE_L2, SCORE_L3, SCORE_L4, CAPPED_L3, CAPPED_L4-> {
+            nextState = DrivetrainState.TELEOP_REEF_ALIGN;
+          }
+          default -> {}
+        }
+      }
+      default -> {}
+     }
+    return nextState;
   }
   
   public void setSnapToAngle(double angle) {
     goalSnapAngle = angle;
   }
 
-  @Override
-  protected void collectInputs() {
-    drivetrainState = drivetrain.getState();
+  boolean isControlled(ChassisSpeeds speeds) {
+    return Math.abs(speeds.vxMetersPerSecond) < 0.01 && Math.abs(speeds.vyMetersPerSecond) < 0.01 && Math.abs(speeds.omegaRadiansPerSecond) < 0.01;
   }
 
-    protected void afterTransition(DrivetrainState newState) {
+  @Override
+  protected void collectInputs() {
+    limelightLocalization.update();
+    drivetrainState = drivetrain.getState();
+    teleopSpeeds = new ChassisSpeeds(-Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, Robot.controls.driver.rightX() * MaxAngularRate);
+    DogLog.log(getName() + "/teleopSpeeds", teleopSpeeds);
+    boolean isSlow = false;
+    if (!RobotManager.getInstance().isHeightCapped) {
+      teleopSpeeds = teleopSpeeds.div(2);
+      isSlow = true;
+    }
+    DogLog.log(getName() + "/isSlow", isSlow);
+  }
+  @Override
+  public void periodic() {
+    super.periodic();
+    sendSwerveRequest(getState());
+  }
+
+    protected void sendSwerveRequest(DrivetrainState newState) {
       switch (newState) {
-      case DRIVE -> {
-      if (CommandSwerveDrivetrain.getInstance().isMoving()) {
+      case TELEOP -> {
+        drivetrain.setControl(
+          drive
+          .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+          .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+          .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      }
+      case TELEOP_CORAL_STATION_ALIGN -> {
+          if (!isControlled(teleopSpeeds)) {
+          drivetrain.setControl(
+                drive
+                .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+                .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+        } else {
+          drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
+        }
+      }
+      case TELEOP_REEF_ALIGN -> {
+      if (!isControlled(teleopSpeeds)) {
         drivetrain.setControl(
               drive
-              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
-              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
-              .withRotationalRate(controller.rightX() * MaxAngularRate)
+              .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+              .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+              .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       } else {
-         drivetrain.applyRequest(() -> CommandSwerveDrivetrain.getInstance().brake);
+        drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
       }
     }
-      case CORAL_STATION_ALIGN ->
-          drivetrain.setControl(
-              driveToAngle
-              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
-              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-      case REEF_ALIGN ->
-          drivetrain.setControl(
-              driveToAngle
-              .withVelocityX(-controller.leftY() * controller.leftY() * controller.leftY() * MaxSpeed)
-              .withVelocityY(-controller.leftX() * controller.leftX() * controller.leftX() * MaxSpeed)
-                  .withTargetDirection(Rotation2d.fromDegrees(goalSnapAngle))
-                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      case AUTO_CORAL_STATION_ALIGN ->
+        {}
+      case AUTO_REEF_ALIGN ->
+        {}
+      case AUTO ->
+        {}
     }
   }
 
   public void setState(DrivetrainState newState) {
     setStateFromRequest(newState);
   }
-
-  @Override
-  public void periodic() {
-    super.periodic();
-
-    }
 
     private static DrivetrainSubsystem instance;
 

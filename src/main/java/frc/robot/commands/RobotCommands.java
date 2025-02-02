@@ -83,8 +83,7 @@ public class RobotCommands {
   }
 
   public Command removeHeightCapCommand() {
-    return Commands.runOnce(robot::removeHeightCapRequest)
-        .andThen(CommandSwerveDrivetrain.getInstance().applyRequest(() -> CommandSwerveDrivetrain.getInstance().brake));
+    return Commands.runOnce(robot::removeHeightCapRequest);
   }
 
   public Command applyHeightCapCommand() {
@@ -107,7 +106,7 @@ public class RobotCommands {
       return invertIdleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareInvertedCoralStationRequest, requirements)) // Prepare CS (inverted)
         .andThen(robot.waitForState(RobotState.INVERTED_IDLE)); // Goes back to inverted idle when we're done intaking
-    }else {
+    } else {
       return Commands.runOnce(robot::prepareInvertedCoralStationRequest, requirements)
           .andThen(robot.waitForState(RobotState.INVERTED_IDLE));
     }

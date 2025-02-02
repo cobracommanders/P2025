@@ -295,7 +295,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L1 -> {
             elevator.setState(ElevatorState.L1);
@@ -304,7 +303,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L1);
             elbow.setState(ElbowState.L1);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case SCORE_L1 -> {
             elevator.setState(ElevatorState.L1);
@@ -313,7 +311,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L1);
             elbow.setState(ElbowState.L1);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L2 -> {
             elevator.setState(ElevatorState.L2);
@@ -321,8 +318,7 @@ public class RobotManager extends StateMachine<RobotState> {
             manipulator.setState(ManipulatorState.IDLE);
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
-            kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);     
+            kicker.setState(KickerState.REMOVE_ALGAE);   
           }
           case SCORE_L2 -> {
             elevator.setState(ElevatorState.L2);
@@ -331,7 +327,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L3 -> {
             elevator.setState(ElevatorState.L3);
@@ -340,7 +335,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L3);
             elbow.setState(ElbowState.L3);
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case SCORE_L3 -> {
             elevator.setState(ElevatorState.L3);
@@ -349,7 +343,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L3);
             elbow.setState(ElbowState.L3);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case PREPARE_L4 -> {
             elevator.setState(ElevatorState.L4);
@@ -358,7 +351,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L4);
             elbow.setState(ElbowState.L4);
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case SCORE_L4 -> {
             elevator.setState(ElevatorState.L4);
@@ -375,7 +367,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.CORAL_STATION);
             elbow.setState(ElbowState.CORAL_STATION);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.CORAL_STATION_ALIGN);
           }
           case INTAKE_CORAL_STATION -> {
             elevator.setState(ElevatorState.CORAL_STATION);
@@ -384,7 +375,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.CORAL_STATION);
             elbow.setState(ElbowState.CORAL_STATION);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.CORAL_STATION_ALIGN);
           }
           case PREPARE_INVERTED_CORAL_STATION -> {
             elevator.setState(ElevatorState.INVERTED_CORAL_STATION);
@@ -393,7 +383,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.INVERTED_CORAL_STATION);
             elbow.setState(ElbowState.INVERTED_CORAL_STATION);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.CORAL_STATION_ALIGN);
           }
           case INVERTED_INTAKE_CORAL_STATION -> {
             elevator.setState(ElevatorState.INVERTED_CORAL_STATION);
@@ -402,7 +391,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.INVERTED_CORAL_STATION);
             elbow.setState(ElbowState.INVERTED_CORAL_STATION);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.CORAL_STATION_ALIGN);
           }
           case PREPARE_DEEP_CLIMB -> {
             elevator.setState(ElevatorState.IDLE);
@@ -411,7 +399,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case DEEP_CLIMB -> {
             elevator.setState(ElevatorState.IDLE);
@@ -420,7 +407,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case CAPPED_L4 -> {
@@ -430,7 +416,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.CAPPED_L4);
             elbow.setState(ElbowState.CAPPED_L4);
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case L4_ELBOW -> {
@@ -440,7 +425,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.L4);
             elbow.setState(ElbowState.L4_ELBOW);
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case CAPPED_L3 -> {
@@ -450,7 +434,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.CAPPED_L3);
             elbow.setState(ElbowState.CAPPED_L3);
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case PREPARE_IDLE -> {
@@ -460,7 +443,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case PREPARE_IDLE_FROM_INVERTED -> {
@@ -470,7 +452,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.INVERTED_IDLE);
             elbow.setState(ElbowState.INVERTED_IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case PREPARE_INVERTED_FROM_IDLE -> {
@@ -480,7 +461,6 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
 
           case PREPARE_INVERTED_IDLE -> {
@@ -490,35 +470,28 @@ public class RobotManager extends StateMachine<RobotState> {
             wrist.setState(WristState.INVERTED_IDLE);
             elbow.setState(ElbowState.INVERTED_IDLE);
             kicker.setState(KickerState.IDLE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case HOMING_STAGE_1_ELEVATOR -> {
             elevator.setState(ElevatorState.HOME_ELEVATOR);
             wrist.setState(WristState.DISABLED);
             elbow.setState(ElbowState.DISABLED);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case HOMING_STAGE_2_ELBOW -> {
             elbow.setState(ElbowState.HOME_ELBOW);
             wrist.setState(WristState.DISABLED);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case HOMING_STAGE_3_WRIST -> {
             wrist.setState(WristState.HOME_WRIST);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case WAIT_L2 -> {
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case WAIT_L3 -> {
             kicker.setState(KickerState.REMOVE_ALGAE);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case WAIT_L4 -> {
             kicker.setState(KickerState.REMOVE_ALGAE);
             elbow.setState(ElbowState.L4_ELBOW);
-            drivetrain.setState(DrivetrainState.DRIVE);
           }
           case INVERTED_IDLE,
             WAIT_DEEP_CLIMB, 
