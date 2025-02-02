@@ -44,7 +44,7 @@ public class WristSubsystem extends StateMachine<WristState>{
     motor_config.MotionMagic.MotionMagicAcceleration = WristConstants.MotionMagicAcceleration;
     motor_config.MotionMagic.MotionMagicJerk = WristConstants.MotionMagicJerk;
     wristMotor.getConfigurator().apply(motor_config);
-    tolerance = 0.015;
+    tolerance = 0.01;
     brakeModeEnabled = false;
   }
   protected WristState getNextState(WristState currentState) {
@@ -110,7 +110,7 @@ public class WristSubsystem extends StateMachine<WristState>{
         motor_config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         wristMotor.getConfigurator().apply(motor_config);
         brakeModeEnabled = false;
-        }
+      }
       else if (DriverStation.isEnabled() && brakeModeEnabled == false)  {
         motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         wristMotor.getConfigurator().apply(motor_config);

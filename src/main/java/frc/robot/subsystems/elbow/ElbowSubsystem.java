@@ -46,7 +46,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
     motor_config.MotionMagic.MotionMagicCruiseVelocity = ElbowConstants.MotionMagicCruiseVelocity;
     motor_config.MotionMagic.MotionMagicAcceleration = ElbowConstants.MotionMagicAcceleration;
     motor_config.MotionMagic.MotionMagicJerk = ElbowConstants.MotionMagicJerk;
-    tolerance = 0.025;
+    tolerance = 0.02;
     brakeModeEnabled = false;
   }
   

@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
@@ -27,6 +28,7 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
     public ManipulatorSubsystem() {
       super(ManipulatorState.IDLE);
       manipulatorMotor = new TalonFX(Ports.ManipulatorPorts.MANIPULATOR_MOTOR);
+      motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       manipulatorMotor.getConfigurator().apply(motor_config);
     }
 
