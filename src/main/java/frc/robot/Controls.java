@@ -51,21 +51,8 @@ public class Controls {
         driver.setTriggerThreshold(0.2);
         driver.setDeadzone(0.15);
         operator.setTriggerThreshold(0.2);
+        operator.setDeadzone(0.2);
     }
-    private Supplier<SwerveRequest> controlStyle;
-    private void newControlStyle () {
-        controlStyle = () -> drive.withVelocityX(-driver.leftY() * driver.leftY() * driver.leftY() * MaxSpeed) // Drive forward -Y
-            .withVelocityY(-driver.leftX() * driver.leftX() * driver.leftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(driver.rightX() * driver.rightX() * driver.rightX() * AngularRate); // Drive counterclockwise with negative X (left)
-    }
-
-
-     
-    public void configureDefaultCommands() {
-        newControlStyle();
-         CommandSwerveDrivetrain.getInstance().setDefaultCommand(repeatingSequence( // Drivetrain will execute this command periodically
-         runOnce(()-> CommandSwerveDrivetrain.getInstance().driveFieldRelative(new ChassisSpeeds(-driver.leftY() * driver.leftY() * driver.leftY() * MaxSpeed, -driver.leftX() * driver.leftX() * driver.leftX() * MaxSpeed, driver.rightX() * AngularRate)), CommandSwerveDrivetrain.getInstance())));
-  }
 
     public void configureDriverCommands() {
         driver.A().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
