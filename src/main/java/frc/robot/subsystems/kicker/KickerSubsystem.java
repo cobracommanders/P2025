@@ -18,7 +18,6 @@ import frc.robot.StateMachine;
 
 public class KickerSubsystem extends StateMachine<KickerState>{
     private final TalonFX kickerMotor;
-    public boolean disabled = false;
     private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((3.0 / 1.0)));
     private double kickerSpeed;
     
@@ -34,13 +33,13 @@ public class KickerSubsystem extends StateMachine<KickerState>{
     }
   
      public boolean atGoal() {
-      return switch (getState()) {
-        case IDLE -> 
-          KickerSpeeds.IDLE == kickerSpeed;
-        case REMOVE_ALGAE -> 
-          KickerSpeeds.REMOVE_ALGAE == kickerSpeed;
+      return true;
+      // switch (getState()) {
+      //   case IDLE -> 
+      //     KickerSpeeds.IDLE == kickerSpeed;
+      //   case REMOVE_ALGAE -> 
+      //     KickerSpeeds.REMOVE_ALGAE == kickerSpeed;
       };
-    }
   
     public void setState(KickerState newState) {
         setStateFromRequest(newState);

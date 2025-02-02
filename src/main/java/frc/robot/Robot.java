@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.RobotCommands;
 import frc.robot.commands.RobotManager;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.elbow.ElbowPositions;
@@ -62,10 +63,24 @@ public class Robot extends TimedRobot{
 
         autoChooser = AutoBuilder.buildAutoChooser();
 
+        NamedCommands.registerCommand("idle", Robot.robotCommands.idleCommand());
+        NamedCommands.registerCommand("inverted idle", Robot.robotCommands.invertIdleCommand());
+        NamedCommands.registerCommand("score", Robot.robotCommands.scoreCommand());
+        NamedCommands.registerCommand("L1", Robot.robotCommands.L1Command());
+        NamedCommands.registerCommand("L2", Robot.robotCommands.L2Command());
+        NamedCommands.registerCommand("L3", Robot.robotCommands.L3Command());
+        NamedCommands.registerCommand("L4", Robot.robotCommands.L4Command());
+        NamedCommands.registerCommand("remove height cap", Robot.robotCommands.removeHeightCapCommand());
+        NamedCommands.registerCommand("apply height cap", Robot.robotCommands.applyHeightCapCommand());
+        NamedCommands.registerCommand("climb", Robot.robotCommands.climbCommand());
+        NamedCommands.registerCommand("intake", Robot.robotCommands.intakeCommand());
+        NamedCommands.registerCommand("inverted intake", Robot.robotCommands.invertedIntakeCommand());
+        NamedCommands.registerCommand("home", Robot.robotCommands.homeCommand());
+
         // DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
         // Limelight.getInstance();
-        
+        LED led = new LED(robotManager);
     }
 
     @Override

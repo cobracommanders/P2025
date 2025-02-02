@@ -24,8 +24,8 @@ public class RobotCommands {
   }
 
   public Command L1Command() {
-    if (robot.getState().inverted) {
-      return idleCommand() // go to non-inverted idle
+    if (!robot.getState().inverted) {
+      return invertIdleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareL1Request, requirements)) // Prepare CS (non-inverted)
         .andThen(robot.waitForState(RobotState.WAIT_L1)); // Goes back to idle when we're done intaking
     }else {
@@ -102,7 +102,7 @@ public class RobotCommands {
   }
 
   public Command invertedIntakeCommand() {
-    if (!robot.getState().inverted) {
+    if (robot.getState().inverted) {
       return invertIdleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareInvertedCoralStationRequest, requirements)) // Prepare CS (inverted)
         .andThen(robot.waitForState(RobotState.INVERTED_IDLE)); // Goes back to inverted idle when we're done intaking
