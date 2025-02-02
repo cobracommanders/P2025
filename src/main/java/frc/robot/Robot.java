@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.RobotCommands;
 import frc.robot.commands.RobotManager;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.elbow.ElbowPositions;
@@ -80,7 +81,7 @@ public class Robot extends TimedRobot{
         // DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
         // Limelight.getInstance();
-        
+        LED led = new LED(robotManager);
     }
 
     @Override
