@@ -141,9 +141,6 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_DEEP_CLIMB:
       case WAIT_IDLE:
       case WAIT_L1:
-      case DRIVE:
-      case CORAL_STATION_ALIGN:
-      case REEF_ALIGN:
       case DEEP_CLIMB:
       case INVERTED_INTAKE_CORAL_STATION:
       case INTAKE_CORAL_STATION:
@@ -498,9 +495,6 @@ public class RobotManager extends StateMachine<RobotState> {
             WAIT_IDLE, 
             WAIT_INVERTED_IDLE, 
             WAIT_L1,
-            DRIVE,
-            CORAL_STATION_ALIGN,
-            REEF_ALIGN,
             PREPARE_HOMING,
             REMOVE_ALGAE -> {}
           }

@@ -20,6 +20,7 @@ public class KickerSubsystem extends StateMachine<KickerState>{
     private final TalonFX kickerMotor;
     private final TalonFXConfiguration motor_config = new TalonFXConfiguration().withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((3.0 / 1.0)));
     private double kickerSpeed;
+    public boolean disabled = false;
     
     public KickerSubsystem() {
       super(KickerState.IDLE);
