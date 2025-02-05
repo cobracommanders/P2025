@@ -455,7 +455,7 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.AFTER_INTAKE);
-            wrist.setState(WristState.IDLE);
+            wrist.setState(WristState.AFTER_L4);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
           }
