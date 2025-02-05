@@ -472,13 +472,21 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.HOME_ELEVATOR);
             wrist.setState(WristState.DISABLED);
             elbow.setState(ElbowState.DISABLED);
+            manipulator.setState(ManipulatorState.IDLE);
+            kicker.setState(KickerState.IDLE);
           }
           case HOMING_STAGE_2_ELBOW -> {
             elbow.setState(ElbowState.HOME_ELBOW);
             wrist.setState(WristState.DISABLED);
+            manipulator.setState(ManipulatorState.IDLE);
+            kicker.setState(KickerState.IDLE);
+
           }
           case HOMING_STAGE_3_WRIST -> {
             wrist.setState(WristState.HOME_WRIST);
+            manipulator.setState(ManipulatorState.IDLE);
+            kicker.setState(KickerState.IDLE);
+
           }
           case WAIT_L2 -> {
             kicker.setState(KickerState.REMOVE_ALGAE);

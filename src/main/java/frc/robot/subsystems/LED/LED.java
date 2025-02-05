@@ -16,33 +16,20 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RobotManager;
 import frc.robot.commands.RobotState;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
+import frc.robot.vision.AlignmentState;
+import frc.robot.vision.LimelightLocalization;
 
 public class LED extends SubsystemBase {
-  private static final LEDState FLASH_LIGHTS = new LEDState(Color.kBlue, Patterns.FAST_BLINK);
   private final AddressableLED m_led;
   private final  RobotManager robotManager;
   private final AddressableLEDBuffer m_ledBuffer;
   private final Timer blinkTimer = new Timer();
-  private Patterns patterns;
-  private Color color;
   private static final double FAST_BLINK_DURATION = 0.08;
   private static final double SLOW_BLINK_DURATION = 0.25;
-  // Create an LED pattern that will display a rainbow across
-  // all hues at maximum saturation and half brightness
- // private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
-
-  // Our LED strip has a density of 120 LEDs per meter
-  private static final Distance kLedSpacing = Meters.of(1 / 120.0);
-
-  // Create a new pattern that scrolls the rainbow pattern across the LED strip, moving at a speed
-  // of 1 meter per second.
   private LEDState state = new LEDState(Color.kBlue, Patterns.SOLID);
-  //private final LEDPattern m_scrollingRainbow =
-    //.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), kLedSpacing);
 
-  /** Called once at the beginning of the robot program. */
-  
-  
   public LED(RobotManager robotManager) {
     this.robotManager = robotManager;
     blinkTimer.start();
@@ -60,28 +47,70 @@ public class LED extends SubsystemBase {
   }
   @Override
   public void periodic() {
-    RobotState robotState = robotManager.getState();
-    state = robotState.ledState;
-    //m_scrollingRainbo.applyTo(m_ledBuffer);
-    switch (state.patterns()) {
-      case SOLID:
-          LEDPattern.solid(state.color()).applyTo(m_ledBuffer);
+    if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_CORAL_STATION_ALIGN && !RobotManager.getInstance().isHeightCapped){
+      switch (LimelightLocalization.getInstance().getCoralStationAlignmentState()) {
+        case ALIGNED:
+        LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
         break;
-      default:
+      case FAR_LEFT:
+        LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
         break;
+      case FAR_RIGHT:
+        LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+        break;
+      case NOT_ALIGNED:
+        LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+        break;
+      case INVALID:
+        LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+        break;
+      }
+        }
+    else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_REEF_ALIGN && !RobotManager.getInstance().isHeightCapped){
+      switch (LimelightLocalization.getInstance().getReefAlignmentState()) {
+        case ALIGNED:
+        LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
+        break;
+      case FAR_LEFT:
+        LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+        break;
+      case FAR_RIGHT:
+        LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+        break;
+      case NOT_ALIGNED:
+        LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+        break;
+        case INVALID:
+        LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+        break;
+      }
+    }
+
+    else{
+      state = robotManager.getState().ledState;
+      //m_scrollingRainbo.applyTo(m_ledBuffer);
+      switch (state.patterns()) {
+        case SOLID:
+            LEDPattern.solid(state.color()).applyTo(m_ledBuffer);
+          break;
+        case SLOW_BLINK:
+          if (blinkTimer.get() % (SLOW_BLINK_DURATION * 2) < SLOW_BLINK_DURATION) {
+            LEDPattern.solid(state.color()).applyTo(m_ledBuffer);
+          } else {
+            LEDPattern.solid(Color.kBlack).applyTo(m_ledBuffer);
+          }
+          break;
+        case FAST_BLINK:
+          if (blinkTimer.get() % (FAST_BLINK_DURATION * 2) < FAST_BLINK_DURATION) {
+            LEDPattern.solid(state.color()).applyTo(m_ledBuffer);
+          } else {
+            LEDPattern.solid(Color.kBlack).applyTo(m_ledBuffer);
+          }
+          break;
+        default:
+          break;
+      }
     }
     m_led.setData(m_ledBuffer);
-
-    double time = blinkTimer.get();
-    double onDuration = 0;
-    double offDuration = 0;
-
-    if(state.patterns() == Patterns.FAST_BLINK){
-      onDuration = FAST_BLINK_DURATION;
-      offDuration = FAST_BLINK_DURATION * 2;
-    } else if(state.patterns() == Patterns.SLOW_BLINK){
-      onDuration = SLOW_BLINK_DURATION;
-      offDuration = SLOW_BLINK_DURATION * 2;
-    }
   }
 }
