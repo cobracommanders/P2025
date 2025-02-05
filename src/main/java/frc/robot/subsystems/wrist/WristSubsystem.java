@@ -59,6 +59,8 @@ public class WristSubsystem extends StateMachine<WristState>{
     return switch (getState()) {
       case IDLE -> 
         MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
+      case POST_IDLE -> 
+        MathUtil.isNear(WristPositions.POST_IDLE, wristPosition, tolerance);
       case INVERTED_IDLE ->
         MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
       case L1 ->
@@ -139,7 +141,10 @@ public class WristSubsystem extends StateMachine<WristState>{
     protected void afterTransition(WristState newState) {
       switch (newState) {
         case IDLE -> {
-          setWristPosition(WristPositions.IDLE);
+          setWristPosition(WristPositions.IDLE).andThen(setWristPosition(WristPositions.POST_IDLE))
+        }
+        case POST_IDLE -> {
+          setWristPosition(WristPositions.POST_IDLE);
         }
         case INVERTED_IDLE -> {
           setWristPosition(WristPositions.INVERTED_IDLE);
