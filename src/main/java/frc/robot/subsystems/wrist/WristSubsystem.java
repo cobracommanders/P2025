@@ -51,6 +51,9 @@ public class WristSubsystem extends StateMachine<WristState>{
     if (getState() == WristState.HOME_WRIST && this.atGoal()) { 
       wristMotor.setPosition(0.38);
       return WristState.INVERTED_IDLE;
+    } else if (getState() == WristState.IDLE && this.atGoal()) {
+      setWristPosition(WristPositions.POST_IDLE);
+      return currentState;
     } else {
       return currentState;
     }
@@ -141,7 +144,7 @@ public class WristSubsystem extends StateMachine<WristState>{
     protected void afterTransition(WristState newState) {
       switch (newState) {
         case IDLE -> {
-          setWristPosition(WristPositions.IDLE).andThen(setWristPosition(WristPositions.POST_IDLE))
+          setWristPosition(WristPositions.IDLE);
         }
         case POST_IDLE -> {
           setWristPosition(WristPositions.POST_IDLE);
