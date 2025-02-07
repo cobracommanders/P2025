@@ -61,7 +61,7 @@ public class WristSubsystem extends StateMachine<WristState>{
    public boolean atGoal() {
     return switch (getState()) {
       case IDLE -> 
-        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
+        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance) || MathUtil.isNear(WristPositions.POST_IDLE, wristPosition, tolerance);
       case POST_IDLE -> 
         MathUtil.isNear(WristPositions.POST_IDLE, wristPosition, tolerance);
       case INVERTED_IDLE ->

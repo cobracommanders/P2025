@@ -150,7 +150,7 @@ public class RobotManager extends StateMachine<RobotState> {
       
 
       case PREPARE_L1:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
           nextState = RobotState.WAIT_L1;
         }
         break;

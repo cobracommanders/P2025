@@ -30,7 +30,7 @@ public class RobotCommands {
         .andThen(robot.waitForState(RobotState.WAIT_L1)); // Goes back to idle when we're done intaking
     }else {
       return Commands.runOnce(robot::prepareL1Request, requirements)
-          .andThen(robot.waitForState(RobotState.WAIT_L1));
+        .andThen(robot.waitForState(RobotState.WAIT_L1));
     }
   }
   
@@ -39,7 +39,7 @@ public class RobotCommands {
       return idleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareL2Request, requirements)) // Prepare CS (non-inverted)
         .andThen(robot.waitForState(RobotState.WAIT_L2)); // Goes back to idle when we're done intaking
-    }else {
+    } else {
       return Commands.runOnce(robot::prepareL2Request, requirements)
           .andThen(robot.waitForState(RobotState.WAIT_L2));
     }
