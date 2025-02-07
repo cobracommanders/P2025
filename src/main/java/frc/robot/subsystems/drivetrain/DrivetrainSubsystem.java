@@ -163,7 +163,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
               drive
               .withVelocityX(teleopSpeeds.vxMetersPerSecond)
               .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-              .withRotationalRate(0)
+              .withRotationalRate(RobotPosition.calculateDegreesToBranch())
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       } else {
         drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);

@@ -48,4 +48,9 @@ public class RobotPosition {
         if (Robot.alliance.get() == Alliance.Red) return calculateDegreesToTarget(PoseUtil.flip(closestCoralStation));
         return calculateDegreesToTarget(closestCoralStation);
     }
+    public static double calculateDegreesToBranch() {
+        Pose2d closestBranch = DrivetrainSubsystem.getInstance().nearestCoralStation;
+        if (Robot.alliance.get() == Alliance.Red) return calculateDegreesToTarget(PoseUtil.flip(closestBranch));
+        return calculateDegreesToTarget(closestBranch);
+    }
 }
