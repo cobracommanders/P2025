@@ -6,6 +6,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Controls;
@@ -23,8 +24,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
+  private Pose2d targetAngle;
   private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain;
+
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
@@ -81,10 +84,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       default -> {}
      }
     return nextState;
-  }
-  
-  public void setSnapToAngle(double angle) {
-    goalSnapAngle = angle;
   }
 
   boolean isNotControlled(ChassisSpeeds speeds) {
@@ -143,7 +142,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
                 drive
                 .withVelocityX(teleopSpeeds.vxMetersPerSecond)
                 .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+                .withRotationalRate(0)
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         } else {
           drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
@@ -155,7 +154,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
               drive
               .withVelocityX(teleopSpeeds.vxMetersPerSecond)
               .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-              .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+              .withRotationalRate(0)
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       } else {
         drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);

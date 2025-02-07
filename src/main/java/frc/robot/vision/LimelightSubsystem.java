@@ -54,7 +54,7 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
           }
           case CORAL_STATION -> {
             limelightLocalization.disableLeft = true;
-            limelightLocalization.disableRight =true;
+            limelightLocalization.disableRight = true;
             LimelightHelpers.setPipelineIndex("limelight-middle", 2);
             limelightLocalization.disableMiddle = false;
           }
