@@ -4,7 +4,7 @@ import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.RotationUtil;
+import frc.robot.util.RotationUtil;
 
 import java.util.EnumMap;
 

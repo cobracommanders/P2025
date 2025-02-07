@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
+import java.util.List;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -8,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Controls;
 import frc.robot.Robot;
@@ -16,6 +19,7 @@ import frc.robot.commands.RobotManager;
 import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.util.RobotPosition;
 import frc.robot.vision.LimelightLocalization;
 import frc.robot.vision.LimelightState;
 import frc.robot.vision.LimelightSubsystem;
@@ -24,9 +28,12 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
-  private Pose2d targetAngle;
   private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain;
+  public Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
+  public Pose2d nearestBranch = robotPose.nearest(List.of(LimelightLocalization.getInstance().branchPoses));
+  public Pose2d nearestCoralStation = robotPose.nearest(List.of(LimelightLocalization.getInstance().coralStationPoses));
+
 
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
 
@@ -45,7 +52,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDeadband(MaxSpeed * 0.03);
 
   private SwerveDriveState drivetrainState = new SwerveDriveState();
-  private double goalSnapAngle = 0;
 
   public SwerveDriveState getDrivetrainState() {
     return drivetrainState;
@@ -107,6 +113,9 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   @Override
   public void periodic() {
     super.periodic();
+    robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
+    nearestBranch = robotPose.nearest(List.of(LimelightLocalization.getInstance().branchPoses));
+    nearestCoralStation = robotPose.nearest(List.of(LimelightLocalization.getInstance().coralStationPoses));
     sendSwerveRequest(getState());
   }
 
@@ -142,7 +151,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
                 drive
                 .withVelocityX(teleopSpeeds.vxMetersPerSecond)
                 .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                .withRotationalRate(0)
+                .withRotationalRate(RobotPosition.calculateDegreesToCoralStation())
                 .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         } else {
           drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
