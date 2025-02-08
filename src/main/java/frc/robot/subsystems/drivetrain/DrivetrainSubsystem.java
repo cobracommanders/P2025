@@ -16,8 +16,6 @@ import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.vision.LimelightLocalization;
-import frc.robot.vision.LimelightState;
-import frc.robot.vision.LimelightSubsystem;
 
 public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
@@ -25,7 +23,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
   private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain;
-  private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
+  private LimelightLocalization limelightLocalization = new LimelightLocalization();
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
 
@@ -50,9 +48,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
 
   public DrivetrainSubsystem() {
     super(DrivetrainState.TELEOP);
-    LimelightSubsystem.getInstance();
     drivetrain = CommandSwerveDrivetrain.getInstance();
-    
   }
 
   @Override
@@ -87,7 +83,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     goalSnapAngle = angle;
   }
 
-  boolean isNotControlled(ChassisSpeeds speeds) {
+  boolean isControlled(ChassisSpeeds speeds) {
     return Math.abs(speeds.vxMetersPerSecond) < 0.01 && Math.abs(speeds.vyMetersPerSecond) < 0.01 && Math.abs(speeds.omegaRadiansPerSecond) < 0.01;
   }
 
@@ -97,7 +93,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     drivetrainState = drivetrain.getState();
     teleopSpeeds = new ChassisSpeeds(-Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, Robot.controls.driver.rightX() * MaxAngularRate);
     DogLog.log(getName() + "/teleopSpeeds", teleopSpeeds);
-    DogLog.log(getName() + "/robot pose", CommandSwerveDrivetrain.getInstance().getState().Pose);
     boolean isSlow = false;
     if (!RobotManager.getInstance().isHeightCapped) {
       teleopSpeeds = teleopSpeeds.div(2);
@@ -111,22 +106,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     sendSwerveRequest(getState());
   }
 
-    @Override
-    protected void afterTransition(DrivetrainState newState) {
-        switch (newState) {
-          case TELEOP -> {
-           LimelightSubsystem.getInstance().setState(LimelightState.DRIVE);
-          }
-          case TELEOP_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.REEF);
-           }
-          case TELEOP_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
-           }
-           default -> {}
-        }
-    }
-
     protected void sendSwerveRequest(DrivetrainState newState) {
       switch (newState) {
       case TELEOP -> {
@@ -138,7 +117,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
       case TELEOP_CORAL_STATION_ALIGN -> {
-          if (!isNotControlled(teleopSpeeds)) {
+          if (!isControlled(teleopSpeeds)) {
           drivetrain.setControl(
                 drive
                 .withVelocityX(teleopSpeeds.vxMetersPerSecond)
@@ -150,7 +129,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         }
       }
       case TELEOP_REEF_ALIGN -> {
-      if (!isNotControlled(teleopSpeeds)) {
+      if (!isControlled(teleopSpeeds)) {
         drivetrain.setControl(
               drive
               .withVelocityX(teleopSpeeds.vxMetersPerSecond)

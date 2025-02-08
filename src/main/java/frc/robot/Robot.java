@@ -22,7 +22,6 @@ import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.vision.LimelightLocalization;
 
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +79,7 @@ public class Robot extends TimedRobot{
 
         // DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
-        //LimelightLocalization.getInstance();
+        // Limelight.getInstance();
         LED led = new LED(robotManager);
     }
 
@@ -92,6 +91,8 @@ public class Robot extends TimedRobot{
             alliance = DriverStation.getAlliance();
         }
         // blinkin.setColor(BlinkinColor
+
+        
         }
 
     @Override
