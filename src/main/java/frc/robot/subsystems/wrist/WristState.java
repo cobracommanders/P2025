@@ -14,6 +14,5 @@ public enum WristState {
     HOME_WRIST,
     INVERTED_CORAL_STATION,
     AFTER_INTAKE,
-    AFTER_L4,
     DISABLED
 }

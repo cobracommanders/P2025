@@ -47,7 +47,7 @@ public class LED extends SubsystemBase {
   }
   @Override
   public void periodic() {
-    if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_CORAL_STATION_ALIGN){
+    if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_CORAL_STATION_ALIGN && !RobotManager.getInstance().isHeightCapped){
       switch (LimelightLocalization.getInstance().getCoralStationAlignmentState()) {
         case ALIGNED:
         LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
