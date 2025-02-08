@@ -51,9 +51,6 @@ public class WristSubsystem extends StateMachine<WristState>{
     if (getState() == WristState.HOME_WRIST && this.atGoal()) { 
       wristMotor.setPosition(0.38);
       return WristState.INVERTED_IDLE;
-    } else if (getState() == WristState.IDLE && this.atGoal()) {
-      setWristPosition(WristPositions.POST_IDLE);
-      return currentState;
     } else {
       return currentState;
     }
@@ -61,9 +58,7 @@ public class WristSubsystem extends StateMachine<WristState>{
    public boolean atGoal() {
     return switch (getState()) {
       case IDLE -> 
-        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance) || MathUtil.isNear(WristPositions.POST_IDLE, wristPosition, tolerance);
-      case POST_IDLE -> 
-        MathUtil.isNear(WristPositions.POST_IDLE, wristPosition, tolerance);
+        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
       case INVERTED_IDLE ->
         MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
       case L1 ->
@@ -85,6 +80,8 @@ public class WristSubsystem extends StateMachine<WristState>{
       case INVERTED_CORAL_STATION ->
         MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
       case AFTER_INTAKE ->
+        MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
+      case AFTER_L4 ->
         MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
       case DISABLED->
         true;
@@ -144,9 +141,6 @@ public class WristSubsystem extends StateMachine<WristState>{
         case IDLE -> {
           setWristPosition(WristPositions.IDLE);
         }
-        case POST_IDLE -> {
-          setWristPosition(WristPositions.POST_IDLE);
-        }
         case INVERTED_IDLE -> {
           setWristPosition(WristPositions.INVERTED_IDLE);
         }
@@ -179,6 +173,9 @@ public class WristSubsystem extends StateMachine<WristState>{
         }
         case AFTER_INTAKE -> {
           setWristPosition(WristPositions.AFTER_INTAKE);
+        }
+        case AFTER_L4 -> {
+          setWristPosition(WristPositions.AFTER_L4);
         }
         default -> {}
       }

@@ -21,7 +21,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
-  private final double MaxAngularRate = Math.PI * 3.5;
+  private final double MaxAngularRate = Math.PI * 4;
   private final CommandSwerveDrivetrain drivetrain;
   private LimelightLocalization limelightLocalization = new LimelightLocalization();
 
@@ -91,7 +91,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   protected void collectInputs() {
     limelightLocalization.update();
     drivetrainState = drivetrain.getState();
-    teleopSpeeds = new ChassisSpeeds(-Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, Robot.controls.driver.rightX() * MaxAngularRate);
+    teleopSpeeds = new ChassisSpeeds(-Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, Robot.controls.driver.rightX() * Robot.controls.driver.rightX() * Robot.controls.driver.rightX() * MaxAngularRate);
     DogLog.log(getName() + "/teleopSpeeds", teleopSpeeds);
     boolean isSlow = false;
     if (!RobotManager.getInstance().isHeightCapped) {

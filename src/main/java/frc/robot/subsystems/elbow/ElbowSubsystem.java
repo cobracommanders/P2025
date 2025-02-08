@@ -74,7 +74,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
       case CAPPED_L4 ->
         MathUtil.isNear(ElbowPositions.CAPPED_L4, elbowPosition, tolerance);
       case L4 ->
-        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
+        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance) || MathUtil.isNear(ElbowPositions.L4_ELBOW, elbowPosition, tolerance);
       case CORAL_STATION ->
         MathUtil.isNear(ElbowPositions.CORAL_STATION, elbowPosition, tolerance);
       case HOME_ELBOW ->
@@ -84,7 +84,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
       case CAPPED_L3 ->
         MathUtil.isNear(ElbowPositions.CAPPED_L3, elbowPosition, tolerance);
       case L4_ELBOW ->
-        MathUtil.isNear(ElbowPositions.L4, elbowPosition, tolerance);
+        MathUtil.isNear(ElbowPositions.L4_ELBOW, elbowPosition, tolerance);
       case DISABLED ->
         true;
     };
@@ -168,7 +168,7 @@ public class ElbowSubsystem extends StateMachine<ElbowState>{
           setElbowPosition(ElbowPositions.CAPPED_L4);
         }
         case L4 -> {
-          setElbowPosition(ElbowPositions.L4);
+          setElbowPosition(ElbowPositions.L4_ELBOW);
         }
         case CORAL_STATION -> {
           setElbowPosition(ElbowPositions.CORAL_STATION);
