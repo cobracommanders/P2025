@@ -14,7 +14,7 @@ public enum RobotState {
   PREPARE_DEEP_CLIMB(true, false,  new LEDState(Color.kOrangeRed, Patterns.SOLID)),
   WAIT_DEEP_CLIMB(true, false,  new LEDState(Color.kGreen, Patterns.SOLID)),
   DEEP_CLIMB(true, false,  new LEDState(Color.kGreen, Patterns.SOLID)),
-  PREPARE_L1(false, true,  new LEDState(Color.kOrangeRed, Patterns.SOLID)),
+  PREPARE_L1(false, false,  new LEDState(Color.kOrangeRed, Patterns.SOLID)),
   WAIT_L1(false, true,  new LEDState(Color.kGreen, Patterns.SOLID)),
   SCORE_L1(false, true,  new LEDState(Color.kGreen, Patterns.SOLID)),
   PREPARE_L2(false, false,  new LEDState(Color.kOrangeRed, Patterns.SOLID)),

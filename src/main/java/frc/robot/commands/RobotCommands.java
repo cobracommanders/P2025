@@ -25,7 +25,7 @@ public class RobotCommands {
 
   public Command L1Command() {
     if (!robot.getState().inverted) {
-      return invertIdleCommand() // go to non-inverted idle
+      return invertIdleCommand() // go to inverted idle
         .andThen(Commands.runOnce(robot::prepareL1Request, requirements)) // Prepare CS (non-inverted)
         .andThen(robot.waitForState(RobotState.WAIT_L1)); // Goes back to idle when we're done intaking
     }else {
