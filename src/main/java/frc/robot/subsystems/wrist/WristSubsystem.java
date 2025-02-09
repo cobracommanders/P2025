@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elevator.ElevatorState;
-import frc.robot.util.Constants;
-import frc.robot.util.Constants.WristConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 
 public class WristSubsystem extends StateMachine<WristState>{
     
@@ -51,6 +51,8 @@ public class WristSubsystem extends StateMachine<WristState>{
     if (getState() == WristState.HOME_WRIST && this.atGoal()) { 
       wristMotor.setPosition(0.38);
       return WristState.INVERTED_IDLE;
+    } else if (getState() == WristState.IDLE && this.atGoal()) {
+      return currentState;
     } else {
       return currentState;
     }
@@ -82,7 +84,7 @@ public class WristSubsystem extends StateMachine<WristState>{
       case AFTER_INTAKE ->
         MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
       case AFTER_L4 ->
-        MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
+        MathUtil.isNear(WristPositions.AFTER_L4, wristPosition, tolerance);
       case DISABLED->
         true;
     };
