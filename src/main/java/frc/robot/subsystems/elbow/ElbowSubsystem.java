@@ -18,13 +18,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants.ElbowConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.WristConstants;
 import frc.robot.commands.RobotManager;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elevator.ElevatorState;
+import frc.robot.util.Constants.ElbowConstants;
+import frc.robot.util.Constants.ElevatorConstants;
+import frc.robot.util.Constants.WristConstants;
 
 public class ElbowSubsystem extends StateMachine<ElbowState>{
     

@@ -21,10 +21,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.WristConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.util.Constants.ElevatorConstants;
+import frc.robot.util.Constants.WristConstants;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
@@ -36,8 +36,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private double leftMotorPosition;
   private double rightMotorPosition;
   private final double tolerance;
-  private MotionMagicVoltage right_motor_request = new MotionMagicVoltage(0).withSlot(0);
-  private Follower left_motor_request = new Follower(Ports.ElevatorPorts.RMOTOR, true);
+  private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
+  private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
@@ -103,7 +103,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   @Override
   public void collectInputs(){
-    elevatorPosition = rightMotor.getPosition().getValueAsDouble();
+    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
     DogLog.log(getName() + "/Elevator Position", elevatorPosition);
     DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
   }
@@ -126,11 +126,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     // }
   }
 
-  public void setElevatorPosition(double rightPosition){
-    leftMotor.setControl(left_motor_request);
-    rightMotor.setControl(right_motor_request.withPosition(rightPosition));
+  public void setElevatorPosition(double leftPosition){
+    leftMotor.setControl(left_motor_request.withPosition(leftPosition));
+    rightMotor.setControl(right_motor_request);
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/right Motor Setpoint", rightPosition);
+    DogLog.log(getName() + "/Elevator Setpoint", leftPosition);
   }
 
     @Override

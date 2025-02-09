@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.util;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

@@ -12,11 +12,11 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.Constants.ElbowConstants;
-import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.util.Constants.ElbowConstants;
+import frc.robot.util.Constants.ManipulatorConstants;
 
 
 
