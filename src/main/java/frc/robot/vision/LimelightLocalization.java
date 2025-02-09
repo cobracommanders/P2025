@@ -36,8 +36,8 @@ public class LimelightLocalization{
     new Pose2d(4, 5.227, Rotation2d.fromDegrees(-60)), //K
   };
   public Pose2d[] coralStationPoses = {
-    new Pose2d(1.227, 7.071, Rotation2d.fromDegrees(120)), // Left CS
-    new Pose2d(7.936, 5.817, Rotation2d.fromDegrees(-120)) // Right CS
+    new Pose2d(1.227, 7.071, Rotation2d.fromDegrees(-120)), // Left CS
+    new Pose2d(7.936, 5.817, Rotation2d.fromDegrees(120)) // Right CS
   };
   public LimelightLocalization() {
     LimelightHelpers.setPipelineIndex("limelight-left", 0);

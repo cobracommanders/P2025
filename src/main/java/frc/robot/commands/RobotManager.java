@@ -315,7 +315,7 @@ public class RobotManager extends StateMachine<RobotState> {
             manipulator.setState(ManipulatorState.IDLE);
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
-            kicker.setState(KickerState.REMOVE_ALGAE);   
+            kicker.setState(KickerState.REMOVE_ALGAE);
           }
           case SCORE_L2 -> {
             elevator.setState(ElevatorState.L2);
