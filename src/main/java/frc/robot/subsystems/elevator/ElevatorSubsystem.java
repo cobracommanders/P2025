@@ -36,8 +36,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private double leftMotorPosition;
   private double rightMotorPosition;
   private final double tolerance;
-  private MotionMagicVoltage right_motor_request = new MotionMagicVoltage(0).withSlot(0);
-  private Follower left_motor_request = new Follower(Ports.ElevatorPorts.RMOTOR, true);
+  private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
+  private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
@@ -103,10 +103,9 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   @Override
   public void collectInputs(){
-    elevatorPosition = rightMotor.getPosition().getValueAsDouble();
-    DogLog.log(getName() + "/Elevator Setpoint", elevatorPosition);
-    DogLog.log(getName() + "/Elevator Position", leftElevatorPosition);
-    DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
+    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
+    DogLog.log(getName() + "/Elevator Position", elevatorPosition);
+    DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
   }
 
   @Override
@@ -127,11 +126,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     // }
   }
 
-  public void setElevatorPosition(double rightPosition){
-    leftMotor.setControl(left_motor_request);
-    rightMotor.setControl(right_motor_request.withPosition(rightPosition));
+  public void setElevatorPosition(double elevatorPosition){
+    rightMotor.setControl(right_motor_request);
+    leftMotor.setControl(left_motor_request.withPosition(elevatorPosition));
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/right Motor Setpoint", rightPosition);
+    DogLog.log(getName() + "/right Motor Setpoint", elevatorPosition);
   }
 
     @Override

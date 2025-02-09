@@ -68,7 +68,7 @@ public class LimelightLocalization{
   }
 
   public AlignmentState getCoralStationAlignmentState(){
-    double tolerance = 5;
+    double tolerance = 3;
     if (LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
       return AlignmentState.INVALID;
     }

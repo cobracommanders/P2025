@@ -2,7 +2,6 @@ package frc.robot.subsystems.wrist;
 
 public enum WristState {
     IDLE,
-    POST_IDLE,
     INVERTED_IDLE,
     L1,
     L2,
