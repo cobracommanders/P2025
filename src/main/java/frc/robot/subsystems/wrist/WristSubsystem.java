@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elevator.ElevatorState;
-import frc.robot.Constants;
-import frc.robot.Constants.WristConstants;
+import frc.robot.util.Constants;
+import frc.robot.util.Constants.WristConstants;
 
 public class WristSubsystem extends StateMachine<WristState>{
     
