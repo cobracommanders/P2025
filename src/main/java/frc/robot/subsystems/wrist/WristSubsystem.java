@@ -44,16 +44,13 @@ public class WristSubsystem extends StateMachine<WristState>{
     motor_config.MotionMagic.MotionMagicAcceleration = WristConstants.MotionMagicAcceleration;
     motor_config.MotionMagic.MotionMagicJerk = WristConstants.MotionMagicJerk;
     wristMotor.getConfigurator().apply(motor_config);
-    tolerance = 0.01;
+    tolerance = 0.02;
     brakeModeEnabled = false;
   }
   protected WristState getNextState(WristState currentState) {
     if (getState() == WristState.HOME_WRIST && this.atGoal()) { 
       wristMotor.setPosition(0.38);
       return WristState.INVERTED_IDLE;
-    } else if (getState() == WristState.IDLE && this.atGoal()) {
-      setWristPosition(WristPositions.POST_IDLE);
-      return currentState;
     } else {
       return currentState;
     }

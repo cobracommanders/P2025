@@ -71,7 +71,7 @@ public class RobotManager extends StateMachine<RobotState> {
           break;
         case INVERTED_IDLE:
           if (!currentState.ignoreRequests) {
-            nextState = (currentState.inverted) ? RobotState.INVERTED_IDLE : RobotState.PREPARE_INVERTED_FROM_IDLE;
+            nextState = (currentState.inverted) ? RobotState.PREPARE_INVERTED_IDLE : RobotState.PREPARE_INVERTED_FROM_IDLE;
           }
           break;
         case CORAL_STATION:

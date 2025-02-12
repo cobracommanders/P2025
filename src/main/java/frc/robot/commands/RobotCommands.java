@@ -15,7 +15,6 @@ public class RobotCommands {
     this.robot = RobotManager.getInstance();
     var requirementsList = List.of(robot.elevator, robot.climber, robot.wrist, robot.elbow, robot.manipulator, robot.kicker);
     requirements = requirementsList.toArray(Subsystem[]::new);
-
   }
 
   public Command scoreCommand() {

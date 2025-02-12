@@ -7,5 +7,9 @@ public enum ManipulatorState {
     L2,
     L3,
     L4,
+    PREPARE_L1,
+    PREPARE_L2,
+    PREPARE_L3,
+    PREPARE_L4,
     AFTER_INTAKE
 }
