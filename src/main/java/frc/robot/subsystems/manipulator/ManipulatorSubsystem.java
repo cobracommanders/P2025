@@ -96,6 +96,18 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
           case L4 -> {
             setManipulatorPositions(ManipulatorSpeeds.L4);
           }
+          case PREPARE_L1 -> {
+            setManipulatorPositions(ManipulatorSpeeds.PREPARE_L1);
+          }
+          case PREPARE_L2 -> {
+            setManipulatorPositions(ManipulatorSpeeds.PREPARE_L2);
+          }
+          case PREPARE_L3 -> {
+            setManipulatorPositions(ManipulatorSpeeds.PREPARE_L3);
+          }
+          case PREPARE_L4 -> {
+            setManipulatorPositions(ManipulatorSpeeds.PREPARE_L4);
+          }
           default -> {}
         }
       }

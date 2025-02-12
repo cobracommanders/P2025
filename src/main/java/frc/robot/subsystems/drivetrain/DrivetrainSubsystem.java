@@ -142,29 +142,41 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
       case TELEOP_CORAL_STATION_ALIGN -> {
-          if (!isNotControlled(teleopSpeeds)) {
-          drivetrain.setControl(
-                drive
-                .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-                .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-                .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
-                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        } else {
-          drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
-        }
-      }
-      case TELEOP_REEF_ALIGN -> {
-      if (!isNotControlled(teleopSpeeds)) {
         drivetrain.setControl(
-              drive
-              .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-              .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-              .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
-              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-      } else {
-        drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
+          drive
+          .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+          .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+          .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
       }
-    }
+      //Swerve X-ing code
+        //   if (!isNotControlled(teleopSpeeds)) {
+        //   drivetrain.setControl(
+        //         drive
+        //         .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+        //         .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+        //         .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+        //         .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+        // } else {
+        //   drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
+      case TELEOP_REEF_ALIGN -> {
+          drivetrain.setControl(
+            drive
+            .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+            .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+            .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+        }
+    //Swerve X-ing code
+      // if (!isNotControlled(teleopSpeeds)) {
+      //   drivetrain.setControl(
+      //         drive
+      //         .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+      //         .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+      //         .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+      //         .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+      // } else {
+      //   drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
       case AUTO_CORAL_STATION_ALIGN ->
         {}
       case AUTO_REEF_ALIGN ->

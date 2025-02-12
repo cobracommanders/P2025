@@ -285,7 +285,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L1 -> {
             elevator.setState(ElevatorState.L1);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L1);
             wrist.setState(WristState.L1);
             elbow.setState(ElbowState.L1);
             kicker.setState(KickerState.IDLE);
@@ -301,7 +301,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L2 -> {
             elevator.setState(ElevatorState.L2);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L2);
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
             kicker.setState(KickerState.REMOVE_ALGAE);   
@@ -317,7 +317,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L3 -> {
             elevator.setState(ElevatorState.L3);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L3);
             wrist.setState(WristState.L3);
             elbow.setState(ElbowState.L3);
             kicker.setState(KickerState.REMOVE_ALGAE);
@@ -333,7 +333,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L4 -> {
             elevator.setState(ElevatorState.L4);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L4);
             wrist.setState(WristState.L4);
             elbow.setState(ElbowState.L4);
             kicker.setState(KickerState.REMOVE_ALGAE);
