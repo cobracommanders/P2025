@@ -52,6 +52,9 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     super(DrivetrainState.TELEOP);
     LimelightSubsystem.getInstance();
     drivetrain = CommandSwerveDrivetrain.getInstance();
+    driveToAngle.HeadingController.setPID(6, 0, 0);
+    driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    driveToAngle.HeadingController.setTolerance(0.5);
     
   }
 
@@ -103,6 +106,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       teleopSpeeds = teleopSpeeds.div(2);
       isSlow = true;
     }
+
     DogLog.log(getName() + "/isSlow", isSlow);
   }
   @Override
