@@ -3,7 +3,7 @@ package frc.robot;
 public class Ports {
 
     public static class ElevatorPorts {
-        public static final int LMOTOR = 20;
+        public static final int LMOTOR = 19;
         public static final int RMOTOR = 21;
     }
     public static class WristPorts {
