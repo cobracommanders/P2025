@@ -18,11 +18,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants.WristConstants;
-import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elevator.ElevatorState;
+import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 
 public class WristSubsystem extends StateMachine<WristState>{
     
