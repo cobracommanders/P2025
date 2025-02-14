@@ -39,7 +39,8 @@ public enum RobotState {
   HOMING_STAGE_1_ELEVATOR(true, true, new LEDState(Color.kRed, Patterns.SLOW_BLINK)),
   HOMING_STAGE_2_ELBOW(true, true, new LEDState(Color.kRed, Patterns.SLOW_BLINK)),
   HOMING_STAGE_3_WRIST(true, true,  new LEDState(Color.kRed, Patterns.SLOW_BLINK)),
-  PREPARE_HOMING(true, true, new LEDState(Color.kPurple, Patterns.SOLID));
+  PREPARE_HOMING(true, true, new LEDState(Color.kPurple, Patterns.SOLID)),
+  PREPARE_IDLE_FROM_SCORE(false, false, new LEDState(Color.kPurple, Patterns.SOLID));
 
   public final boolean ignoreRequests;
   public final boolean inverted;

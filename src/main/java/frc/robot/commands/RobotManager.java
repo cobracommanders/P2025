@@ -1,4 +1,6 @@
 package frc.robot.commands;
+import java.lang.Thread.State;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -238,6 +240,10 @@ public class RobotManager extends StateMachine<RobotState> {
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.PREPARE_IDLE;
         }
+      case PREPARE_IDLE_FROM_SCORE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal() && currentState == RobotState.SCORE_L4) {
+          nextState = RobotState.PREPARE_INVERTED_IDLE;
+        }
         break;
       case PREPARE_DEEP_CLIMB:
         if (climber.atGoal()) {
@@ -431,11 +437,20 @@ public class RobotManager extends StateMachine<RobotState> {
             kicker.setState(KickerState.IDLE);
           }
 
+          case PREPARE_IDLE_FROM_SCORE -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.AFTER_L4);
+            elbow.setState(ElbowState.IDLE);
+            kicker.setState(KickerState.IDLE);
+          }
+
           case PREPARE_IDLE_FROM_INVERTED -> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.AFTER_INTAKE);
-            wrist.setState(WristState.AFTER_INTAKE);
+            wrist.setState(WristState.INVERTED_IDLE);
             elbow.setState(ElbowState.INVERTED_IDLE);
             kicker.setState(KickerState.IDLE);
           }
@@ -444,7 +459,7 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.AFTER_INTAKE);
-            wrist.setState(WristState.AFTER_L4);
+            wrist.setState(WristState.IDLE);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
           }
