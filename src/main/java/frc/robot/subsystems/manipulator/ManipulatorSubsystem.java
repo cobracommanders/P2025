@@ -32,13 +32,9 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
       manipulatorMotor.getConfigurator().apply(motor_config);
     }
 
-    protected ManipulatorState getNextState(ManipulatorState currentState) {
-    if (getState() == ManipulatorState.INTAKE_CORAL && manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent) { 
-      return ManipulatorState.AFTER_INTAKE;
-    } else {
+    protected ManipulatorState getNextState(ManipulatorState currentState){
       return currentState;
     }
-  }
 
     @Override
     public void collectInputs(){

@@ -158,7 +158,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           setElevatorPosition(ElevatorPositions.L4);
         }
         case HOME_ELEVATOR -> {
-          rightMotor.setControl(new VoltageOut(-0.4));
+          rightMotor.setControl(new VoltageOut(-0.7));
         }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);

@@ -60,7 +60,7 @@ public class RobotManager extends StateMachine<RobotState> {
     }
     for (RobotFlag flag : flags.getChecked()) {
       switch (flag) {
-        case APPLY_HEIGHT_CAP: 
+        case APPLY_HEIGHT_CAP:
           isHeightCapped = true;
           break;
         case REMOVE_HEIGHT_CAP:
@@ -128,6 +128,8 @@ public class RobotManager extends StateMachine<RobotState> {
             case WAIT_L4:
               nextState = RobotState.SCORE_L4;
               break;
+            case CAPPED_L4:
+              nextState = RobotState.SCORE_L4;
             case DEEP_CLIMB:
             default:
               break;
@@ -227,7 +229,7 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case SCORE_L4:
-        if (timeout(1)) {
+        if (timeout(5)) {
           nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
         }
         break;

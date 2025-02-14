@@ -10,7 +10,7 @@ public final class Constants {
   }
 
 public static final class ElevatorConstants{
-  public static final double homingStallCurrent = 18.5;
+  public static final double homingStallCurrent = 20;
   public static final double P = 40;
   public static final double I = 0;
   public static final double D = 0;

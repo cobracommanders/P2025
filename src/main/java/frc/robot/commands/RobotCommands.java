@@ -19,7 +19,7 @@ public class RobotCommands {
 
   public Command scoreCommand() {
     return Commands.runOnce(robot::scoreRequest, requirements)
-        .andThen(robot.waitForState(RobotState.IDLE));
+        .andThen(robot.waitForState(RobotState.INVERTED_IDLE));
   }
 
   public Command L1Command() {
@@ -113,6 +113,6 @@ public class RobotCommands {
 
   public Command homeCommand(){
     return Commands.runOnce(robot::homeRequest, requirements)
-      .andThen(robot.waitForState(RobotState.HOMING_STAGE_1_ELEVATOR));    
+      .andThen(robot.waitForState(RobotState.PREPARE_HOMING));    
   }
 }
