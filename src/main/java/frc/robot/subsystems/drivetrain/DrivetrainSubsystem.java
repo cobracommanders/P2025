@@ -64,11 +64,11 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     DrivetrainState nextState = currentState;
      switch (currentState) {
       case AUTO -> {
-        if (DriverStation.isAutonomous()){
-          nextState = DrivetrainState.AUTO;
-        }
+        // if (DriverStation.isAutonomous()){
+        //   nextState = DrivetrainState.AUTO;
+        // }
       }
-      case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN -> {
+      case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN, AUTO_CORAL_STATION_ALIGN, AUTO_REEF_ALIGN -> {
         switch (RobotManager.getInstance().getState()) {
           case IDLE, INVERTED_IDLE, PREPARE_IDLE, PREPARE_INVERTED_IDLE, PREPARE_INVERTED_FROM_IDLE, PREPARE_IDLE_FROM_INVERTED-> {
             nextState = DrivetrainState.TELEOP;
@@ -80,11 +80,16 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         switch (RobotManager.getInstance().getState()) {
           case PREPARE_CORAL_STATION, PREPARE_INVERTED_CORAL_STATION, INVERTED_INTAKE_CORAL_STATION, INTAKE_CORAL_STATION-> {
             // nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
-            nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
+            if (DriverStation.isAutonomous()){
+              nextState = DrivetrainState.AUTO_CORAL_STATION_ALIGN;
+            }
+            else nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
           }
           case PREPARE_L1, PREPARE_L2, PREPARE_L3, PREPARE_L4, WAIT_L1, WAIT_L2, WAIT_L3, WAIT_L4, SCORE_L1, SCORE_L2, SCORE_L3, SCORE_L4, CAPPED_L4-> {
-            // nextState = DrivetrainState.TELEOP_REEF_ALIGN;
-            nextState = DrivetrainState.TELEOP_REEF_ALIGN;
+            if (DriverStation.isAutonomous()){
+              nextState = DrivetrainState.AUTO_REEF_ALIGN;
+            }
+            else nextState = DrivetrainState.TELEOP_REEF_ALIGN;
           }
           default -> {}
         }
@@ -138,6 +143,12 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           case AUTO -> {
             LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
           }
+          case AUTO_CORAL_STATION_ALIGN -> {
+            LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
+           }
+          case AUTO_REEF_ALIGN -> {
+            LimelightSubsystem.getInstance().setState(LimelightState.REEF);
+           }
            default -> {}
         }
     }
@@ -189,6 +200,12 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       // } else {
       //   drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
       case AUTO_CORAL_STATION_ALIGN ->
+      drivetrain.setControl(
+              drive
+              .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+              .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+              .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
+              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         {}
       case AUTO_REEF_ALIGN ->
         {}

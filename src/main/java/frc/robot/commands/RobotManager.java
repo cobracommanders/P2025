@@ -229,7 +229,7 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case SCORE_L4:
-        if (timeout(5)) {
+        if (timeout(1)) {
           nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
         }
         break;

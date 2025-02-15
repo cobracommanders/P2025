@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "remove height cap"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -21,13 +27,19 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.2
+                        "waitTime": 1.0
                       }
                     },
                     {
                       "type": "named",
                       "data": {
                         "name": "L4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
                       }
                     },
                     {
@@ -69,9 +81,22 @@
                       }
                     },
                     {
-                      "type": "named",
+                      "type": "deadline",
                       "data": {
-                        "name": "inverted intake"
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "inverted intake"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 5.0
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -116,6 +141,12 @@
                       "type": "named",
                       "data": {
                         "name": "L4"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.0
                       }
                     },
                     {

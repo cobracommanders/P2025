@@ -115,6 +115,11 @@ public class LimelightLocalization{
     {
       rejectLeftData = true;
     }
+    // if (DriverStation.isAutonomous()){
+    //   rejectLeftData = true;
+    //   rejectRightData = true;
+    //   rejectMiddleData = true;
+    // }
     if(!rejectRightData)
     {
 

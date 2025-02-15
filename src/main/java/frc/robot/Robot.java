@@ -62,21 +62,22 @@ public class Robot extends TimedRobot{
         controls.configureDriverCommands();
         controls.configureOperatorCommands();
 
-        autoChooser = AutoBuilder.buildAutoChooser();
-
         NamedCommands.registerCommand("idle", Robot.robotCommands.idleCommand());
         NamedCommands.registerCommand("inverted idle", Robot.robotCommands.invertIdleCommand());
         NamedCommands.registerCommand("score", Robot.robotCommands.scoreCommand());
         NamedCommands.registerCommand("L1", Robot.robotCommands.L1Command());
         NamedCommands.registerCommand("L2", Robot.robotCommands.L2Command());
         NamedCommands.registerCommand("L3", Robot.robotCommands.L3Command());
-        NamedCommands.registerCommand("L4", Robot.robotCommands.L4Command());
+        NamedCommands.registerCommand("L4", Robot.robotCommands.L4AutoCommand());
         NamedCommands.registerCommand("remove height cap", Robot.robotCommands.removeHeightCapCommand());
         NamedCommands.registerCommand("apply height cap", Robot.robotCommands.applyHeightCapCommand());
         NamedCommands.registerCommand("climb", Robot.robotCommands.climbCommand());
         NamedCommands.registerCommand("intake", Robot.robotCommands.intakeCommand());
         NamedCommands.registerCommand("inverted intake", Robot.robotCommands.invertedIntakeCommand());
         NamedCommands.registerCommand("home", Robot.robotCommands.homeCommand());
+        NamedCommands.registerCommand("remove height cap", Robot.robotCommands.removeHeightCapCommand());
+
+        autoChooser = AutoBuilder.buildAutoChooser();
 
         // DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
 
@@ -121,7 +122,7 @@ public class Robot extends TimedRobot{
     }
     @Override
     public void autonomousInit() {
-        ElevatorSubsystem.getInstance();
+        //ElevatorSubsystem.getInstance();
         if (autoChooser.getSelected() != null)
             autoChooser.getSelected().schedule();
     }

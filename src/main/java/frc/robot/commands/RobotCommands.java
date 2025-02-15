@@ -66,6 +66,17 @@ public class RobotCommands {
     }
   }
 
+  public Command L4AutoCommand() {
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL4Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotState.PREPARE_L4)); // Goes back to idle when we're done intaking
+    } else {
+      return Commands.runOnce(robot::prepareL2Request, requirements)
+          .andThen(robot.waitForState(RobotState.PREPARE_L4));
+    }
+  }
+
   public Command idleCommand() {
     return Commands.runOnce(robot::prepareIdleRequest, requirements)
         .andThen(robot.waitForState(RobotState.IDLE));
