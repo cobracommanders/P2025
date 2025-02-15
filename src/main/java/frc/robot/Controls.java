@@ -63,7 +63,6 @@ public class Controls {
             driver.rightTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
             driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
-        driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setState(ElevatorState.HOME_ELEVATOR), WristSubsystem.getInstance()));
     }
 
     public void configureOperatorCommands(){

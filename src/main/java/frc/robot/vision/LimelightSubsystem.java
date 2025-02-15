@@ -66,6 +66,14 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             LimelightHelpers.setPipelineIndex("limelight-right", 0);
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
+          case DISABLED -> {
+            limelightLocalization.disableLeft = true;
+            limelightLocalization.disableRight = true;
+            limelightLocalization.disableMiddle = true;
+            LimelightHelpers.setPipelineIndex("limelight-left", 0);
+            LimelightHelpers.setPipelineIndex("limelight-right", 0);
+            LimelightHelpers.setPipelineIndex("limelight-middle", 0);
+          }
           default -> {}
         }
 
