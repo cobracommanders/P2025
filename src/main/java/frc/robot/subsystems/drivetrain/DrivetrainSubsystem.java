@@ -132,22 +132,22 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     protected void afterTransition(DrivetrainState newState) {
         switch (newState) {
           case TELEOP -> {
-           LimelightSubsystem.getInstance().setState(LimelightState.DRIVE);
+           LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
           }
           case TELEOP_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.REEF);
+            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
            }
           case TELEOP_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
+            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
            }
           case AUTO -> {
             LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
           }
           case AUTO_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
+            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
            }
           case AUTO_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.REEF);
+            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
            }
            default -> {}
         }
@@ -200,15 +200,17 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       // } else {
       //   drivetrain.setControl(CommandSwerveDrivetrain.getInstance().brake);
       case AUTO_CORAL_STATION_ALIGN ->
-      drivetrain.setControl(
-              drive
+        drivetrain.setControl(
+            driveToAngle
               .withVelocityX(teleopSpeeds.vxMetersPerSecond)
               .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-              .withRotationalRate(teleopSpeeds.omegaRadiansPerSecond)
-              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        {}
+              .withTargetDirection(Rotation2d.fromDegrees(0)));
       case AUTO_REEF_ALIGN ->
-        {}
+        drivetrain.setControl(
+          driveToAngle
+            .withVelocityX(teleopSpeeds.vxMetersPerSecond)
+            .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+            .withTargetDirection(Rotation2d.fromDegrees(0)));
       case AUTO ->
         {}
     }
