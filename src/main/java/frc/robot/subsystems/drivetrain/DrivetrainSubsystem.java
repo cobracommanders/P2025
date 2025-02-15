@@ -63,11 +63,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   protected DrivetrainState getNextState(DrivetrainState currentState) {
     DrivetrainState nextState = currentState;
      switch (currentState) {
-      case AUTO -> {
-        // if (DriverStation.isAutonomous()){
-        //   nextState = DrivetrainState.AUTO;
-        // }
-      }
       case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN, AUTO_CORAL_STATION_ALIGN, AUTO_REEF_ALIGN -> {
         switch (RobotManager.getInstance().getState()) {
           case IDLE, INVERTED_IDLE, PREPARE_IDLE, PREPARE_INVERTED_IDLE, PREPARE_INVERTED_FROM_IDLE, PREPARE_IDLE_FROM_INVERTED-> {
@@ -132,22 +127,19 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     protected void afterTransition(DrivetrainState newState) {
         switch (newState) {
           case TELEOP -> {
-           LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
+           LimelightSubsystem.getInstance().setState(LimelightState.DRIVE);
           }
           case TELEOP_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
+            LimelightSubsystem.getInstance().setState(LimelightState.REEF);
            }
           case TELEOP_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
+            LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
            }
-          case AUTO -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
-          }
           case AUTO_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_CORAL_STATION);
            }
           case AUTO_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.DISABLED);
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
            }
            default -> {}
         }

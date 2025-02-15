@@ -4,5 +4,7 @@ public enum LimelightState {
     DRIVE,
     CORAL_STATION,
     REEF,
-    DISABLED
+    DISABLED,
+    AUTO_CORAL_STATION,
+    AUTO_REEF
 }
