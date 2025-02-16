@@ -9,19 +9,29 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.ElbowConstants;
 import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.vision.LimelightHelpers.LimelightResults;
 
 
 
 public class LimelightSubsystem extends StateMachine<LimelightState>{
+   NetworkTable leftLimelightTable = NetworkTableInstance.getDefault().getTable("left-limelight");
+   NetworkTable rightLimelightTable = NetworkTableInstance.getDefault().getTable("right-limelight");
+   NetworkTable middleLimelightTable = NetworkTableInstance.getDefault().getTable("middle-limelight");
   
 
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
@@ -91,12 +101,18 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             LimelightHelpers.setPipelineIndex("limelight-middle", 2);
           }
           default -> {}
-        }
+
+          }
+
+          
+
 
         DogLog.log(getName() + "/left camera disabled", limelightLocalization.disableLeft);
         DogLog.log(getName() + "/right camera disabled", limelightLocalization.disableRight);
         DogLog.log(getName() + "/middle camera disabled", limelightLocalization.disableMiddle);
       }
+
+      
   
     private static LimelightSubsystem instance;
   

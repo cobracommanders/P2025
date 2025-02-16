@@ -9,6 +9,8 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Controls;
 import frc.robot.Robot;
 import frc.robot.StateMachine;
@@ -24,6 +26,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
   private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain;
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
@@ -36,6 +39,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
           .withDeadband(MaxSpeed * 0.03)
           .withRotationalDeadband(MaxAngularRate * 0.03);
+  
 
   private final SwerveRequest.FieldCentricFacingAngle driveToAngle =
       new SwerveRequest.FieldCentricFacingAngle()
@@ -56,6 +60,8 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     driveToAngle.HeadingController.setPID(6, 0, 0);
     driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
     driveToAngle.HeadingController.setTolerance(0.5);
+
+    autoAlignSpeeds = new ChassisSpeeds(1, 1, 0);
     
   }
 
@@ -121,6 +127,19 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   public void periodic() {
     super.periodic();
     sendSwerveRequest(getState());
+
+    if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_REEF_ALIGN){
+      switch (LimelightLocalization.getInstance().getCoralStationAlignmentState()) {
+        case AUTO_NOT_ALIGNED_TA:
+          new ChassisSpeeds(0, 1, 0);
+        case AUTO_ALIGNED_TA:
+          new ChassisSpeeds();
+        case AUTO_NOT_ALIGNED_TX:
+          new ChassisSpeeds(1, 0, 0);
+        case AUTO_ALIGNED_TX:
+          new ChassisSpeeds();
+      }
+        }
   }
 
     @Override
@@ -131,16 +150,16 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           }
           case TELEOP_REEF_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.REEF);
-           }
+          }
           case TELEOP_CORAL_STATION_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
-           }
+          }
           case AUTO_CORAL_STATION_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.AUTO_CORAL_STATION);
-           }
+          }
           case AUTO_REEF_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
-           }
+          }
            default -> {}
         }
     }

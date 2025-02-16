@@ -47,7 +47,40 @@ public class LimelightLocalization{
 
   public AlignmentState getReefAlignmentState(){
     double tolerance = 4;
-    if (LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 2 || LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 2){
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-left")) > Math.abs(LimelightHelpers.getTA("limelight-right"))){
+      rejectRightData = true;
+      rejectLeftData = false;
+      rejectMiddleData = true;
+
+      return AlignmentState.AUTO_NOT_ALIGNED_TA;
+    }
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-right")) > Math.abs(LimelightHelpers.getTA("limelight-left"))){
+      rejectLeftData = true;
+      rejectRightData = false;
+      rejectMiddleData = true;
+      return AlignmentState.AUTO_NOT_ALIGNED_TA;
+    }
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-right")) > 3.5){
+      return AlignmentState.AUTO_ALIGNED_TA;
+    }
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-left")) > 3.5){
+      return AlignmentState.AUTO_ALIGNED_TA;
+    }
+
+    if(Math.abs(LimelightHelpers.getTX("limelight-right") + 14) < tolerance ){
+      return AlignmentState.AUTO_ALIGNED_TX;
+    }
+
+
+    if(Math.abs(LimelightHelpers.getTX("limelight-left") - 6) < tolerance ){
+      return AlignmentState.AUTO_ALIGNED_TX;
+    }
+
+    if (LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 2 || LimelightHelpers.getCurrentPipelineIndex("limelight-right") != 2){
       return AlignmentState.INVALID;
     }
 
