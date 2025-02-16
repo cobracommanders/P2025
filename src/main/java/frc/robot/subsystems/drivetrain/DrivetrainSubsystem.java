@@ -66,7 +66,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN, AUTO_CORAL_STATION_ALIGN, AUTO_REEF_ALIGN -> {
         switch (RobotManager.getInstance().getState()) {
           case IDLE, INVERTED_IDLE, PREPARE_IDLE, PREPARE_INVERTED_IDLE, PREPARE_INVERTED_FROM_IDLE, PREPARE_IDLE_FROM_INVERTED-> {
-            nextState = DrivetrainState.TELEOP;
+            if (DriverStation.isAutonomous()) {
+              nextState = DrivetrainState.AUTO;
+            }
+            else nextState = DrivetrainState.TELEOP;
           }
           default -> {}
         }
@@ -128,6 +131,9 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         switch (newState) {
           case TELEOP -> {
            LimelightSubsystem.getInstance().setState(LimelightState.DRIVE);
+          }
+          case AUTO -> {
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO);
           }
           case TELEOP_REEF_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.REEF);
