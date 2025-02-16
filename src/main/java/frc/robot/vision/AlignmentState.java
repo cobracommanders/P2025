@@ -5,5 +5,7 @@ public enum AlignmentState {
     FAR_LEFT,
     FAR_RIGHT,
     NOT_ALIGNED,
-    INVALID
+    INVALID,
+    AUTO_NOT_ALIGNED_TA,
+    AUTO_NOT_ALIGNED_TX,
 }
