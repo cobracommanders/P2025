@@ -3,6 +3,7 @@ import java.util.List;
 
 import com.ctre.phoenix6.Utils;
 
+import dev.doglog.DogLog;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,49 +41,74 @@ public class LimelightLocalization{
     new Pose2d(7.936, 5.817, Rotation2d.fromDegrees(-120)) // Right CS
   };
   public LimelightLocalization() {
-    LimelightHelpers.setPipelineIndex("limelight-left", 0);
-    LimelightHelpers.setPipelineIndex("limelight-right", 0);
-    LimelightHelpers.setPipelineIndex("limelight-middle", 0);
+    LimelightHelpers.setPipelineIndex("limelight-left", 2);
+    LimelightHelpers.setPipelineIndex("limelight-right", 2);
+    LimelightHelpers.setPipelineIndex("limelight-middle", 2);
   }
 
-  public AlignmentState getReefAlignmentState(){
+  public AutoReefAlignmentState getCoralAutoAlignmentStates(){
+    double tolerance = 3;
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-middle")) > 4.5){
+      return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX;
+    }
+
+    if(Math.abs(LimelightHelpers.getTX("limelight-middle") + 5) < tolerance && getCoralAutoAlignmentStates() == AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX){
+      return AutoReefAlignmentState.AUTO_ALIGNED_TX;
+    }
+
+    if (LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 2 || LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
+      return AutoReefAlignmentState.INVALID;
+    }
+
+    else {
+      return AutoReefAlignmentState.NOT_ALIGNED;
+    }
+
+  }
+
+  public AutoReefAlignmentState getReefAutoAlignmentStates(){
     double tolerance = 4;
 
     if(Math.abs(LimelightHelpers.getTA("limelight-left")) > Math.abs(LimelightHelpers.getTA("limelight-right"))){
-      rejectRightData = true;
-      rejectLeftData = false;
-      rejectMiddleData = true;
 
-      return AlignmentState.AUTO_NOT_ALIGNED_TA;
+      return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TA;
     }
 
     if(Math.abs(LimelightHelpers.getTA("limelight-right")) > Math.abs(LimelightHelpers.getTA("limelight-left"))){
-      rejectLeftData = true;
-      rejectRightData = false;
-      rejectMiddleData = true;
-      return AlignmentState.AUTO_NOT_ALIGNED_TA;
+      return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TA;
     }
 
-    if(Math.abs(LimelightHelpers.getTA("limelight-right")) > 3.5){
-      return AlignmentState.AUTO_ALIGNED_TA;
+    if(Math.abs(LimelightHelpers.getTA("limelight-right")) > 13){
+      return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX;
     }
 
-    if(Math.abs(LimelightHelpers.getTA("limelight-left")) > 3.5){
-      return AlignmentState.AUTO_ALIGNED_TA;
+    if(Math.abs(LimelightHelpers.getTA("limelight-left")) > 13){
+      return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX;
     }
 
-    if(Math.abs(LimelightHelpers.getTX("limelight-right") + 14) < tolerance ){
-      return AlignmentState.AUTO_ALIGNED_TX;
+    if(Math.abs(LimelightHelpers.getTX("limelight-right") + 18) < tolerance && getReefAutoAlignmentStates() == AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX){
+      return AutoReefAlignmentState.AUTO_ALIGNED_TX;
     }
 
 
-    if(Math.abs(LimelightHelpers.getTX("limelight-left") - 6) < tolerance ){
-      return AlignmentState.AUTO_ALIGNED_TX;
+    if(Math.abs(LimelightHelpers.getTX("limelight-left") - 6) < tolerance && getReefAutoAlignmentStates() == AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX){
+      return AutoReefAlignmentState.AUTO_ALIGNED_TX;
     }
 
     if (LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 2 || LimelightHelpers.getCurrentPipelineIndex("limelight-right") != 2){
-      return AlignmentState.INVALID;
+      return AutoReefAlignmentState.INVALID;
     }
+
+    else {
+      return AutoReefAlignmentState.NOT_ALIGNED;
+    }
+
+  }
+
+  public AlignmentState getReefAlignmentState(){
+
+    double tolerance = 4;
 
     // Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
     // Pose2d nearestBranch = robotPose.nearest(List.of(branchPoses));
@@ -136,15 +162,15 @@ public class LimelightLocalization{
       rejectRightData = true;
       rejectMiddleData = true;
     }
-    if(mt2m == null || mt2m.tagCount == 0 || disableMiddle || LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 0)
+    if(mt2m == null || mt2m.tagCount == 0 || disableMiddle)
     {
       rejectMiddleData = true;
     }
-    if(mt2r == null || mt2r.tagCount == 0 || disableRight || LimelightHelpers.getCurrentPipelineIndex("limelight-right") != 0)
+    if(mt2r == null || mt2r.tagCount == 0 || disableRight)
     {
       rejectRightData = true;
     }
-    if(mt2l == null || mt2l.tagCount == 0 || disableLeft || LimelightHelpers.getCurrentPipelineIndex("limelight-left") != 0)// || DriverStation.isAutonomous())
+    if(mt2l == null || mt2l.tagCount == 0 || disableLeft)// || DriverStation.isAutonomous())
     {
       rejectLeftData = true;
     }
@@ -183,6 +209,27 @@ public class LimelightLocalization{
           SmartDashboard.putNumber("mt2m", mt2m.timestampSeconds);
 
     }
+
+    
+    if(Math.abs(LimelightHelpers.getTA("limelight-left")) > Math.abs(LimelightHelpers.getTA("limelight-right"))){
+      rejectRightData = true;
+      rejectLeftData = false;
+      rejectMiddleData = true;
+    }
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-right")) > Math.abs(LimelightHelpers.getTA("limelight-left"))){
+      rejectLeftData = true;
+      rejectRightData = false;
+      rejectMiddleData = true;
+    }
+
+    if(Math.abs(LimelightHelpers.getTA("limelight-middle")) > Math.abs(LimelightHelpers.getTA("limelight-left")) || Math.abs(LimelightHelpers.getTA("limelight-middle")) > Math.abs(LimelightHelpers.getTA("limelight-right")) ){
+      rejectLeftData = true;
+      rejectRightData = true;
+      rejectMiddleData = false;
+    }
+    
+
   }
 
   public void updateLeftCamera() {

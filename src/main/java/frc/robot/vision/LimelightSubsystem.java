@@ -85,17 +85,11 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case AUTO_CORAL_STATION -> {
-            limelightLocalization.disableLeft = false;
-            limelightLocalization.disableRight = false;
-            limelightLocalization.disableMiddle = false;
             LimelightHelpers.setPipelineIndex("limelight-left", 2);
             LimelightHelpers.setPipelineIndex("limelight-right", 2);
             LimelightHelpers.setPipelineIndex("limelight-middle", 2);
           }
           case AUTO_REEF -> {
-            limelightLocalization.disableLeft = false;
-            limelightLocalization.disableRight = false;
-            limelightLocalization.disableMiddle = false;
             LimelightHelpers.setPipelineIndex("limelight-left", 2);
             LimelightHelpers.setPipelineIndex("limelight-right", 2);
             LimelightHelpers.setPipelineIndex("limelight-middle", 2);
@@ -107,9 +101,9 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
           
 
 
-        DogLog.log(getName() + "/left camera disabled", limelightLocalization.disableLeft);
-        DogLog.log(getName() + "/right camera disabled", limelightLocalization.disableRight);
-        DogLog.log(getName() + "/middle camera disabled", limelightLocalization.disableMiddle);
+        DogLog.log(getName() + "/left camera reject data", limelightLocalization.rejectLeftData);
+        DogLog.log(getName() + "/right camera reject data", limelightLocalization.rejectRightData);
+        DogLog.log(getName() + "/middle camera reject data", limelightLocalization.rejectMiddleData);
       }
 
       

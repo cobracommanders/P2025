@@ -4,6 +4,8 @@ import java.lang.Thread.State;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.FlagManager;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.climber.ClimberState;
@@ -37,7 +39,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
   public RobotManager() {
-    super(RobotState.PREPARE_HOMING);
+    super(RobotState.INVERTED_IDLE);
     this.elevator = ElevatorSubsystem.getInstance();
     this.climber = ClimberSubsystem.getInstance();
     this.manipulator = ManipulatorSubsystem.getInstance();
@@ -55,7 +57,10 @@ public class RobotManager extends StateMachine<RobotState> {
   protected RobotState getNextState(RobotState currentState) {
     flags.log();
     RobotState nextState = currentState;
-    if (DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled() && DriverStation.isAutonomous()){
+        nextState = RobotState.INVERTED_IDLE;
+    }
+    if(DriverStation.isDisabled() && DriverStation.isTeleop()){
       nextState = RobotState.PREPARE_HOMING;
     }
     for (RobotFlag flag : flags.getChecked()) {
@@ -146,14 +151,16 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_IDLE:
       case WAIT_L1:
       case DEEP_CLIMB:
-      case INVERTED_INTAKE_CORAL_STATION:
       case INTAKE_CORAL_STATION:
       case INVERTED_IDLE:
       case REMOVE_ALGAE:
       case WAIT_L3:
         break;
       
-
+      case INVERTED_INTAKE_CORAL_STATION:
+        if (ManipulatorSubsystem.getInstance().manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent); {
+          nextState = RobotState.IDLE;
+        }
       case PREPARE_L1:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
           nextState = RobotState.WAIT_L1;

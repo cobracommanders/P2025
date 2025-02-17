@@ -122,6 +122,10 @@ public class RobotCommands {
     }
   }
 
+  // public Command autoAlign(){
+    
+  // }
+
   public Command homeCommand(){
     return Commands.runOnce(robot::homeRequest, requirements)
       .andThen(robot.waitForState(RobotState.PREPARE_HOMING));    

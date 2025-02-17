@@ -1,11 +1,15 @@
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.derive;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.config.PIDConstants;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,6 +22,7 @@ import frc.robot.commands.RobotManager;
 import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.vision.AutoReefAlignmentState;
 import frc.robot.vision.LimelightLocalization;
 import frc.robot.vision.LimelightState;
 import frc.robot.vision.LimelightSubsystem;
@@ -27,6 +32,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
+  private PIDController autoAlign = new PIDController(0, 0, 0);
   private final double MaxAngularRate = Math.PI * 3.5;
   private final CommandSwerveDrivetrain drivetrain;
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
@@ -39,6 +45,13 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
           .withDeadband(MaxSpeed * 0.03)
           .withRotationalDeadband(MaxAngularRate * 0.03);
+
+    private final SwerveRequest.RobotCentric driveRobotRelative =
+          new SwerveRequest.RobotCentric()
+              // I want field-centric driving in open loop
+              .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+              .withDeadband(MaxSpeed * 0.03)
+              .withRotationalDeadband(MaxAngularRate * 0.03);
   
 
   private final SwerveRequest.FieldCentricFacingAngle driveToAngle =
@@ -72,12 +85,15 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN, AUTO_CORAL_STATION_ALIGN, AUTO_REEF_ALIGN -> {
         switch (RobotManager.getInstance().getState()) {
           case IDLE, INVERTED_IDLE, PREPARE_IDLE, PREPARE_INVERTED_IDLE, PREPARE_INVERTED_FROM_IDLE, PREPARE_IDLE_FROM_INVERTED-> {
+           if(DriverStation.isAutonomous()){
+            nextState = DrivetrainState.AUTO;
+           }
             nextState = DrivetrainState.TELEOP;
           }
           default -> {}
         }
       }
-      case TELEOP -> {
+      case TELEOP, AUTO -> {
         switch (RobotManager.getInstance().getState()) {
           case PREPARE_CORAL_STATION, PREPARE_INVERTED_CORAL_STATION, INVERTED_INTAKE_CORAL_STATION, INTAKE_CORAL_STATION-> {
             // nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
@@ -129,17 +145,45 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     sendSwerveRequest(getState());
 
     if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_REEF_ALIGN){
-      switch (LimelightLocalization.getInstance().getCoralStationAlignmentState()) {
+      switch (LimelightLocalization.getInstance().getReefAutoAlignmentStates()) {
         case AUTO_NOT_ALIGNED_TA:
-          new ChassisSpeeds(0, 1, 0);
+          drivetrain.setControl(
+            driveRobotRelative
+            .withVelocityX(autoAlign.getP())
+            .withVelocityY(autoAlign.getP())
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         case AUTO_ALIGNED_TA:
-          new ChassisSpeeds();
         case AUTO_NOT_ALIGNED_TX:
-          new ChassisSpeeds(1, 0, 0);
+        drivetrain.setControl(
+          driveRobotRelative
+          .withVelocityX(autoAlign.getP())
+          .withVelocityY(autoAlign.getP())
+          .withRotationalRate(0)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         case AUTO_ALIGNED_TX:
-          new ChassisSpeeds();
       }
         }
+
+      if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN){
+          switch (LimelightLocalization.getInstance().getCoralAutoAlignmentStates()) {
+            case AUTO_NOT_ALIGNED_TA:
+              drivetrain.setControl(
+                driveRobotRelative
+                .withVelocityX(0)
+                .withVelocityY(1)
+                .withRotationalRate(0)
+              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+            case AUTO_ALIGNED_TA:
+            case AUTO_NOT_ALIGNED_TX:
+            drivetrain.setControl(
+              driveRobotRelative
+              .withVelocityX(1)
+              .withVelocityY(0)
+              .withRotationalRate(0)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+            case AUTO_ALIGNED_TX:
+          }
+            }
   }
 
     @Override
@@ -148,17 +192,14 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           case TELEOP -> {
            LimelightSubsystem.getInstance().setState(LimelightState.DRIVE);
           }
+          case AUTO -> {
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
+          }
           case TELEOP_REEF_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.REEF);
           }
           case TELEOP_CORAL_STATION_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
-          }
-          case AUTO_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_CORAL_STATION);
-          }
-          case AUTO_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
           }
            default -> {}
         }
@@ -215,13 +256,15 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
             driveToAngle
               .withVelocityX(teleopSpeeds.vxMetersPerSecond)
               .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-              .withTargetDirection(Rotation2d.fromDegrees(0)));
+              .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+              .withTargetDirection(Rotation2d.fromDegrees(-50)));
       case AUTO_REEF_ALIGN ->
         drivetrain.setControl(
           driveToAngle
             .withVelocityX(teleopSpeeds.vxMetersPerSecond)
             .withVelocityY(teleopSpeeds.vyMetersPerSecond)
-            .withTargetDirection(Rotation2d.fromDegrees(0)));
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            .withTargetDirection(Rotation2d.fromDegrees(-120)));
       case AUTO ->
         {}
     }
