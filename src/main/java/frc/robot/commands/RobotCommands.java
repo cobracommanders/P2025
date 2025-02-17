@@ -122,9 +122,9 @@ public class RobotCommands {
     }
   }
 
-  // public Command autoAlign(){
-    
-  // }
+  public Command autoAlign(){
+    return Commands.runOnce(robot::autoAlignRequest, requirements);
+  }
 
   public Command homeCommand(){
     return Commands.runOnce(robot::homeRequest, requirements)

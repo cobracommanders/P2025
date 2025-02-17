@@ -32,9 +32,9 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
-  private PIDController autoAlign = new PIDController(0, 0, 0);
+  public PIDController autoAlign = new PIDController(0, 0, 0);
   private final double MaxAngularRate = Math.PI * 3.5;
-  private final CommandSwerveDrivetrain drivetrain;
+  public final CommandSwerveDrivetrain drivetrain;
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
 
   public final Pigeon2 drivetrainPigeon = CommandSwerveDrivetrain.getInstance().getPigeon2();
@@ -46,7 +46,7 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           .withDeadband(MaxSpeed * 0.03)
           .withRotationalDeadband(MaxAngularRate * 0.03);
 
-    private final SwerveRequest.RobotCentric driveRobotRelative =
+    public final SwerveRequest.RobotCentric driveRobotRelative =
           new SwerveRequest.RobotCentric()
               // I want field-centric driving in open loop
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
@@ -143,47 +143,6 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   public void periodic() {
     super.periodic();
     sendSwerveRequest(getState());
-
-    if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_REEF_ALIGN){
-      switch (LimelightLocalization.getInstance().getReefAutoAlignmentStates()) {
-        case AUTO_NOT_ALIGNED_TA:
-          drivetrain.setControl(
-            driveRobotRelative
-            .withVelocityX(autoAlign.getP())
-            .withVelocityY(autoAlign.getP())
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        case AUTO_ALIGNED_TA:
-        case AUTO_NOT_ALIGNED_TX:
-        drivetrain.setControl(
-          driveRobotRelative
-          .withVelocityX(autoAlign.getP())
-          .withVelocityY(autoAlign.getP())
-          .withRotationalRate(0)
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        case AUTO_ALIGNED_TX:
-      }
-        }
-
-      if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN){
-          switch (LimelightLocalization.getInstance().getCoralAutoAlignmentStates()) {
-            case AUTO_NOT_ALIGNED_TA:
-              drivetrain.setControl(
-                driveRobotRelative
-                .withVelocityX(0)
-                .withVelocityY(1)
-                .withRotationalRate(0)
-              .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-            case AUTO_ALIGNED_TA:
-            case AUTO_NOT_ALIGNED_TX:
-            drivetrain.setControl(
-              driveRobotRelative
-              .withVelocityX(1)
-              .withVelocityY(0)
-              .withRotationalRate(0)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-            case AUTO_ALIGNED_TX:
-          }
-            }
   }
 
     @Override

@@ -1,6 +1,8 @@
 package frc.robot.commands;
 import java.lang.Thread.State;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -22,6 +24,7 @@ import frc.robot.subsystems.manipulator.ManipulatorState;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.vision.LimelightLocalization;
 
 public class RobotManager extends StateMachine<RobotState> {
   public final ElevatorSubsystem elevator;
@@ -582,6 +585,26 @@ public class RobotManager extends StateMachine<RobotState> {
   public void homeRequest(){
     flags.check(RobotFlag.HOMING);
   }
+
+  public void autoAlignRequest(){
+      switch (LimelightLocalization.getInstance().getReefAutoAlignmentStates()) {
+        case AUTO_NOT_ALIGNED_TA:
+          DrivetrainSubsystem.getInstance().drivetrain.setControl(
+            DrivetrainSubsystem.getInstance().driveRobotRelative
+            .withVelocityX(DrivetrainSubsystem.getInstance().autoAlign.getP())
+            .withVelocityY(DrivetrainSubsystem.getInstance().autoAlign.getP())
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+        case AUTO_ALIGNED_TA:
+        case AUTO_NOT_ALIGNED_TX:
+        DrivetrainSubsystem.getInstance().drivetrain.setControl(
+          DrivetrainSubsystem.getInstance().driveRobotRelative
+          .withVelocityX(DrivetrainSubsystem.getInstance().autoAlign.getP())
+          .withVelocityY(DrivetrainSubsystem.getInstance().autoAlign.getP())
+          .withRotationalRate(0)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+        case AUTO_ALIGNED_TX:
+      }
+        }
 
 
 
