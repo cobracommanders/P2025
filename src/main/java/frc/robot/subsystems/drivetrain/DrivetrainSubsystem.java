@@ -23,6 +23,7 @@ import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.vision.AutoReefAlignmentState;
+import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightLocalization;
 import frc.robot.vision.LimelightState;
 import frc.robot.vision.LimelightSubsystem;
@@ -31,8 +32,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   private  double MaxSpeed = TunerConstants.kSpeedAt12Volts;
   private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
   private ChassisSpeeds autoSpeeds = new ChassisSpeeds();
-  private ChassisSpeeds autoAlignSpeeds = new ChassisSpeeds();
-  public PIDController autoAlign = new PIDController(0, 0, 0);
+  private ChassisSpeeds reefAutoAlignSpeeds = new ChassisSpeeds();
+  private ChassisSpeeds coralStationAutoAlignSpeeds = new ChassisSpeeds();
+  public PIDController reefAutoAlign = new PIDController(0, 0, 0);
+  public PIDController coralStationAutoAlign = new PIDController(0, 0, 0);
   private final double MaxAngularRate = Math.PI * 3.5;
   public final CommandSwerveDrivetrain drivetrain;
   private LimelightLocalization limelightLocalization = LimelightLocalization.getInstance();
@@ -74,8 +77,14 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
     driveToAngle.HeadingController.setTolerance(0.5);
 
-    autoAlignSpeeds = new ChassisSpeeds(1, 1, 0);
-    
+    coralStationAutoAlign.setPID(3, 0, 0);
+    coralStationAutoAlign.enableContinuousInput(0, 10);
+
+    reefAutoAlign.setPID(3, 0, 0);
+    reefAutoAlign.enableContinuousInput(0, 10);
+
+    reefAutoAlignSpeeds = new ChassisSpeeds(1, 1, 0);
+    coralStationAutoAlignSpeeds = new ChassisSpeeds(1, 1, 0);
   }
 
   @Override
@@ -136,7 +145,9 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       teleopSpeeds = teleopSpeeds.div(2);
       isSlow = true;
     }
-
+    reefAutoAlignSpeeds = new ChassisSpeeds(reefAutoAlign.calculate(LimelightLocalization.getInstance().limelightTX, LimelightLocalization.getInstance().limelightTXsetpoint), reefAutoAlign.calculate(LimelightLocalization.getInstance().limelightTX, LimelightLocalization.getInstance().limelightTXsetpoint), 0);
+    coralStationAutoAlignSpeeds = new ChassisSpeeds(coralStationAutoAlign.calculate(LimelightHelpers.getTX("limelight-middle"), 0), coralStationAutoAlign.calculate(LimelightHelpers.getTX("limelight-middle"), 0), 0);
+   
     DogLog.log(getName() + "/isSlow", isSlow);
   }
   @Override
@@ -159,6 +170,44 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
           }
           case TELEOP_CORAL_STATION_ALIGN -> {
             LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
+          }
+          case AUTO_REEF_ALIGN -> {
+            switch (LimelightLocalization.getInstance().getReefAutoAlignmentStates()) {
+              case AUTO_NOT_ALIGNED_TA:
+                DrivetrainSubsystem.getInstance().drivetrain.setControl(
+                  DrivetrainSubsystem.getInstance().driveRobotRelative
+                  .withVelocityX(0)
+                  .withVelocityY(1)
+                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+              case AUTO_ALIGNED_TA:
+              case AUTO_NOT_ALIGNED_TX:
+              DrivetrainSubsystem.getInstance().drivetrain.setControl(
+                DrivetrainSubsystem.getInstance().driveRobotRelative
+                .withVelocityX(reefAutoAlignSpeeds.vxMetersPerSecond)
+                .withVelocityY(reefAutoAlignSpeeds.vyMetersPerSecond)
+                .withRotationalRate(0)
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+              case AUTO_ALIGNED_TX:
+            }
+          }
+          case AUTO_CORAL_STATION_ALIGN -> {
+            switch (LimelightLocalization.getInstance().getCoralAutoAlignmentStates()) {
+              case AUTO_NOT_ALIGNED_TA:
+                DrivetrainSubsystem.getInstance().drivetrain.setControl(
+                  DrivetrainSubsystem.getInstance().driveRobotRelative
+                  .withVelocityX(0)
+                  .withVelocityY(1)
+                  .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+              case AUTO_ALIGNED_TA:
+              case AUTO_NOT_ALIGNED_TX:
+              DrivetrainSubsystem.getInstance().drivetrain.setControl(
+                DrivetrainSubsystem.getInstance().driveRobotRelative
+                .withVelocityX(coralStationAutoAlignSpeeds.vxMetersPerSecond)
+                .withVelocityY(coralStationAutoAlignSpeeds.vyMetersPerSecond)
+                .withRotationalRate(0)
+                .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
+              case AUTO_ALIGNED_TX:
+            }
           }
            default -> {}
         }

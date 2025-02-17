@@ -122,8 +122,12 @@ public class RobotCommands {
     }
   }
 
-  public Command autoAlign(){
-    return Commands.runOnce(robot::autoAlignRequest, requirements);
+  public Command autoCoralStationAlign(){
+    return Commands.runOnce(robot::autoCoralStationAlignRequest, requirements);
+  }
+
+  public Command autoReefAlign(){
+    return Commands.runOnce(robot::autoReefAlignRequest, requirements);
   }
 
   public Command homeCommand(){

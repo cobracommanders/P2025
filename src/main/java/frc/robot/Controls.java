@@ -56,6 +56,8 @@ public class Controls {
 
     public void configureDriverCommands() {
         driver.A().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
+        driver.B().onTrue(Robot.robotCommands.autoReefAlign());
+        driver.Y().onTrue(Robot.robotCommands.autoCoralStationAlign());
         driver.leftTrigger().and(driver.rightBumper().negate()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.rightBumper().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());

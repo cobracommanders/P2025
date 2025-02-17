@@ -586,27 +586,13 @@ public class RobotManager extends StateMachine<RobotState> {
     flags.check(RobotFlag.HOMING);
   }
 
-  public void autoAlignRequest(){
-      switch (LimelightLocalization.getInstance().getReefAutoAlignmentStates()) {
-        case AUTO_NOT_ALIGNED_TA:
-          DrivetrainSubsystem.getInstance().drivetrain.setControl(
-            DrivetrainSubsystem.getInstance().driveRobotRelative
-            .withVelocityX(DrivetrainSubsystem.getInstance().autoAlign.getP())
-            .withVelocityY(DrivetrainSubsystem.getInstance().autoAlign.getP())
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        case AUTO_ALIGNED_TA:
-        case AUTO_NOT_ALIGNED_TX:
-        DrivetrainSubsystem.getInstance().drivetrain.setControl(
-          DrivetrainSubsystem.getInstance().driveRobotRelative
-          .withVelocityX(DrivetrainSubsystem.getInstance().autoAlign.getP())
-          .withVelocityY(DrivetrainSubsystem.getInstance().autoAlign.getP())
-          .withRotationalRate(0)
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
-        case AUTO_ALIGNED_TX:
-      }
-        }
+  public void autoReefAlignRequest(){
+    DrivetrainSubsystem.getInstance().setState(DrivetrainState.AUTO_REEF_ALIGN);
+  }
 
-
+  public void autoCoralStationAlignRequest(){
+    DrivetrainSubsystem.getInstance().setState(DrivetrainState.AUTO_CORAL_STATION_ALIGN);
+  }
 
   public void stopScoringRequest() {
     switch (getState()) {

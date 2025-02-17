@@ -21,6 +21,8 @@ public class LimelightLocalization{
   public boolean disableLeft;
   public boolean disableRight;
   public boolean disableMiddle;
+  public double limelightTX;
+  public double limelightTXsetpoint;
 
   public Pose2d[] branchPoses = {
     new Pose2d(5, 5.247, Rotation2d.fromDegrees(-120)), //J
@@ -71,11 +73,14 @@ public class LimelightLocalization{
     double tolerance = 4;
 
     if(Math.abs(LimelightHelpers.getTA("limelight-left")) > Math.abs(LimelightHelpers.getTA("limelight-right"))){
-
+      limelightTX = LimelightHelpers.getTX("limelight-left");
+      limelightTXsetpoint = -6;
       return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TA;
     }
 
     if(Math.abs(LimelightHelpers.getTA("limelight-right")) > Math.abs(LimelightHelpers.getTA("limelight-left"))){
+      limelightTX = LimelightHelpers.getTX("limelight-right");
+      limelightTXsetpoint = 18;
       return AutoReefAlignmentState.AUTO_NOT_ALIGNED_TA;
     }
 
@@ -90,7 +95,6 @@ public class LimelightLocalization{
     if(Math.abs(LimelightHelpers.getTX("limelight-right") + 18) < tolerance && getReefAutoAlignmentStates() == AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX){
       return AutoReefAlignmentState.AUTO_ALIGNED_TX;
     }
-
 
     if(Math.abs(LimelightHelpers.getTX("limelight-left") - 6) < tolerance && getReefAutoAlignmentStates() == AutoReefAlignmentState.AUTO_NOT_ALIGNED_TX){
       return AutoReefAlignmentState.AUTO_ALIGNED_TX;
