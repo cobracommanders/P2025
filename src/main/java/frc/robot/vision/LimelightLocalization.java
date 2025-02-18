@@ -174,18 +174,6 @@ public class LimelightLocalization{
       default:
         return 0;
     }
-    // new Pose2d(5, 5.247, Rotation2d.fromDegrees(-120)), //J
-    // new Pose2d(5.285, 5.107, Rotation2d.fromDegrees(-120)), //I
-    // new Pose2d(5.843, 4.2, Rotation2d.fromDegrees(180)), //H
-    // new Pose2d(5.843, 3.841, Rotation2d.fromDegrees(180)), //G
-    // new Pose2d(5.295, 2.923, Rotation2d.fromDegrees(120)), //F
-    // new Pose2d(5.036, 2.784, Rotation2d.fromDegrees(120)), //E
-    // new Pose2d(3.949, 2.774, Rotation2d.fromDegrees(60)), //D
-    // new Pose2d(3.65, 2.943, Rotation2d.fromDegrees(60)), //C
-    // new Pose2d(3.171, 3.841, Rotation2d.fromDegrees(0)), //B
-    // new Pose2d(3.171, 4.170, Rotation2d.fromDegrees(0)), //A
-    // new Pose2d(3.719, 5.087, Rotation2d.fromDegrees(-60)), //L
-    // new Pose2d(4, 5.227, Rotation2d.fromDegrees(-60)), //K
   }
 
   public AlignmentState getCoralStationAlignmentState(){
