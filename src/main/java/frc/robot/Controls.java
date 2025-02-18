@@ -16,6 +16,8 @@ import frc.robot.commands.RobotFlag;
 import frc.robot.commands.RobotManager;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.TunerConstants;
 import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -55,9 +57,10 @@ public class Controls {
     }
 
     public void configureDriverCommands() {
-        driver.A().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
-        driver.B().onTrue(Robot.robotCommands.autoReefAlign());
+        driver.A().onTrue(runOnce(() -> CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
+        driver.B().onTrue(runOnce(() -> DrivetrainSubsystem.getInstance().setState(DrivetrainState.TELEOP)));
         driver.Y().onTrue(Robot.robotCommands.autoCoralStationAlign());
+        driver.X().onTrue(Robot.robotCommands.autoReefAlign());
         driver.leftTrigger().and(driver.rightBumper().negate()).onTrue(Robot.robotCommands.invertedIntakeCommand());
             driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.rightBumper().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());

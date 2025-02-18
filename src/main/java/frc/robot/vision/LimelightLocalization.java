@@ -117,17 +117,75 @@ public class LimelightLocalization{
     // Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
     // Pose2d nearestBranch = robotPose.nearest(List.of(branchPoses));
     //Transform2d poseDifference = nearestBranch.minus(robotPose);
-    if ((Math.abs(LimelightHelpers.getTX("limelight-left") - 6)  < tolerance && LimelightHelpers.getTA("limelight-left") > 10)|| 
+    if ((Math.abs(LimelightHelpers.getTX("limelight-left") - 6)  < tolerance && LimelightHelpers.getTA("limelight-left") > 10) || 
       (Math.abs(LimelightHelpers.getTX("limelight-right") + 14) < tolerance && LimelightHelpers.getTA("limelight-right") > 10)) {
       return AlignmentState.ALIGNED;
     }
     // else if (Math.abs(LimelightHelpers.getTX("limelight-left") - 6)  < tolerance || Math.abs(LimelightHelpers.getTX("limelight-right") + 8) < tolerance){
     //   return AlignmentState.FAR_RIGHT;
     // }
-    else{
+    else {
       return AlignmentState.NOT_ALIGNED;
     }
 
+  }
+  
+  public double getCoralStationAngleFromTag() {
+    switch ((int) LimelightHelpers.getFiducialID("limelight-middle")) {
+      case 13:
+        return -50;
+      case 12:
+        return 50;
+      case 2:
+        return -130;
+      case 1:
+        return 130;
+      default:
+        return 0;
+    }
+  }
+
+  public double getReefAngleFromTag() {
+    switch ((int) LimelightHelpers.getFiducialID("limelight-middle")) {
+      case 6:
+        return 120;
+      case 7:
+        return 180;
+      case 8:
+        return -120;
+      case 9:
+        return -60;
+      case 10:
+        return 0;
+      case 11:
+        return 60;
+      case 17:
+        return 60;
+      case 18:
+        return 0;
+      case 19:
+        return -60;
+      case 20:
+        return -120;
+      case 21:
+        return 180;
+      case 22:
+        return 120;
+      default:
+        return 0;
+    }
+    // new Pose2d(5, 5.247, Rotation2d.fromDegrees(-120)), //J
+    // new Pose2d(5.285, 5.107, Rotation2d.fromDegrees(-120)), //I
+    // new Pose2d(5.843, 4.2, Rotation2d.fromDegrees(180)), //H
+    // new Pose2d(5.843, 3.841, Rotation2d.fromDegrees(180)), //G
+    // new Pose2d(5.295, 2.923, Rotation2d.fromDegrees(120)), //F
+    // new Pose2d(5.036, 2.784, Rotation2d.fromDegrees(120)), //E
+    // new Pose2d(3.949, 2.774, Rotation2d.fromDegrees(60)), //D
+    // new Pose2d(3.65, 2.943, Rotation2d.fromDegrees(60)), //C
+    // new Pose2d(3.171, 3.841, Rotation2d.fromDegrees(0)), //B
+    // new Pose2d(3.171, 4.170, Rotation2d.fromDegrees(0)), //A
+    // new Pose2d(3.719, 5.087, Rotation2d.fromDegrees(-60)), //L
+    // new Pose2d(4, 5.227, Rotation2d.fromDegrees(-60)), //K
   }
 
   public AlignmentState getCoralStationAlignmentState(){
