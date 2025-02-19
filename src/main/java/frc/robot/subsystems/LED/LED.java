@@ -66,6 +66,25 @@ public class LED extends SubsystemBase {
         break;
       }
         }
+        else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN){
+          switch (LimelightLocalization.getInstance().getCoralStationAlignmentState()) {
+          case ALIGNED:
+            LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
+            break;
+          case FAR_LEFT:
+            LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+            break;
+          case FAR_RIGHT:
+            LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+            break;
+          case NOT_ALIGNED:
+            LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+            break;
+          case INVALID:
+            LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+            break;
+          }
+        }
     else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_REEF_ALIGN && !RobotManager.getInstance().isHeightCapped){
       switch (LimelightLocalization.getInstance().getReefAlignmentState()) {
         case ALIGNED:
@@ -84,6 +103,25 @@ public class LED extends SubsystemBase {
         LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
         break;
       }
+    }
+      else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_REEF_ALIGN){
+        switch (LimelightLocalization.getInstance().getReefAlignmentState()) {
+          case ALIGNED:
+          LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
+          break;
+        case FAR_LEFT:
+          LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+          break;
+        case FAR_RIGHT:
+          LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+          break;
+        case NOT_ALIGNED:
+          LEDPattern.solid(Color.kRed).applyTo(m_ledBuffer);
+          break;
+          case INVALID:
+          LEDPattern.solid(Color.kYellow).applyTo(m_ledBuffer);
+          break;
+        }
     }
 
     else{

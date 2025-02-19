@@ -70,6 +70,8 @@ public class Robot extends TimedRobot{
         NamedCommands.registerCommand("L3", Robot.robotCommands.L3Command());
         NamedCommands.registerCommand("L4", Robot.robotCommands.L4AutoCommand());
         NamedCommands.registerCommand("remove height cap", Robot.robotCommands.removeHeightCapCommand());
+        NamedCommands.registerCommand("auto coral station align", Robot.robotCommands.autoCoralStationAlign());
+        NamedCommands.registerCommand("auto reef align", Robot.robotCommands.autoReefAlign());
         NamedCommands.registerCommand("apply height cap", Robot.robotCommands.applyHeightCapCommand());
         NamedCommands.registerCommand("climb", Robot.robotCommands.climbCommand());
         NamedCommands.registerCommand("intake", Robot.robotCommands.intakeCommand());

@@ -88,8 +88,8 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
     coralStationAutoAlignTA.setPID(0.7, 0, 0);
     coralStationAutoAlignTX.setPID(0.2, 0, 0);
 
-    reefAutoAlignTA.setPID(0.3, 0, 0);
-    reefAutoAlignTX.setPID(0.1, 0, 0);
+    reefAutoAlignTA.setPID(0.1, 0, 0);
+    reefAutoAlignTX.setPID(0.025, 0, 0);
 
     reefAutoAlignSpeeds = new ChassisSpeeds(0, 0, 0);
     coralStationAutoAlignSpeeds = new ChassisSpeeds(0, 0, 0);
@@ -101,12 +101,12 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
      switch (currentState) {
       case AUTO_CORAL_STATION_ALIGN -> {
         if (LimelightLocalization.getInstance().getCoralStationAlignmentState() == AlignmentState.ALIGNED) {
-          nextState = DrivetrainState.TELEOP; //TODO: SET TO AUTO
+          nextState = DrivetrainState.AUTO; //TODO: SET TO AUTO
         }
       }
       case AUTO_REEF_ALIGN -> {
         if (LimelightLocalization.getInstance().getReefAlignmentState() == AlignmentState.ALIGNED) {
-          nextState = DrivetrainState.TELEOP; //TODO: SET TO AUTO
+          nextState = DrivetrainState.AUTO; //TODO: SET TO AUTO
         }
       }
       case TELEOP_CORAL_STATION_ALIGN, TELEOP_REEF_ALIGN-> {
@@ -169,14 +169,15 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       coralStationAutoAlignSpeeds = new ChassisSpeeds(coralStationSpeedX, coralStationSpeedY, 0);
     } 
     if (getState() == DrivetrainState.AUTO_REEF_ALIGN) {
-      double reefSpeedX = reefAutoAlignTA.calculate(LimelightHelpers.getTA("limelight-right"), 13);
-      double reefSpeedY = reefAutoAlignTX.calculate(LimelightHelpers.getTX("limelight-right"), 18);
+      double reefSpeedX = reefAutoAlignTA.calculate(LimelightHelpers.getTA("limelight-right"), 14);
+      double reefSpeedY = reefAutoAlignTX.calculate(LimelightHelpers.getTX("limelight-right"), -14);
       reefAutoAlignSpeeds = new ChassisSpeeds(reefSpeedX, reefSpeedY, 0);
     }
     snapCoralStationAngle = LimelightLocalization.getInstance().getCoralStationAngleFromTag();
     snapReefAngle = LimelightLocalization.getInstance().getReefAngleFromTag();
    
     DogLog.log(getName() + "/isSlow", isSlow);
+    DogLog.log(getName() + "/Reef Snap Angle", snapReefAngle);
   }
   @Override
   public void periodic() {
@@ -200,11 +201,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
             LimelightSubsystem.getInstance().setState(LimelightState.CORAL_STATION);
           }
           case AUTO_REEF_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_CORAL_STATION);
-           
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
           }
           case AUTO_CORAL_STATION_ALIGN -> {
-            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_REEF);
+            LimelightSubsystem.getInstance().setState(LimelightState.AUTO_CORAL_STATION);
           }
            default -> {}
         }

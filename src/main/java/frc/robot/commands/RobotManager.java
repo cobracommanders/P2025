@@ -161,8 +161,8 @@ public class RobotManager extends StateMachine<RobotState> {
         break;
       
       case INVERTED_INTAKE_CORAL_STATION:
-        if (ManipulatorSubsystem.getInstance().manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent); {
-          nextState = RobotState.IDLE;
+        if (timeout(5)) {
+          nextState = RobotState.PREPARE_INVERTED_IDLE;
         }
       case PREPARE_L1:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {

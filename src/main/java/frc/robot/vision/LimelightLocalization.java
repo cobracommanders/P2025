@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 
 
@@ -141,12 +143,12 @@ public class LimelightLocalization{
       case 1:
         return 130;
       default:
-        return 0;
+        return CommandSwerveDrivetrain.getInstance().getState().Pose.getRotation().getDegrees();
     }
   }
 
   public double getReefAngleFromTag() {
-    switch ((int) LimelightHelpers.getFiducialID("limelight-middle")) {
+    switch ((int) LimelightHelpers.getFiducialID("limelight-right")) {
       case 6:
         return 120;
       case 7:

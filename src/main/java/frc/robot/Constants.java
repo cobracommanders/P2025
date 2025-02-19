@@ -42,7 +42,7 @@ public static final class ElbowConstants{
 }
 
 public static final class ManipulatorConstants{
-  public static final double coralStallCurrent = 20;
+  public static final double coralStallCurrent = 5;
 }
 
 

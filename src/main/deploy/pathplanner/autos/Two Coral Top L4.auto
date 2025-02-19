@@ -31,6 +31,12 @@
                       }
                     },
                     {
+                      "type": "named",
+                      "data": {
+                        "name": "auto reef align"
+                      }
+                    },
+                    {
                       "type": "wait",
                       "data": {
                         "waitTime": 2.0
@@ -71,7 +77,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.75
+                        "waitTime": 3.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "auto coral station align"
                       }
                     },
                     {
@@ -135,6 +147,12 @@
                       "type": "named",
                       "data": {
                         "name": "L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "auto reef align"
                       }
                     },
                     {
