@@ -124,16 +124,16 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         switch (RobotManager.getInstance().getState()) {
           case PREPARE_CORAL_STATION, PREPARE_INVERTED_CORAL_STATION, INVERTED_INTAKE_CORAL_STATION, INTAKE_CORAL_STATION-> {
             // nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
-            if (DriverStation.isAutonomous()){
-              nextState = DrivetrainState.AUTO_CORAL_STATION_ALIGN;
-            }
-            else nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
+            // if (DriverStation.isAutonomous()){
+            //   nextState = DrivetrainState.AUTO_CORAL_STATION_ALIGN;
+            // }
+            // else nextState = DrivetrainState.TELEOP_CORAL_STATION_ALIGN;
           }
           case PREPARE_L1, PREPARE_L2, PREPARE_L3, PREPARE_L4, WAIT_L1, WAIT_L2, WAIT_L3, WAIT_L4, SCORE_L1, SCORE_L2, SCORE_L3, SCORE_L4, CAPPED_L4-> {
-            if (DriverStation.isAutonomous()){
-              nextState = DrivetrainState.AUTO_REEF_ALIGN;
-            }
-            else nextState = DrivetrainState.TELEOP_REEF_ALIGN;
+            // if (DriverStation.isAutonomous()){
+            //   nextState = DrivetrainState.AUTO_REEF_ALIGN;
+            // }
+            // else nextState = DrivetrainState.TELEOP_REEF_ALIGN;
           }
           default -> {}
         }
@@ -260,8 +260,8 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         if (!MathUtil.isNear(snapCoralStationAngle, CommandSwerveDrivetrain.getInstance().getState().Pose.getRotation().getDegrees(), 3)) {
           drivetrain.setControl(
             driveToAngle
-              .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-              .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+              .withVelocityX(autoSpeeds.vxMetersPerSecond)
+              .withVelocityY(autoSpeeds.vyMetersPerSecond)
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
               .withTargetDirection(Rotation2d.fromDegrees(snapCoralStationAngle)));
         } else {
@@ -277,8 +277,8 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
         if (!MathUtil.isNear(snapReefAngle, CommandSwerveDrivetrain.getInstance().getState().Pose.getRotation().getDegrees(), 3)) {
           drivetrain.setControl(
             driveToAngle
-              .withVelocityX(teleopSpeeds.vxMetersPerSecond)
-              .withVelocityY(teleopSpeeds.vyMetersPerSecond)
+              .withVelocityX(autoSpeeds.vxMetersPerSecond)
+              .withVelocityY(autoSpeeds.vyMetersPerSecond)
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
               .withTargetDirection(Rotation2d.fromDegrees(snapReefAngle)));
         } else {
