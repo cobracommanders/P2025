@@ -104,7 +104,10 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   @Override
   public void collectInputs(){
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
-    DogLog.log(getName() + "/Elevator Position", elevatorPosition);
+    double leftElevatorPosition = elevatorPosition;
+    double rightElevatorPosition = rightMotor.getPosition().getValueAsDouble();
+    DogLog.log(getName() + "/Left Elevator Position", leftElevatorPosition);
+    DogLog.log(getName() + "/Right Elevator Position", rightElevatorPosition);
     DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
   }
 
