@@ -41,7 +41,7 @@ public class ClimberSubsystem extends StateMachine<ClimberState>{
           motor.set(0.0);
         }
         case DEEP_CLIMB -> {
-          motor.set(0);
+          motor.set(0.1);
         }
         default -> {}
       }

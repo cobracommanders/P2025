@@ -15,6 +15,8 @@ import frc.robot.commands.RobotFlag;
 import frc.robot.commands.RobotManager;
 import frc.robot.drivers.Xbox;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.TunerConstants;
 import frc.robot.subsystems.elbow.ElbowState;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
@@ -55,20 +57,23 @@ public class Controls {
     }
 
     public void configureDriverCommands() {
-        driver.A().onTrue(runOnce(() ->CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
+        driver.A().onTrue(runOnce(() -> CommandSwerveDrivetrain.getInstance().setYaw(Robot.alliance.get())));
+        // driver.B().onTrue(runOnce(() -> DrivetrainSubsystem.getInstance().setState(DrivetrainState.TELEOP)));
+        // driver.Y().onTrue(Robot.robotCommands.autoCoralStationAlign());
+        // driver.X().onTrue(Robot.robotCommands.autoReefAlign());
         driver.leftTrigger().and(driver.rightBumper().negate()).onTrue(Robot.robotCommands.invertedIntakeCommand());
-            driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
+            driver.leftTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.rightBumper().and(driver.leftTrigger()).onTrue(Robot.robotCommands.intakeCommand());
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
             driver.rightTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
             driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
-        driver.B().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setState(ElevatorState.HOME_ELEVATOR), WristSubsystem.getInstance()));
     }
 
     public void configureOperatorCommands(){
         operator.leftBumper().onTrue(Robot.robotCommands.invertIdleCommand());
         operator.rightBumper().onTrue(Robot.robotCommands.idleCommand());
+        operator.leftTrigger().onTrue(Commands.runOnce(()-> ElevatorSubsystem.getInstance().setState(ElevatorState.HOME_ELEVATOR)));
         operator.start().and(operator.back()).onTrue(Robot.robotCommands.homeCommand());
         operator.Y().onTrue(Robot.robotCommands.L3Command());
         operator.B().onTrue(Robot.robotCommands.L4Command());

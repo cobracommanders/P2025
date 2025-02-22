@@ -15,12 +15,11 @@ public class RobotCommands {
     this.robot = RobotManager.getInstance();
     var requirementsList = List.of(robot.elevator, robot.climber, robot.wrist, robot.elbow, robot.manipulator, robot.kicker);
     requirements = requirementsList.toArray(Subsystem[]::new);
-
   }
 
   public Command scoreCommand() {
     return Commands.runOnce(robot::scoreRequest, requirements)
-        .andThen(robot.waitForState(RobotState.IDLE));
+        .andThen(robot.waitForState(RobotState.INVERTED_IDLE));
   }
 
   public Command L1Command() {
@@ -46,14 +45,14 @@ public class RobotCommands {
   }
 
   public Command L3Command() {
-      if (robot.getState().inverted) {
-          return idleCommand() // go to non-inverted idle
-            .andThen(Commands.runOnce(robot::prepareL3Request, requirements)) // Prepare CS (non-inverted)
-            .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L3 : RobotState.PREPARE_L3)); // Goes back to idle when we're done intaking
-        }else {
-        return Commands.runOnce(robot::prepareL3Request, requirements)
-          .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L3 : RobotState.PREPARE_L3));
-        }
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL3Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotState.WAIT_L3)); // Goes back to idle when we're done intaking
+    } else {
+      return Commands.runOnce(robot::prepareL3Request, requirements)
+          .andThen(robot.waitForState(RobotState.WAIT_L3));
+    }
   }
 
   public Command L4Command() {
@@ -64,6 +63,17 @@ public class RobotCommands {
     } else {
     return Commands.runOnce(robot::prepareL4Request, requirements)
       .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4));
+    }
+  }
+
+  public Command L4AutoCommand() {
+    if (robot.getState().inverted) {
+      return idleCommand() // go to non-inverted idle
+        .andThen(Commands.runOnce(robot::prepareL4Request, requirements)) // Prepare CS (non-inverted)
+        .andThen(robot.waitForState(RobotState.PREPARE_L4)); // Goes back to idle when we're done intaking
+    } else {
+      return Commands.runOnce(robot::prepareL2Request, requirements)
+          .andThen(robot.waitForState(RobotState.PREPARE_L4));
     }
   }
 
@@ -102,7 +112,7 @@ public class RobotCommands {
   }
 
   public Command invertedIntakeCommand() {
-    if (robot.getState().inverted) {
+    if (!robot.getState().inverted) {
       return invertIdleCommand() // go to non-inverted idle
         .andThen(Commands.runOnce(robot::prepareInvertedCoralStationRequest, requirements)) // Prepare CS (inverted)
         .andThen(robot.waitForState(RobotState.INVERTED_IDLE)); // Goes back to inverted idle when we're done intaking
@@ -112,8 +122,16 @@ public class RobotCommands {
     }
   }
 
+  public Command autoCoralStationAlign(){
+    return Commands.runOnce(robot::autoCoralStationAlignRequest, requirements);
+  }
+
+  public Command autoReefAlign(){
+    return Commands.runOnce(robot::autoReefAlignRequest, requirements);
+  }
+
   public Command homeCommand(){
     return Commands.runOnce(robot::homeRequest, requirements)
-      .andThen(robot.waitForState(RobotState.HOMING_STAGE_1_ELEVATOR));    
+      .andThen(robot.waitForState(RobotState.PREPARE_HOMING));    
   }
 }

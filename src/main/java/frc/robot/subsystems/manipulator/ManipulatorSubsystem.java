@@ -12,14 +12,20 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.Constants.ElbowConstants;
+import frc.robot.Constants.ManipulatorConstants;
+import frc.robot.Constants.WristConstants;
+import frc.robot.commands.RobotManager;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
-import frc.robot.util.Constants.ManipulatorConstants;
+import frc.robot.subsystems.elbow.ElbowState;
+import frc.robot.subsystems.elevator.ElevatorState;
+import frc.robot.subsystems.wrist.WristState;
 
 
 
 public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
-    private final TalonFX manipulatorMotor;
+    public final TalonFX manipulatorMotor;
     private final TalonFXConfiguration motor_config = new TalonFXConfiguration();
     private double manipulatorSpeed;
     
@@ -31,12 +37,8 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
     }
 
     protected ManipulatorState getNextState(ManipulatorState currentState) {
-    if (getState() == ManipulatorState.INTAKE_CORAL && manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent) { 
-      return ManipulatorState.AFTER_INTAKE;
-    } else {
       return currentState;
     }
-  }
 
     @Override
     public void collectInputs(){
@@ -49,7 +51,7 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
       //   case IDLE -> 
       //     ManipulatorSpeeds.IDLE == manipulatorSpeed;
       //   case INTAKE_CORAL -> 
-      //     ManipulatorSpeeds.INTAKE_CORAL == manipulatorSpeed;
+      //     manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent;
       //   case L1 ->
       //     ManipulatorSpeeds.L1 == manipulatorSpeed;
       //   case L2 ->
@@ -58,8 +60,17 @@ public class ManipulatorSubsystem extends StateMachine<ManipulatorState>{
       //     ManipulatorSpeeds.L3 == manipulatorSpeed;
       //   case L4 ->
       //     ManipulatorSpeeds.L4 == manipulatorSpeed;
-      // };
-    }
+      //   case PREPARE_L1 ->
+      //     ManipulatorSpeeds.PREPARE_L1 == manipulatorSpeed;
+      //   case PREPARE_L2 ->
+      //     ManipulatorSpeeds.PREPARE_L2 == manipulatorSpeed;
+      //   case PREPARE_L3 ->
+      //     ManipulatorSpeeds.PREPARE_L3 == manipulatorSpeed;
+      //   case PREPARE_L4 ->
+      //     ManipulatorSpeeds.PREPARE_L4 == manipulatorSpeed;
+      //   case AFTER_INTAKE->
+      //     ManipulatorSpeeds.AFTER_INTAKE == manipulatorSpeed;
+      };
   
     public void setState(ManipulatorState newState) {
         setStateFromRequest(newState);

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -8,11 +9,13 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import dev.doglog.DogLog;
+import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -21,16 +24,20 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
-import frc.robot.util.Constants.ElevatorConstants;
-import frc.robot.util.Constants.WristConstants;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
+  private final CANcoder encoder;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
+  private final CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+  private double absolutePosition;
   private double elevatorPosition;
   private double leftElevatorPosition;
   private double leftMotorPosition;
@@ -43,6 +50,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
 
   public ElevatorSubsystem() {
     super(ElevatorState.HOME_ELEVATOR);
+    encoder = new CANcoder(Ports.ElevatorPorts.ENCODER);
     right_motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     left_motor_config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     left_motor_config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.MotionMagicCruiseVelocity;
@@ -55,12 +63,14 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     leftMotor.getConfigurator().apply(left_motor_config);
     rightMotor.getConfigurator().apply(right_motor_config);
+    canCoderConfig.MagnetSensor.MagnetOffset = Constants.ElevatorConstants.encoderOffset;
+    canCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+    encoder.getConfigurator().apply(canCoderConfig);
     tolerance = 0.1;
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
     if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
-      rightMotor.setPosition(0);
       leftMotor.setPosition(0);
       return ElevatorState.IDLE;
     } else {
@@ -101,11 +111,19 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     return getState() == ElevatorState.IDLE;
   }
 
+  public void syncEncoder(){
+    leftMotor.setPosition(absolutePosition);
+  }
+
   @Override
   public void collectInputs(){
+    double leftElevatorPosition = leftMotor.getPosition().getValueAsDouble();
+    double rightElevatorPosition = rightMotor.getPosition().getValueAsDouble();
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
-    DogLog.log(getName() + "/Elevator Position", elevatorPosition);
-    DogLog.log(getName() + "/Elevator Current", rightMotor.getStatorCurrent().getValueAsDouble());
+    absolutePosition = encoder.getAbsolutePosition().getValueAsDouble();
+    DogLog.log(getName() + "/Left Elevator Position", leftElevatorPosition);
+    DogLog.log(getName() + "/Right Elevator Position", rightElevatorPosition);
+    DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
   }
 
   @Override
@@ -126,11 +144,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     // }
   }
 
-  public void setElevatorPosition(double leftPosition){
-    leftMotor.setControl(left_motor_request.withPosition(leftPosition));
+  public void setElevatorPosition(double elevatorPosition){
     rightMotor.setControl(right_motor_request);
+    leftMotor.setControl(left_motor_request.withPosition(elevatorPosition));
     //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/Elevator Setpoint", leftPosition);
+    DogLog.log(getName() + "/right Motor Setpoint", elevatorPosition);
   }
 
     @Override
@@ -158,7 +176,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           setElevatorPosition(ElevatorPositions.L4);
         }
         case HOME_ELEVATOR -> {
-          rightMotor.setControl(new VoltageOut(-0.4));
+          rightMotor.setControl(new VoltageOut(-0.7));
         }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);

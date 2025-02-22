@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.elevator.ElevatorState;
-import frc.robot.util.Constants;
-import frc.robot.util.Constants.WristConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 
 public class WristSubsystem extends StateMachine<WristState>{
     
@@ -44,15 +44,13 @@ public class WristSubsystem extends StateMachine<WristState>{
     motor_config.MotionMagic.MotionMagicAcceleration = WristConstants.MotionMagicAcceleration;
     motor_config.MotionMagic.MotionMagicJerk = WristConstants.MotionMagicJerk;
     wristMotor.getConfigurator().apply(motor_config);
-    tolerance = 0.01;
+    tolerance = 0.02;
     brakeModeEnabled = false;
   }
   protected WristState getNextState(WristState currentState) {
     if (getState() == WristState.HOME_WRIST && this.atGoal()) { 
       wristMotor.setPosition(0.38);
       return WristState.INVERTED_IDLE;
-    } else if (getState() == WristState.IDLE && this.atGoal()) {
-      return currentState;
     } else {
       return currentState;
     }
@@ -81,8 +79,6 @@ public class WristSubsystem extends StateMachine<WristState>{
         wristMotor.getStatorCurrent().getValueAsDouble() > WristConstants.homingStallCurrent;
       case INVERTED_CORAL_STATION ->
         MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
-      case AFTER_INTAKE ->
-        MathUtil.isNear(WristPositions.AFTER_INTAKE, wristPosition, tolerance);
       case AFTER_L4 ->
         MathUtil.isNear(WristPositions.AFTER_L4, wristPosition, tolerance);
       case DISABLED->
@@ -172,9 +168,6 @@ public class WristSubsystem extends StateMachine<WristState>{
         }
         case DISABLED-> {
           wristMotor.setControl(new VoltageOut(0));
-        }
-        case AFTER_INTAKE -> {
-          setWristPosition(WristPositions.AFTER_INTAKE);
         }
         case AFTER_L4 -> {
           setWristPosition(WristPositions.AFTER_L4);

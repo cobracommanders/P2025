@@ -1,7 +1,13 @@
 package frc.robot.commands;
+import java.lang.Thread.State;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ManipulatorConstants;
 import frc.robot.FlagManager;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.climber.ClimberState;
@@ -18,6 +24,7 @@ import frc.robot.subsystems.manipulator.ManipulatorState;
 import frc.robot.subsystems.manipulator.ManipulatorSubsystem;
 import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.vision.LimelightLocalization;
 
 public class RobotManager extends StateMachine<RobotState> {
   public final ElevatorSubsystem elevator;
@@ -35,7 +42,7 @@ public class RobotManager extends StateMachine<RobotState> {
   public final FlagManager<RobotFlag> flags = new FlagManager<>("RobotManager", RobotFlag.class);
 
   public RobotManager() {
-    super(RobotState.PREPARE_HOMING);
+    super(RobotState.INVERTED_IDLE);
     this.elevator = ElevatorSubsystem.getInstance();
     this.climber = ClimberSubsystem.getInstance();
     this.manipulator = ManipulatorSubsystem.getInstance();
@@ -53,12 +60,15 @@ public class RobotManager extends StateMachine<RobotState> {
   protected RobotState getNextState(RobotState currentState) {
     flags.log();
     RobotState nextState = currentState;
-    if (DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled() && DriverStation.isAutonomous()){
+        nextState = RobotState.INVERTED_IDLE;
+    }
+    if(DriverStation.isDisabled() && DriverStation.isTeleop()){
       nextState = RobotState.PREPARE_HOMING;
     }
     for (RobotFlag flag : flags.getChecked()) {
       switch (flag) {
-        case APPLY_HEIGHT_CAP: 
+        case APPLY_HEIGHT_CAP:
           isHeightCapped = true;
           break;
         case REMOVE_HEIGHT_CAP:
@@ -71,7 +81,7 @@ public class RobotManager extends StateMachine<RobotState> {
           break;
         case INVERTED_IDLE:
           if (!currentState.ignoreRequests) {
-            nextState = (currentState.inverted) ? RobotState.INVERTED_IDLE : RobotState.PREPARE_INVERTED_FROM_IDLE;
+            nextState = (currentState.inverted) ? RobotState.PREPARE_INVERTED_IDLE : RobotState.PREPARE_INVERTED_FROM_IDLE;
           }
           break;
         case CORAL_STATION:
@@ -126,6 +136,8 @@ public class RobotManager extends StateMachine<RobotState> {
             case WAIT_L4:
               nextState = RobotState.SCORE_L4;
               break;
+            case CAPPED_L4:
+              nextState = RobotState.SCORE_L4;
             case DEEP_CLIMB:
             default:
               break;
@@ -142,13 +154,16 @@ public class RobotManager extends StateMachine<RobotState> {
       case WAIT_IDLE:
       case WAIT_L1:
       case DEEP_CLIMB:
-      case INVERTED_INTAKE_CORAL_STATION:
       case INTAKE_CORAL_STATION:
       case INVERTED_IDLE:
       case REMOVE_ALGAE:
+      case WAIT_L3:
         break;
       
-
+      case INVERTED_INTAKE_CORAL_STATION:
+        if (timeout(5) || ManipulatorSubsystem.getInstance().manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent); {
+          nextState = RobotState.INVERTED_IDLE;
+        }
       case PREPARE_L1:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
           nextState = RobotState.WAIT_L1;
@@ -159,22 +174,10 @@ public class RobotManager extends StateMachine<RobotState> {
           nextState = RobotState.WAIT_L2;
         }
         break;
-      case CAPPED_L3:
-        if (!isHeightCapped){
-          nextState = RobotState.PREPARE_L3;
-        }
-      break;
       case PREPARE_L3:
-        if(isHeightCapped){
-          nextState = RobotState.CAPPED_L3;
-        } else if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.WAIT_L3;
-        }
-        break;
-      case WAIT_L3:
-        if(isHeightCapped) {
-          nextState = RobotState.CAPPED_L3;
-        }
+      }
         break;
       case CAPPED_L4:
         if (!isHeightCapped) {
@@ -206,7 +209,7 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_INVERTED_CORAL_STATION:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
           nextState = RobotState.INVERTED_INTAKE_CORAL_STATION;
         }
         break;
@@ -248,6 +251,10 @@ public class RobotManager extends StateMachine<RobotState> {
       case PREPARE_IDLE_FROM_INVERTED:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
           nextState = RobotState.PREPARE_IDLE;
+        }
+      case PREPARE_IDLE_FROM_SCORE:
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal() && currentState == RobotState.SCORE_L4) {
+          nextState = RobotState.PREPARE_INVERTED_IDLE;
         }
         break;
       case PREPARE_DEEP_CLIMB:
@@ -296,7 +303,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L1 -> {
             elevator.setState(ElevatorState.L1);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L1);
             wrist.setState(WristState.L1);
             elbow.setState(ElbowState.L1);
             kicker.setState(KickerState.IDLE);
@@ -312,7 +319,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L2 -> {
             elevator.setState(ElevatorState.L2);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L2);
             wrist.setState(WristState.L2);
             elbow.setState(ElbowState.L2);
             kicker.setState(KickerState.REMOVE_ALGAE);
@@ -328,7 +335,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L3 -> {
             elevator.setState(ElevatorState.L3);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L3);
             wrist.setState(WristState.L3);
             elbow.setState(ElbowState.L3);
             kicker.setState(KickerState.REMOVE_ALGAE);
@@ -344,7 +351,7 @@ public class RobotManager extends StateMachine<RobotState> {
           case PREPARE_L4 -> {
             elevator.setState(ElevatorState.L4);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
+            manipulator.setState(ManipulatorState.PREPARE_L4);
             wrist.setState(WristState.L4);
             elbow.setState(ElbowState.L4);
             kicker.setState(KickerState.REMOVE_ALGAE);
@@ -424,20 +431,29 @@ public class RobotManager extends StateMachine<RobotState> {
             kicker.setState(KickerState.REMOVE_ALGAE);
           }
 
-          case CAPPED_L3 -> {
-            elevator.setState(ElevatorState.CAPPED_L3);
-            climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.IDLE);
-            wrist.setState(WristState.CAPPED_L3);
-            elbow.setState(ElbowState.CAPPED_L3);
-            kicker.setState(KickerState.REMOVE_ALGAE);
-          }
+          // case CAPPED_L3 -> {
+          //   elevator.setState(ElevatorState.CAPPED_L3);
+          //   climber.setState(ClimberState.IDLE);
+          //   manipulator.setState(ManipulatorState.IDLE);
+          //   wrist.setState(WristState.CAPPED_L3);
+          //   elbow.setState(ElbowState.CAPPED_L3);
+          //   kicker.setState(KickerState.REMOVE_ALGAE);
+          // }
 
           case PREPARE_IDLE -> {
             elevator.setState(ElevatorState.IDLE);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.IDLE);
             wrist.setState(WristState.IDLE);
+            elbow.setState(ElbowState.IDLE);
+            kicker.setState(KickerState.IDLE);
+          }
+
+          case PREPARE_IDLE_FROM_SCORE -> {
+            elevator.setState(ElevatorState.IDLE);
+            climber.setState(ClimberState.IDLE);
+            manipulator.setState(ManipulatorState.IDLE);
+            wrist.setState(WristState.AFTER_L4);
             elbow.setState(ElbowState.IDLE);
             kicker.setState(KickerState.IDLE);
           }
@@ -490,7 +506,11 @@ public class RobotManager extends StateMachine<RobotState> {
             kicker.setState(KickerState.REMOVE_ALGAE);
             elbow.setState(ElbowState.L4_ELBOW);
           }
-          case INVERTED_IDLE,
+
+          case INVERTED_IDLE -> {
+            
+          }
+          case 
             WAIT_DEEP_CLIMB, 
             WAIT_IDLE, 
             WAIT_INVERTED_IDLE, 
@@ -562,7 +582,13 @@ public class RobotManager extends StateMachine<RobotState> {
     flags.check(RobotFlag.HOMING);
   }
 
+  public void autoReefAlignRequest(){
+    DrivetrainSubsystem.getInstance().setState(DrivetrainState.AUTO_REEF_ALIGN);
+  }
 
+  public void autoCoralStationAlignRequest(){
+    DrivetrainSubsystem.getInstance().setState(DrivetrainState.AUTO_CORAL_STATION_ALIGN);
+  }
 
   public void stopScoringRequest() {
     switch (getState()) {
