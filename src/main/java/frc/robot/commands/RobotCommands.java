@@ -60,11 +60,11 @@ public class RobotCommands {
   public Command L4Command() {
     if (robot.getState().inverted) {
       return idleCommand() // go to non-inverted idle
-        .andThen(Commands.runOnce(robot::prepareL4Request, requirements)) // Prepare CS (non-inverted)
-        .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4)); // Goes back to idle when we're done intaking
+        .andThen(Commands.runOnce(robot::prepareL4Request, requirements)); // Prepare CS (non-inverted)
+        // .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.WAIT_L4)); // Goes back to idle when we're done intaking
     } else {
-    return Commands.runOnce(robot::prepareL4Request, requirements)
-      .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.PREPARE_L4));
+    return Commands.runOnce(robot::prepareL4Request, requirements);
+      // .andThen(robot.waitForState(RobotManager.getInstance().isHeightCapped == true ? RobotState.CAPPED_L4 : RobotState.WAIT_L4));
     }
   }
 
@@ -114,11 +114,13 @@ public class RobotCommands {
   }
 
   public Command autoCoralStationAlign(){
-    return Commands.runOnce(robot::autoCoralStationAlignRequest, requirements);
+    return Commands.runOnce(robot::autoCoralStationAlignRequest, requirements)
+    .andThen(Commands.waitUntil(()-> DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO || DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP));
   }
 
   public Command autoReefAlign(){
-    return Commands.runOnce(robot::autoReefAlignRequest, requirements);
+    return Commands.runOnce(robot::autoReefAlignRequest, requirements)
+    .andThen(Commands.waitUntil(()-> DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO || DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP));
   }
 
   public Command setDrivetrainAuto(){

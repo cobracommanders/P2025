@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -66,7 +67,7 @@ public class LED extends SubsystemBase {
         break;
       }
         }
-        else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN){
+        else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN_1){
           switch (LimelightLocalization.getInstance().getCoralStationAlignmentState(true)) {
           case ALIGNED:
             LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
@@ -148,6 +149,9 @@ public class LED extends SubsystemBase {
         default:
           break;
       }
+    }
+    if (DriverStation.isDisabled()) {
+      LEDPattern.solid(Color.kPurple).applyTo(m_ledBuffer);
     }
     m_led.setData(m_ledBuffer);
   }

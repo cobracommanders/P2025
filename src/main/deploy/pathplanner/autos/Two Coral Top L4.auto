@@ -128,12 +128,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "auto reef align"
-          }
-        },
-        {
           "type": "sequential",
           "data": {
             "commands": [
@@ -147,6 +141,12 @@
                 "type": "named",
                 "data": {
                   "name": "L4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "auto reef align"
                 }
               },
               {

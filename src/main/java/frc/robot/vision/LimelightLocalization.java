@@ -41,8 +41,8 @@ public class LimelightLocalization{
     new Pose2d(4, 5.227, Rotation2d.fromDegrees(-60)), //K
   };
   public Pose2d[] coralStationPoses = {
-    new Pose2d(1.227, 7.071, Rotation2d.fromDegrees(120)), // Left CS
-    new Pose2d(7.936, 5.817, Rotation2d.fromDegrees(-120)) // Right CS
+    new Pose2d(0.58, 7.13, Rotation2d.fromDegrees(-50)), // Left CS
+    new Pose2d(0.66, 1.1, Rotation2d.fromDegrees(50)) // Right CS
   };
   public static List<Integer> coralStationTags = List.of(
     1, 2, 12, 13
@@ -118,7 +118,7 @@ public class LimelightLocalization{
 
   public AlignmentState getReefAlignmentState(){
 
-    double tolerance = 4;
+    double tolerance = 6;
 
     // Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
     // Pose2d nearestBranch = robotPose.nearest(List.of(branchPoses));
@@ -183,7 +183,7 @@ public class LimelightLocalization{
   }
 
   public AlignmentState getCoralStationAlignmentState(boolean isAuto){
-    double tolerance = isAuto ? 0.25 : 3;
+    double tolerance = isAuto ? 3 : 3;
     // if (LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
     //   return AlignmentState.INVALID;
     // }
@@ -261,7 +261,7 @@ public class LimelightLocalization{
       CommandSwerveDrivetrain.getInstance().addVisionMeasurement(
           mt2m.pose,
           Utils.fpgaToCurrentTime(mt2m.timestampSeconds),
-          VecBuilder.fill(0.75, 0.75,9999999));
+          VecBuilder.fill(0.05, 0.05,9999999));
           SmartDashboard.putNumber("mt2m", mt2m.timestampSeconds);
 
     }

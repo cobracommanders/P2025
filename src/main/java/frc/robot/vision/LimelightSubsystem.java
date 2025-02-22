@@ -38,9 +38,9 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
 
   public LimelightSubsystem() {
      super(LimelightState.DRIVE);
-     limelightLocalization.disableLeft = true;
-     limelightLocalization.disableRight = true;
-     limelightLocalization.disableMiddle = true;
+     limelightLocalization.disableLeft = false;
+     limelightLocalization.disableRight = false;
+     limelightLocalization.disableMiddle = false;
     }
 
     protected LimelightState getNextState(LimelightState currentState) {
@@ -88,9 +88,9 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case AUTO -> {
-            limelightLocalization.disableLeft = false;
-            limelightLocalization.disableRight = false;
-            limelightLocalization.disableMiddle = false;
+            limelightLocalization.disableLeft = true;
+            limelightLocalization.disableRight = true;
+            limelightLocalization.disableMiddle = true;
             LimelightHelpers.setPipelineIndex("limelight-left", 0);
             LimelightHelpers.setPipelineIndex("limelight-right", 0);
           }
@@ -101,6 +101,9 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case AUTO_REEF -> {
+            limelightLocalization.disableLeft = false;
+            limelightLocalization.disableRight = false;
+            limelightLocalization.disableMiddle = true;
             LimelightHelpers.setPipelineIndex("limelight-left", 2);
             LimelightHelpers.setPipelineIndex("limelight-right", 2);
             LimelightHelpers.setPipelineIndex("limelight-middle", 2);

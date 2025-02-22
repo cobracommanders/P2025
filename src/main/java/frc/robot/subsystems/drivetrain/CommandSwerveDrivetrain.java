@@ -18,6 +18,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -176,6 +177,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 hasAppliedOperatorPerspective = true;
             });
         }
+    }
+
+    public boolean isNear(Pose2d pose) {
+        Pose2d robotPose = getState().Pose;
+        return MathUtil.isNear(robotPose.getX(), pose.getX(), 0.01) && MathUtil.isNear(robotPose.getY(), pose.getY(), 0.01);
     }
     
         private static CommandSwerveDrivetrain instance;
