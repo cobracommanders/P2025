@@ -10,7 +10,7 @@ public final class Constants {
   }
 
 public static final class ElevatorConstants{
-  public static final double homingStallCurrent = 27;
+  public static final double homingStallCurrent = 25;
   public static final double P = 40;
   public static final double I = 0;
   public static final double D = 0;
@@ -32,7 +32,7 @@ public static final class WristConstants{
   public static final double MotionMagicJerk = 95;
 }
 public static final class ElbowConstants{
-  public static final double homingStallCurrent = 15;
+  public static final double homingStallCurrent = 10;
   public static final double P = 40;
   public static final double I = 0;
   public static final double D = 0;

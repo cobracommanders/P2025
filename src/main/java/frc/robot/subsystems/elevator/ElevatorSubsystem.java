@@ -72,13 +72,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   }
 
   protected ElevatorState getNextState(ElevatorState currentState) {
-    if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
-      leftMotor.setPosition(0);
-      return ElevatorState.IDLE;
-    } else {
       return currentState;
     }
-  }
 
   public boolean atGoal() {
     return switch (getState()) {

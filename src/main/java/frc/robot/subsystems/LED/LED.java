@@ -86,7 +86,7 @@ public class LED extends SubsystemBase {
             break;
           }
         }
-    else if (DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_REEF_ALIGN && !RobotManager.getInstance().isHeightCapped){
+    else if ((DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP_REEF_ALIGN && !RobotManager.getInstance().isHeightCapped) || (RobotManager.getInstance().getState() == RobotState.WAIT_L3) || (RobotManager.getInstance().getState() == RobotState.WAIT_L2)){
       switch (LimelightLocalization.getInstance().getReefAlignmentState()) {
         case ALIGNED:
         LEDPattern.solid(Color.kGreen).applyTo(m_ledBuffer);
