@@ -18,6 +18,7 @@ public static final class ElevatorConstants{
   public static final double MotionMagicAcceleration = 40; //40
   public static final double MotionMagicCruiseVelocity = 200; //115
   public static final double MotionMagicJerk = 250; //175
+  public static final double encoderOffset = 0;
 }
 
 public static final class WristConstants{

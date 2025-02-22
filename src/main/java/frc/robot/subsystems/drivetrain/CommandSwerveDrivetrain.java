@@ -86,12 +86,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
     }
-        public void driveRobotRelative(ChassisSpeeds speeds) {
-            this.setControl(new SwerveRequest.RobotCentric().withVelocityX(speeds.vxMetersPerSecond).withVelocityY(speeds.vyMetersPerSecond).withRotationalRate(speeds.omegaRadiansPerSecond).withDriveRequestType(DriveRequestType.Velocity));        
-        }
-        public void driveFieldRelative(ChassisSpeeds speeds) {
-            this.setControl(new SwerveRequest.FieldCentric().withVelocityX(xLimiter.calculate(speeds.vxMetersPerSecond)).withVelocityY(yLimiter.calculate(speeds.vyMetersPerSecond)).withRotationalRate(speeds.omegaRadiansPerSecond));
-        }
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
         super(driveTrainConstants, modules);
 
@@ -107,10 +101,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             () -> this.getState().Pose, // Robot pose supplier
             this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
             () -> this.getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            (speeds, feedforwards) -> DrivetrainSubsystem.getInstance().setAutoSpeeds(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(8.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(8.0, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             ),
             config, // The robot configuration
             () -> {

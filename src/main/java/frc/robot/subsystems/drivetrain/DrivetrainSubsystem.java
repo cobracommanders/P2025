@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Controls;
 import frc.robot.Robot;
 import frc.robot.StateMachine;
+import frc.robot.commands.Autos;
 import frc.robot.commands.RobotManager;
 import frc.robot.commands.RobotState;
 import frc.robot.drivers.Xbox;
@@ -142,6 +143,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
      }
     return nextState;
   }
+
+  public void setAutoSpeeds(ChassisSpeeds speeds) {
+    autoSpeeds = speeds;
+  }
   
   public void setSnapToAngle(double angle) {
     goalSnapAngle = angle;
@@ -155,7 +160,10 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
   protected void collectInputs() {
     limelightLocalization.update();
     drivetrainState = drivetrain.getState();
-    teleopSpeeds = new ChassisSpeeds(-Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, Robot.controls.driver.rightX() * MaxAngularRate);
+    teleopSpeeds = new ChassisSpeeds(
+      -Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * Robot.controls.driver.leftY() * MaxSpeed, 
+      -Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * Robot.controls.driver.leftX() * MaxSpeed, 
+      Robot.controls.driver.rightX() * Robot.controls.driver.rightX() * Robot.controls.driver.rightX() * MaxAngularRate);
     DogLog.log(getName() + "/teleopSpeeds", teleopSpeeds);
     DogLog.log(getName() + "/robot pose", CommandSwerveDrivetrain.getInstance().getState().Pose);
     boolean isSlow = false;
@@ -289,7 +297,15 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
               .withDriveRequestType(DriveRequestType.OpenLoopVoltage));
         }
       }
-      case AUTO -> {}
+      case AUTO -> {
+        drivetrain.setControl(
+          driveRobotRelative
+            .withVelocityX(autoSpeeds.vxMetersPerSecond)
+            .withVelocityY(autoSpeeds.vyMetersPerSecond)
+            .withRotationalRate(autoSpeeds.omegaRadiansPerSecond)
+            .withDriveRequestType(DriveRequestType.Velocity)
+        );
+      }
     }
   }
 
