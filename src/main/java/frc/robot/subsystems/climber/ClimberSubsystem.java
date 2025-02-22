@@ -5,10 +5,10 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
 import frc.robot.commands.RobotFlag;
-import frc.robot.util.Constants;
 
 public class ClimberSubsystem extends StateMachine<ClimberState>{
     

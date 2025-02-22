@@ -22,6 +22,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -34,8 +35,8 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.util.Constants;
 import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightLocalization;
 
@@ -134,6 +135,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
+    }
+
+    private PIDController xController = new PIDController(5.0, 0, 0);
+    private PIDController yController = new PIDController(5.0, 0, 0);
+    public ChassisSpeeds driveToPoseSpeeds(Pose2d pose) {
+        double xSpeed = xController.calculate(getState().Pose.getX(), pose.getX());
+        double ySpeed = yController.calculate(getState().Pose.getY(), pose.getY());
+        return new ChassisSpeeds(xSpeed, ySpeed, 0);
     }
 
     private void startSimThread() {

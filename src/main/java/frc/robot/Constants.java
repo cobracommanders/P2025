@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -18,7 +18,7 @@ public static final class ElevatorConstants{
   public static final double MotionMagicAcceleration = 40; //40
   public static final double MotionMagicCruiseVelocity = 200; //115
   public static final double MotionMagicJerk = 250; //175
-  public static final double encoderOffset = 0;
+  public static final double encoderOffset = -0.112305;
 }
 
 public static final class WristConstants{

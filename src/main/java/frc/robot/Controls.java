@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.OIConstants;
 import frc.robot.commands.RobotCommands;
 import frc.robot.commands.RobotFlag;
 import frc.robot.commands.RobotManager;
@@ -25,7 +26,6 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.kicker.KickerSubsystem;
 import frc.robot.subsystems.wrist.WristState;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.util.Constants.OIConstants;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -68,6 +68,8 @@ public class Controls {
             driver.rightTrigger().onFalse(Robot.robotCommands.invertIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
             driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
+        driver.B().onTrue(Robot.robotCommands.autoCoralStationAlign());
+        driver.Y().onTrue(Robot.robotCommands.setDrivetrainTeleop());
     }
 
     public void configureOperatorCommands(){

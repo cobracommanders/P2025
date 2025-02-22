@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "set drivetrain auto"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Blue 3 to I"
+            "pathName": "Cage 3 to I"
           }
         },
         {
@@ -86,15 +92,15 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
-                      "data": {
-                        "name": "inverted intake"
-                      }
-                    },
-                    {
                       "type": "wait",
                       "data": {
                         "waitTime": 3.0
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "inverted intake"
                       }
                     }
                   ]
@@ -109,7 +115,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "idle"
+                  "name": "inverted idle"
                 }
               }
             ]
