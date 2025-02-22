@@ -184,9 +184,9 @@ public class LimelightLocalization{
 
   public AlignmentState getCoralStationAlignmentState(boolean isAuto){
     double tolerance = isAuto ? 0.25 : 3;
-    if (LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
-      return AlignmentState.INVALID;
-    }
+    // if (LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
+    //   return AlignmentState.INVALID;
+    // }
     // Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
     // Pose2d nearestCoralStation = robotPose.nearest(List.of(coralStationPoses));
     // Transform2d poseDifference = nearestCoralStation.minus(robotPose);
@@ -218,7 +218,7 @@ public class LimelightLocalization{
     //   rejectRightData = true;
     //   rejectMiddleData = true;
     // }
-    if(mt2m == null || mt2m.tagCount == 0)// || disableMiddle)
+    if(mt2m == null || mt2m.tagCount == 0 || disableMiddle)
     {
       rejectMiddleData = true;
     }

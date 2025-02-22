@@ -40,7 +40,7 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
      super(LimelightState.DRIVE);
      limelightLocalization.disableLeft = true;
      limelightLocalization.disableRight = true;
-     limelightLocalization.disableMiddle = false;
+     limelightLocalization.disableMiddle = true;
     }
 
     protected LimelightState getNextState(LimelightState currentState) {
@@ -72,17 +72,17 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
             limelightLocalization.disableMiddle = false;
           }
           case DRIVE -> {
-            limelightLocalization.disableLeft = true;
-            limelightLocalization.disableRight = true;
+            limelightLocalization.disableLeft = false;
+            limelightLocalization.disableRight = false;
             limelightLocalization.disableMiddle = false;
             LimelightHelpers.setPipelineIndex("limelight-left", 0);
             LimelightHelpers.setPipelineIndex("limelight-right", 0);
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case DISABLED -> {
-            limelightLocalization.disableLeft = true;
-            limelightLocalization.disableRight = true;
-            limelightLocalization.disableMiddle = true;
+            limelightLocalization.disableLeft = false;
+            limelightLocalization.disableRight = false;
+            limelightLocalization.disableMiddle = false;
             LimelightHelpers.setPipelineIndex("limelight-left", 0);
             LimelightHelpers.setPipelineIndex("limelight-right", 0);
             LimelightHelpers.setPipelineIndex("limelight-middle", 0);
@@ -90,7 +90,7 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
           case AUTO -> {
             limelightLocalization.disableLeft = false;
             limelightLocalization.disableRight = false;
-            limelightLocalization.disableMiddle = true;
+            limelightLocalization.disableMiddle = false;
             LimelightHelpers.setPipelineIndex("limelight-left", 0);
             LimelightHelpers.setPipelineIndex("limelight-right", 0);
           }

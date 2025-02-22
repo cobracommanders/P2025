@@ -179,18 +179,19 @@ public class DrivetrainSubsystem extends StateMachine<DrivetrainState> {
       teleopSpeeds = teleopSpeeds.div(2);
       isSlow = true;
     }
-    if (getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN) {
-      coralStationTag = (int) LimelightHelpers.getFiducialID("limelight-middle");
-      boolean isValidTag = LimelightLocalization.coralStationTags.contains(coralStationTag);
-      if (isValidTag) {
-        double coralStationSpeedX = -coralStationAutoAlignTA.calculate(LimelightHelpers.getTA("limelight-middle"), 4.5);
-        double coralStationSpeedY = coralStationAutoAlignTX.calculate(-LimelightHelpers.getTX("limelight-middle"), 0);
-        coralStationAutoAlignSpeeds = new ChassisSpeeds(coralStationSpeedX, coralStationSpeedY, 0);
-      } else {
-        coralStationAutoAlignSpeeds = new ChassisSpeeds();
-      }
-    } 
-    else if (getState() == DrivetrainState.AUTO_REEF_ALIGN) {
+    // if (getState() == DrivetrainState.AUTO_CORAL_STATION_ALIGN) {
+    //   coralStationTag = (int) LimelightHelpers.getFiducialID("limelight-middle");
+    //   boolean isValidTag = LimelightLocalization.coralStationTags.contains(coralStationTag);
+    //   if (isValidTag) {
+    //     double coralStationSpeedX = -coralStationAutoAlignTA.calculate(LimelightHelpers.getTA("limelight-middle"), 4.5);
+    //     double coralStationSpeedY = coralStationAutoAlignTX.calculate(-LimelightHelpers.getTX("limelight-middle"), 0);
+    //     coralStationAutoAlignSpeeds = new ChassisSpeeds(coralStationSpeedX, coralStationSpeedY, 0);
+    //   } else {
+    //     coralStationAutoAlignSpeeds = new ChassisSpeeds();
+    //   }
+    // } 
+    // else 
+    if (getState() == DrivetrainState.AUTO_REEF_ALIGN) {
       double reefSpeedX = reefAutoAlignTA.calculate(LimelightHelpers.getTA("limelight-right"), 14);
       double reefSpeedY = reefAutoAlignTX.calculate(LimelightHelpers.getTX("limelight-right"), -14);
       reefAutoAlignSpeeds = new ChassisSpeeds(reefSpeedX, reefSpeedY, 0);
