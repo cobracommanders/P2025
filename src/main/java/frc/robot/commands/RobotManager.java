@@ -161,8 +161,8 @@ public class RobotManager extends StateMachine<RobotState> {
         break;
       
       case INVERTED_INTAKE_CORAL_STATION:
-        if (timeout(5)) {
-          nextState = RobotState.PREPARE_INVERTED_IDLE;
+        if (timeout(5) || ManipulatorSubsystem.getInstance().manipulatorMotor.getStatorCurrent().getValueAsDouble() > ManipulatorConstants.coralStallCurrent); {
+          nextState = RobotState.INVERTED_IDLE;
         }
       case PREPARE_L1:
         if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
@@ -209,7 +209,7 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case PREPARE_INVERTED_CORAL_STATION:
-        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal() && manipulator.atGoal()) {
+        if (elevator.atGoal() && elbow.atGoal() && wrist.atGoal()) {
           nextState = RobotState.INVERTED_INTAKE_CORAL_STATION;
         }
         break;
@@ -514,7 +514,11 @@ public class RobotManager extends StateMachine<RobotState> {
             kicker.setState(KickerState.REMOVE_ALGAE);
             elbow.setState(ElbowState.L4_ELBOW);
           }
-          case INVERTED_IDLE,
+
+          case INVERTED_IDLE -> {
+            
+          }
+          case 
             WAIT_DEEP_CLIMB, 
             WAIT_IDLE, 
             WAIT_INVERTED_IDLE, 
