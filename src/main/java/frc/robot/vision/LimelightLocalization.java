@@ -118,7 +118,7 @@ public class LimelightLocalization{
 
   public AlignmentState getReefAlignmentState(){
 
-    double tolerance = 6;
+    double tolerance = 6.75;
 
     // Pose2d robotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
     // Pose2d nearestBranch = robotPose.nearest(List.of(branchPoses));
@@ -183,7 +183,7 @@ public class LimelightLocalization{
   }
 
   public AlignmentState getCoralStationAlignmentState(boolean isAuto){
-    double tolerance = isAuto ? 3 : 3;
+    double tolerance = isAuto ? 2.5 : 3;
     // if (LimelightHelpers.getCurrentPipelineIndex("limelight-middle") != 2){
     //   return AlignmentState.INVALID;
     // }

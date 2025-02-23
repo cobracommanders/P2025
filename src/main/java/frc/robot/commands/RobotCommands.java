@@ -21,7 +21,7 @@ public class RobotCommands {
 
   public Command scoreCommand() {
     return Commands.runOnce(robot::scoreRequest, requirements)
-        .andThen(robot.waitForState(RobotState.INVERTED_IDLE));
+        .andThen(robot.waitForState(RobotState.PREPARE_INVERTED_FROM_IDLE));
   }
 
   public Command L1Command() {
@@ -114,12 +114,12 @@ public class RobotCommands {
   }
 
   public Command autoCoralStationAlign(){
-    return Commands.runOnce(robot::autoCoralStationAlignRequest, requirements)
+    return Commands.runOnce(robot::autoCoralStationAlignRequest, DrivetrainSubsystem.getInstance())
     .andThen(Commands.waitUntil(()-> DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO || DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP));
   }
 
   public Command autoReefAlign(){
-    return Commands.runOnce(robot::autoReefAlignRequest, requirements)
+    return Commands.runOnce(robot::autoReefAlignRequest, DrivetrainSubsystem.getInstance())
     .andThen(Commands.waitUntil(()-> DrivetrainSubsystem.getInstance().getState() == DrivetrainState.AUTO || DrivetrainSubsystem.getInstance().getState() == DrivetrainState.TELEOP));
   }
 

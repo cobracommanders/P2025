@@ -69,28 +69,35 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
+                      "type": "sequential",
                       "data": {
-                        "waitTime": 2.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "auto coral station align"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "deadline",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.0
+                        "commands": [
+                          {
+                            "type": "race",
+                            "data": {
+                              "commands": [
+                                {
+                                  "type": "wait",
+                                  "data": {
+                                    "waitTime": 1.75
+                                  }
+                                },
+                                {
+                                  "type": "named",
+                                  "data": {
+                                    "name": "auto coral station align"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 0.75
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -122,19 +129,13 @@
                 }
               },
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Coral Station Top to K"
-                }
-              },
-              {
                 "type": "deadline",
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
+                      "type": "path",
                       "data": {
-                        "waitTime": 2.0
+                        "pathName": "Coral Station Top to K"
                       }
                     },
                     {
@@ -156,6 +157,19 @@
                 "type": "named",
                 "data": {
                   "name": "score"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "K to Coral Station"
                 }
               }
             ]
