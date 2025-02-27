@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import dev.doglog.DogLog;
@@ -64,6 +65,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
     leftMotor.getConfigurator().apply(left_motor_config);
     rightMotor.getConfigurator().apply(right_motor_config);
+    left_motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    right_motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     canCoderConfig.MagnetSensor.MagnetOffset = Constants.ElevatorConstants.encoderOffset;
     canCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.9;
     canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
