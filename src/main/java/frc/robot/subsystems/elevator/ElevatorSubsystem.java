@@ -21,6 +21,8 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.commands.RobotManager;
+import frc.robot.commands.RobotState;
 import frc.robot.subsystems.elbow.ElbowState;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
@@ -40,6 +42,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
   private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
+  private boolean isSynced;
   
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
@@ -66,6 +69,7 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     encoder.getConfigurator().apply(canCoderConfig);
     tolerance = 0.1;
+    isSynced = false;
   }
   public void setTeleopConfig() {
     left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
@@ -219,10 +223,6 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     }
   }
 
-  // public void syncEncoder(){
-  //   leftMotor.setPosition(absolutePosition);
-  // }
-
   @Override
   public void collectInputs(){
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
@@ -234,6 +234,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
     DogLog.log(getName() + "/left motor voltage", leftMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log(getName() + "/right Motor voltage", rightMotor.getMotorVoltage().getValueAsDouble());
+  }
+
+  @Override
+  public void periodic(){
+    super.periodic();
+    if (RobotManager.getInstance().getState() == RobotState.INVERTED_IDLE && RobotManager.getInstance().timeout(1) && !isSynced) {
+      syncEncoder();
+      isSynced = true;
+    }
+    else if (RobotManager.getInstance().getState() != RobotState.INVERTED_IDLE) {
+      isSynced = false;
+    }
   }
 
   public void setElevatorPosition(double elevatorSetpoint){
