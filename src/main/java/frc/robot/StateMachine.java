@@ -118,7 +118,7 @@ public abstract class StateMachine<S extends Enum<S>> extends SubsystemBase {
    * @param duration The timeout duration (in seconds) to use.
    * @return Whether the current state has been active for longer than the given duration.
    */
-  protected boolean timeout(double duration) {
+  public boolean timeout(double duration) {
     var currentStateDuration = Timer.getFPGATimestamp() - lastTransitionTimestamp;
 
     return currentStateDuration > duration;

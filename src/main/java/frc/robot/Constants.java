@@ -16,6 +16,7 @@ public static final class ElevatorConstants{
   public static final double D = 0;
   public static final double G = 0.5075;
   public static final double MotionMagicAcceleration = 40; //40
+  public static final double AutoMotionMagicAcceleration = 45; //45
   public static final double MotionMagicCruiseVelocity = 200; //115
   public static final double MotionMagicJerk = 250; //175
   public static final double encoderOffset = -0.112305;

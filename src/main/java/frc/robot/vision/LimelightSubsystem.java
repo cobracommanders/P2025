@@ -1,30 +1,9 @@
 package frc.robot.vision;
 
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-
 import dev.doglog.DogLog;
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetector;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.units.measure.Angle;
-import frc.robot.Constants.ElbowConstants;
-import frc.robot.Constants.ManipulatorConstants;
-import frc.robot.Ports;
 import frc.robot.StateMachine;
-import frc.robot.subsystems.drivetrain.DrivetrainState;
-import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
-import frc.robot.subsystems.elbow.ElbowState;
-import frc.robot.vision.LimelightHelpers.LimelightResults;
 
 
 
@@ -41,6 +20,9 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
      limelightLocalization.disableLeft = false;
      limelightLocalization.disableRight = false;
      limelightLocalization.disableMiddle = false;
+     LimelightHelpers.setPipelineIndex("limelight-left", 0);
+     LimelightHelpers.setPipelineIndex("limelight-left", 0);
+     LimelightHelpers.setPipelineIndex("limelight-left", 0);
     }
 
     protected LimelightState getNextState(LimelightState currentState) {
@@ -49,7 +31,11 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
 
     @Override
     public void collectInputs(){
-    }
+      limelightLocalization.collectInputs();
+        DogLog.log(getName() + "/left camera reject data", limelightLocalization.rejectLeftData);
+        DogLog.log(getName() + "/right camera reject data", limelightLocalization.rejectRightData);
+        DogLog.log(getName() + "/middle camera reject data", limelightLocalization.rejectMiddleData);
+       }
     
     public void setState(LimelightState newState) {
         setStateFromRequest(newState);
@@ -60,63 +46,47 @@ public class LimelightSubsystem extends StateMachine<LimelightState>{
         switch (newState) {
           case REEF -> {
             limelightLocalization.disableLeft = false;
-            LimelightHelpers.setPipelineIndex("limelight-left", 2);
-            LimelightHelpers.setPipelineIndex("limelight-right", 2);
             limelightLocalization.disableRight = false;
             limelightLocalization.disableMiddle = true;
           }
           case CORAL_STATION -> {
             limelightLocalization.disableLeft = true;
             limelightLocalization.disableRight = true;
-            LimelightHelpers.setPipelineIndex("limelight-middle", 2);
             limelightLocalization.disableMiddle = false;
           }
           case DRIVE -> {
             limelightLocalization.disableLeft = false;
             limelightLocalization.disableRight = false;
             limelightLocalization.disableMiddle = false;
-            LimelightHelpers.setPipelineIndex("limelight-left", 0);
-            LimelightHelpers.setPipelineIndex("limelight-right", 0);
-            LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case DISABLED -> {
             limelightLocalization.disableLeft = false;
             limelightLocalization.disableRight = false;
-            limelightLocalization.disableMiddle = false;
-            LimelightHelpers.setPipelineIndex("limelight-left", 0);
-            LimelightHelpers.setPipelineIndex("limelight-right", 0);
-            LimelightHelpers.setPipelineIndex("limelight-middle", 0);
+            limelightLocalization.disableMiddle = true;
           }
           case AUTO -> {
             limelightLocalization.disableLeft = true;
             limelightLocalization.disableRight = true;
             limelightLocalization.disableMiddle = true;
-            LimelightHelpers.setPipelineIndex("limelight-left", 0);
-            LimelightHelpers.setPipelineIndex("limelight-right", 0);
           }
           case AUTO_CORAL_STATION -> {
             limelightLocalization.disableLeft = true;
             limelightLocalization.disableRight = true;
             limelightLocalization.disableMiddle = false;
-            LimelightHelpers.setPipelineIndex("limelight-middle", 0);
           }
           case AUTO_REEF -> {
             limelightLocalization.disableLeft = false;
             limelightLocalization.disableRight = false;
             limelightLocalization.disableMiddle = true;
-            LimelightHelpers.setPipelineIndex("limelight-left", 2);
-            LimelightHelpers.setPipelineIndex("limelight-right", 2);
-            LimelightHelpers.setPipelineIndex("limelight-middle", 2);
+          }
+          case BARGE_ALIGN -> {
+            limelightLocalization.disableLeft = true;
+            limelightLocalization.disableRight = true;
+            limelightLocalization.disableMiddle = false;
           }
           default -> {}
           }
 
-          
-
-
-        DogLog.log(getName() + "/left camera reject data", limelightLocalization.rejectLeftData);
-        DogLog.log(getName() + "/right camera reject data", limelightLocalization.rejectRightData);
-        DogLog.log(getName() + "/middle camera reject data", limelightLocalization.rejectMiddleData);
       }
 
       

@@ -2,6 +2,7 @@ package frc.robot.subsystems.manipulator;
 
 public enum ManipulatorState {
     INTAKE_CORAL,
+    INTAKE_ALGAE,
     IDLE,
     L1,
     L2,
@@ -11,5 +12,8 @@ public enum ManipulatorState {
     PREPARE_L2,
     PREPARE_L3,
     PREPARE_L4,
-    AFTER_INTAKE
+    PRE_SCORE,
+    AFTER_INTAKE,
+    SCORE_ALGAE,
+    SCORE_PROCESSOR
 }

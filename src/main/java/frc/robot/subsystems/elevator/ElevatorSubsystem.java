@@ -4,10 +4,8 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,22 +13,15 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.WristConstants;
+import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
+import frc.robot.subsystems.elbow.ElbowState;
 
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
@@ -38,45 +29,64 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final CANcoder encoder;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
-  private final CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+  private CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
   private double absolutePosition;
   private double elevatorPosition;
   private double leftElevatorPosition;
   private double leftMotorPosition;
   private double rightMotorPosition;
+  private double motorCurrent;
   private final double tolerance;
   private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
   private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
+  
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
   public ElevatorSubsystem() {
     super(ElevatorState.HOME_ELEVATOR);
     encoder = new CANcoder(Ports.ElevatorPorts.ENCODER);
+
     right_motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     left_motor_config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     left_motor_config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.MotionMagicCruiseVelocity;
-    left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
+    left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.AutoMotionMagicAcceleration;
     left_motor_config.MotionMagic.MotionMagicJerk = ElevatorConstants.MotionMagicJerk;
     right_motor_config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.MotionMagicCruiseVelocity;
-    right_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
+    right_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.AutoMotionMagicAcceleration;
     right_motor_config.MotionMagic.MotionMagicJerk = ElevatorConstants.MotionMagicJerk;
     leftMotor = new TalonFX(Ports.ElevatorPorts.LMOTOR);
     rightMotor = new TalonFX(Ports.ElevatorPorts.RMOTOR);
-    leftMotor.getConfigurator().apply(left_motor_config);
-    rightMotor.getConfigurator().apply(right_motor_config);
     left_motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     right_motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    leftMotor.getConfigurator().apply(left_motor_config);
+    rightMotor.getConfigurator().apply(right_motor_config);
     canCoderConfig.MagnetSensor.MagnetOffset = Constants.ElevatorConstants.encoderOffset;
     canCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.9;
     canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     encoder.getConfigurator().apply(canCoderConfig);
     tolerance = 0.1;
   }
-
+  public void setTeleopConfig() {
+    left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
+    right_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
+    leftMotor.getConfigurator().apply(left_motor_config);
+    rightMotor.getConfigurator().apply(right_motor_config);
+  }
+  public void setAutoConfig() {
+    left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.AutoMotionMagicAcceleration;
+    right_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.AutoMotionMagicAcceleration;
+    leftMotor.getConfigurator().apply(left_motor_config);
+    rightMotor.getConfigurator().apply(right_motor_config);
+  }
   protected ElevatorState getNextState(ElevatorState currentState) {
+    if (getState() == ElevatorState.HOME_ELEVATOR && this.atGoal()) { 
+      leftMotor.setPosition(0);
+      return ElevatorState.IDLE;
+    } else {  
       return currentState;
     }
+  }
 
   public boolean atGoal() {
     return switch (getState()) {
@@ -88,18 +98,24 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
           MathUtil.isNear(ElevatorPositions.L2, elevatorPosition, tolerance);
         case L3 ->
           MathUtil.isNear(ElevatorPositions.L3, elevatorPosition, tolerance);
-        case CAPPED_L3 ->
-          MathUtil.isNear(ElevatorPositions.CAPPED_L3, elevatorPosition, tolerance);
+        case LOW_ALGAE ->
+          MathUtil.isNear(ElevatorPositions.LOW_ALGAE, elevatorPosition, tolerance);
+        case HIGH_ALGAE ->
+          MathUtil.isNear(ElevatorPositions.HIGH_ALGAE, elevatorPosition, tolerance);
         case CAPPED_L4 ->
           MathUtil.isNear(ElevatorPositions.CAPPED_L4, elevatorPosition, tolerance);
         case L4 ->
           MathUtil.isNear(ElevatorPositions.L4, elevatorPosition, tolerance);
+        case L4_MAX ->
+          MathUtil.isNear(ElevatorPositions.L4_MAX, elevatorPosition, tolerance);
         case CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.CORAL_STATION, elevatorPosition, tolerance);
         case HOME_ELEVATOR ->
-          (rightMotor.getStatorCurrent().getValueAsDouble() > ElevatorConstants.homingStallCurrent);
+          (motorCurrent > ElevatorConstants.homingStallCurrent);
         case INVERTED_CORAL_STATION ->
           MathUtil.isNear(ElevatorPositions.INVERTED_CORAL_STATION, elevatorPosition, tolerance);
+        case PROCESSOR ->
+          MathUtil.isNear(ElevatorPositions.PROCESSOR, elevatorPosition, tolerance);
       };
   }
 
@@ -110,45 +126,120 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   public boolean isIdle() {
     return getState() == ElevatorState.IDLE;
   }
-
   public void syncEncoder(){
     leftMotor.setPosition(absolutePosition);
   }
+  public void increaseSetpoint(){
+    switch (getState()) {
+      case L1 -> {
+        ElevatorPositions.L1 += 0.1;
+        setElevatorPosition(ElevatorPositions.L1);
+        break;
+      }
+      case L2 -> {
+        ElevatorPositions.L2 += 0.1;
+        setElevatorPosition(ElevatorPositions.L2);
+        break;
+      }
+      case L3 -> {
+        ElevatorPositions.L3 += 0.1;
+        setElevatorPosition(ElevatorPositions.L3);
+        break;
+      }
+      case LOW_ALGAE -> {
+        ElevatorPositions.LOW_ALGAE += 0.1;
+        setElevatorPosition(ElevatorPositions.LOW_ALGAE);
+        break;
+      }
+      case HIGH_ALGAE -> {
+        ElevatorPositions.HIGH_ALGAE += 0.1;
+        setElevatorPosition(ElevatorPositions.HIGH_ALGAE);
+        break;
+      }
+      case L4_MAX -> {
+        ElevatorPositions.L4_MAX += 0.1;
+        setElevatorPosition(ElevatorPositions.L4_MAX);
+        break;
+      }
+      case INVERTED_CORAL_STATION -> {
+        ElevatorPositions.INVERTED_CORAL_STATION += 0.1;
+        setElevatorPosition(ElevatorPositions.INVERTED_CORAL_STATION);
+        break;
+      }
+      case PROCESSOR -> {
+        ElevatorPositions.PROCESSOR += 0.1;
+        setElevatorPosition(ElevatorPositions.PROCESSOR);
+        break;
+      }
+    }
+  }
+
+  public void decreaseSetpoint(){
+    switch (getState()) {
+      case L1 -> {
+        ElevatorPositions.L1 -= 0.1;
+        setElevatorPosition(ElevatorPositions.L1);
+        break;
+      }
+      case L2 -> {
+        ElevatorPositions.L2 -= 0.1;
+        setElevatorPosition(ElevatorPositions.L2);
+        break;
+      }
+      case L3 -> {
+        ElevatorPositions.L3 -= 0.1;
+        setElevatorPosition(ElevatorPositions.L3);
+        break;
+      }
+      case LOW_ALGAE -> {
+        ElevatorPositions.LOW_ALGAE -= 0.1;
+        setElevatorPosition(ElevatorPositions.LOW_ALGAE);
+        break;
+      }
+      case HIGH_ALGAE -> {
+        ElevatorPositions.HIGH_ALGAE -= 0.1;
+        setElevatorPosition(ElevatorPositions.HIGH_ALGAE);
+        break;
+      }
+      case L4_MAX -> {
+        ElevatorPositions.L4_MAX -= 0.1;
+        setElevatorPosition(ElevatorPositions.L4_MAX);
+        break;
+      }
+      case INVERTED_CORAL_STATION -> {
+        ElevatorPositions.INVERTED_CORAL_STATION -= 0.1;
+        setElevatorPosition(ElevatorPositions.INVERTED_CORAL_STATION);
+        break;
+      }
+      case PROCESSOR -> {
+        ElevatorPositions.PROCESSOR -= 0.1;
+        setElevatorPosition(ElevatorPositions.PROCESSOR);
+        break;
+      }
+    }
+  }
+
+  // public void syncEncoder(){
+  //   leftMotor.setPosition(absolutePosition);
+  // }
 
   @Override
   public void collectInputs(){
+    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
     double leftElevatorPosition = leftMotor.getPosition().getValueAsDouble();
     double rightElevatorPosition = rightMotor.getPosition().getValueAsDouble();
-    elevatorPosition = leftMotor.getPosition().getValueAsDouble();
-    absolutePosition = encoder.getAbsolutePosition().getValueAsDouble();
+    motorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
     DogLog.log(getName() + "/Left Elevator Position", leftElevatorPosition);
     DogLog.log(getName() + "/Right Elevator Position", rightElevatorPosition);
     DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
+    DogLog.log(getName() + "/left motor voltage", leftMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log(getName() + "/right Motor voltage", rightMotor.getMotorVoltage().getValueAsDouble());
   }
 
-  @Override
-  public void periodic(){
-    super.periodic();
-    DogLog.log(getName() + "/Elevator AtGoal", atGoal());
-    // if (DriverStation.isDisabled()) {
-    //  if (lowestSeenHeight > elevatorPosition) {
-    //   lowestSeenHeight = elevatorPosition;
-    //  }
-    // } else {
-    //   if (!preMatchHomingOccured) {
-    //     double homingEndPosition = 0;
-    //     double homedPosition = homingEndPosition + (elevatorPosition - lowestSeenHeight);
-    //     rightMotor.setPosition(homedPosition);
-    //     preMatchHomingOccured = true;
-    //   }
-    // }
-  }
-
-  public void setElevatorPosition(double elevatorPosition){
+  public void setElevatorPosition(double elevatorSetpoint){
     rightMotor.setControl(right_motor_request);
-    leftMotor.setControl(left_motor_request.withPosition(elevatorPosition));
-    //DogLog.log(getName() + "/Left Motor Setpoint", leftMotorPosition);
-    DogLog.log(getName() + "/right Motor Setpoint", elevatorPosition);
+    leftMotor.setControl(left_motor_request.withPosition(elevatorSetpoint));
+    DogLog.log(getName() + "/right Motor Setpoint", elevatorSetpoint);
   }
 
     @Override
@@ -166,8 +257,11 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         case L3 -> {
           setElevatorPosition(ElevatorPositions.L3);
         }
-        case CAPPED_L3 -> {
-          setElevatorPosition(ElevatorPositions.CAPPED_L3);
+        case LOW_ALGAE -> {
+          setElevatorPosition(ElevatorPositions.LOW_ALGAE);
+        }
+        case HIGH_ALGAE -> {
+          setElevatorPosition(ElevatorPositions.HIGH_ALGAE);
         }
         case CAPPED_L4 -> {
           setElevatorPosition(ElevatorPositions.CAPPED_L4);
@@ -175,14 +269,21 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         case L4 -> {
           setElevatorPosition(ElevatorPositions.L4);
         }
+        case L4_MAX -> {
+          setElevatorPosition(ElevatorPositions.L4_MAX);
+        }
         case HOME_ELEVATOR -> {
           rightMotor.setControl(new VoltageOut(-0.7));
+          leftMotor.setControl(new VoltageOut(-0.7));
         }
         case CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.CORAL_STATION);
         }
         case INVERTED_CORAL_STATION -> {
           setElevatorPosition(ElevatorPositions.INVERTED_CORAL_STATION);
+        }
+        case PROCESSOR -> {
+          setElevatorPosition(ElevatorPositions.PROCESSOR);
         }
       }
     }

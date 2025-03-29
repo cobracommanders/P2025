@@ -3,15 +3,21 @@ package frc.robot.subsystems.wrist;
 public enum WristState {
     IDLE,
     INVERTED_IDLE,
+    PRE_L4,
     L1,
     L2,
     L3,
-    L4,
+    L4_TRANSITION,
     CAPPED_L4,
-    CAPPED_L3,
     CORAL_STATION,
     HOME_WRIST,
+    L4_WRIST,
     INVERTED_CORAL_STATION,
-    AFTER_L4,
-    DISABLED
+    DISABLED,
+    PRE_ALGAE_SCORE,
+    INTAKE_ALGAE,
+    ALGAE_FLICK,
+    PROCESSOR,
+    SCORE_ALGAE,
+    CAGE_FLIP
 }

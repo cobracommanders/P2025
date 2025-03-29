@@ -7,5 +7,6 @@ public enum LimelightState {
     DISABLED,
     AUTO,
     AUTO_CORAL_STATION,
-    AUTO_REEF
+    AUTO_REEF,
+    BARGE_ALIGN
 }
