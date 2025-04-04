@@ -79,10 +79,13 @@ public class Robot extends TimedRobot{
         NamedCommands.registerCommand("set drivetrain auto", Robot.robotCommands.setDrivetrainAuto());
         NamedCommands.registerCommand("set coral mode", Robot.robotCommands.coralModeCommand());
         NamedCommands.registerCommand("set algae mode", Robot.robotCommands.algaeModeCommand());
+        NamedCommands.registerCommand("enable supercycle", Robot.robotCommands.supercycleModeCommand());
+        NamedCommands.registerCommand("enable regular cycle", Robot.robotCommands.regularCycleModeCommand());
         NamedCommands.registerCommand("low algae intake", Robot.robotCommands.lowAlgaeCommand());
         NamedCommands.registerCommand("high algae intake", Robot.robotCommands.highAlgaeCommand());
         NamedCommands.registerCommand("wait for low algae intake", robotManager.waitForState(RobotState.WAIT_REMOVE_ALGAE_LOW));
         NamedCommands.registerCommand("wait for high algae intake", robotManager.waitForState(RobotState.WAIT_REMOVE_ALGAE_HIGH));
+        NamedCommands.registerCommand("wait for prepare algae score", robotManager.waitForState(RobotState.PREPARE_SCORE_ALGAE));
         NamedCommands.registerCommand("wait for algae score", robotManager.waitForState(RobotState.SCORE_ALGAE_WAIT));
 
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -103,6 +106,7 @@ public class Robot extends TimedRobot{
         DogLog.log("Robot/Is autonomous", DriverStation.isAutonomous());
         DogLog.log("Robot/Is disabled", DriverStation.isDisabled());
         DogLog.log("Robot/Is teleop", DriverStation.isTeleop());
+        DogLog.log("Robot/Is near high algae", FieldConstants.getInstance().isNearHighAlgae());
     }
 
     @Override

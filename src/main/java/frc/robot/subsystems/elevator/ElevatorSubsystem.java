@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import org.opencv.features2d.FastFeatureDetector;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -18,6 +20,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import dev.doglog.DogLog;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.RobotMode;
 import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.StateMachine;
@@ -28,7 +31,7 @@ import frc.robot.subsystems.elbow.ElbowState;
 public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
-  private final CANcoder encoder;
+  private final CANcoder elevatorEncoder;
   private final TalonFXConfiguration left_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private final TalonFXConfiguration right_motor_config = new TalonFXConfiguration().withSlot0(new Slot0Configs().withKP(ElevatorConstants.P).withKI(ElevatorConstants.I).withKD(ElevatorConstants.D).withKG(ElevatorConstants.G).withGravityType(GravityTypeValue.Elevator_Static)).withFeedback(new FeedbackConfigs().withSensorToMechanismRatio((4.0 / 1.0)));
   private CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
@@ -38,18 +41,18 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   private double leftMotorPosition;
   private double rightMotorPosition;
   private double motorCurrent;
+  private boolean isSynced;
   private final double tolerance;
   private Follower right_motor_request = new Follower(Ports.ElevatorPorts.LMOTOR, true);
   private MotionMagicVoltage left_motor_request = new MotionMagicVoltage(0).withSlot(0);
   private boolean preMatchHomingOccured = false;
-  private boolean isSynced;
   
   private double lowestSeenHeight = Double.POSITIVE_INFINITY;
 
   public ElevatorSubsystem() {
     super(ElevatorState.HOME_ELEVATOR);
-    encoder = new CANcoder(Ports.ElevatorPorts.ENCODER);
-
+    elevatorEncoder = new CANcoder(Ports.ElevatorPorts.ENCODER);
+    isSynced = false;
     right_motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     left_motor_config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     left_motor_config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.MotionMagicCruiseVelocity;
@@ -67,9 +70,8 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     canCoderConfig.MagnetSensor.MagnetOffset = Constants.ElevatorConstants.encoderOffset;
     canCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.9;
     canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    encoder.getConfigurator().apply(canCoderConfig);
+    elevatorEncoder.getConfigurator().apply(canCoderConfig);
     tolerance = 0.1;
-    isSynced = false;
   }
   public void setTeleopConfig() {
     left_motor_config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MotionMagicAcceleration;
@@ -91,6 +93,22 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
       return currentState;
     }
   }
+
+  public void setL1Row() {
+    if (RobotMode.getInstance().inHighL1Mode()) {
+      ElevatorPositions.L1 = ElevatorPositions.L1_ROW2;
+    } else {
+      ElevatorPositions.L1 = ElevatorPositions.L1_ROW1;
+    }
+  }
+
+  // public void setL1Row() {
+  //   if (RobotMode.getInstance().inHighL1Mode()) {
+  //     ElevatorPositions.L1 = ElevatorPositions.L1_ROW2;
+  //   } else {
+  //     ElevatorPositions.L1 = ElevatorPositions.L1_ROW1;
+  //   }
+  // }
 
   public boolean atGoal() {
     return switch (getState()) {
@@ -124,15 +142,13 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
   }
 
   public void setState(ElevatorState newState) {
-      setStateFromRequest(newState);
-    }
+    setStateFromRequest(newState);
+  }
 
   public boolean isIdle() {
     return getState() == ElevatorState.IDLE;
   }
-  public void syncEncoder(){
-    leftMotor.setPosition(absolutePosition);
-  }
+
   public void increaseSetpoint(){
     switch (getState()) {
       case L1 -> {
@@ -221,10 +237,15 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
         break;
       }
     }
+}
+
+  public void syncEncoder(){
+    leftMotor.setPosition(absolutePosition);
   }
 
   @Override
   public void collectInputs(){
+    absolutePosition = elevatorEncoder.getPosition().getValueAsDouble() - 0.099;
     elevatorPosition = leftMotor.getPosition().getValueAsDouble();
     double leftElevatorPosition = leftMotor.getPosition().getValueAsDouble();
     double rightElevatorPosition = rightMotor.getPosition().getValueAsDouble();
@@ -234,18 +255,20 @@ public class ElevatorSubsystem extends StateMachine<ElevatorState>{
     DogLog.log(getName() + "/Elevator Current", leftMotor.getStatorCurrent().getValueAsDouble());
     DogLog.log(getName() + "/left motor voltage", leftMotor.getMotorVoltage().getValueAsDouble());
     DogLog.log(getName() + "/right Motor voltage", rightMotor.getMotorVoltage().getValueAsDouble());
+    DogLog.log(getName() + "/Elevator encoder position", absolutePosition);
   }
 
   @Override
-  public void periodic(){
-    super.periodic();
-    if (RobotManager.getInstance().getState() == RobotState.INVERTED_IDLE && RobotManager.getInstance().timeout(1) && !isSynced) {
-      syncEncoder();
-      isSynced = true;
-    }
-    else if (RobotManager.getInstance().getState() != RobotState.INVERTED_IDLE) {
-      isSynced = false;
-    }
+  public void periodic() {
+      super.periodic();
+
+      if (RobotManager.getInstance().getState() == RobotState.INVERTED_IDLE && RobotManager.getInstance().timeout(1) && !isSynced) {
+        syncEncoder();
+        isSynced = true;
+      }
+      else if (RobotManager.getInstance().getState() != RobotState.INVERTED_IDLE) {
+        isSynced = false;
+      }
   }
 
   public void setElevatorPosition(double elevatorSetpoint){

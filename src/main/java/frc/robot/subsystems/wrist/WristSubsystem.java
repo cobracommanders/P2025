@@ -22,6 +22,7 @@ import frc.robot.StateMachine;
 import frc.robot.Constants;
 import frc.robot.Constants.WristConstants;
 import frc.robot.commands.RobotManager;
+import frc.robot.commands.RobotMode;
 import frc.robot.commands.RobotState;
 
 public class WristSubsystem extends StateMachine<WristState>{
@@ -58,49 +59,58 @@ public class WristSubsystem extends StateMachine<WristState>{
     } else {
       return currentState;
     }
+  }
+
+  public void setL1Row() {
+    if (RobotMode.getInstance().inHighL1Mode()) {
+      WristPositions.L1 = WristPositions.L1_ROW2;
+    } else {
+      WristPositions.L1 = WristPositions.L1_ROW1;
     }
+  }
 
    public boolean atGoal() {
-    return switch (getState()) {
-      case IDLE -> 
-        MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
-      case INVERTED_IDLE ->
-        MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
-      case PRE_L4 ->
-        MathUtil.isNear(WristPositions.PRE_L4, wristPosition, tolerance);
-      case L1 ->
-        MathUtil.isNear(WristPositions.L1, wristPosition, tolerance);
-      case L2 ->
-        MathUtil.isNear(WristPositions.L2, wristPosition, tolerance);
-      case L3 ->
-        MathUtil.isNear(WristPositions.L3, wristPosition, tolerance);
-      case CAPPED_L4 ->
-        MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, tolerance);
-      case L4_TRANSITION ->
-        MathUtil.isNear(WristPositions.L4_TRANSITION, wristPosition, tolerance);
-      case CORAL_STATION ->
-        MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, tolerance);
-      case HOME_WRIST ->
-        motorCurrent > WristConstants.homingStallCurrent;
-      case L4_WRIST ->
-        MathUtil.isNear(WristPositions.L4_WRIST, wristPosition, tolerance);
-      case INVERTED_CORAL_STATION ->
-        MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
-      case PRE_ALGAE_SCORE ->
-        MathUtil.isNear(WristPositions.PRE_ALGAE_SCORE, wristPosition, tolerance);
-      case SCORE_ALGAE ->
-        MathUtil.isNear(WristPositions.ALGAE_SCORE, wristPosition, tolerance);
-      case INTAKE_ALGAE ->
-        MathUtil.isNear(WristPositions.ALGAE_INTAKE, wristPosition, tolerance);
-      case ALGAE_FLICK ->
-        MathUtil.isNear(WristPositions.ALGAE_FLICK, wristPosition, tolerance);
-      case CAGE_FLIP ->
-        MathUtil.isNear(WristPositions.CAGE_FLIP, wristPosition, tolerance);
-      case PROCESSOR ->
-        MathUtil.isNear(WristPositions.PROCESSOR, wristPosition, tolerance);
-      case DISABLED->
-        true;
-    };
+    return true;
+    // return switch (getState()) {
+    //   case IDLE -> 
+    //     MathUtil.isNear(WristPositions.IDLE, wristPosition, tolerance);
+    //   case INVERTED_IDLE ->
+    //     MathUtil.isNear(WristPositions.INVERTED_IDLE, wristPosition, tolerance);
+    //   case PRE_L4 ->
+    //     MathUtil.isNear(WristPositions.PRE_L4, wristPosition, tolerance);
+    //   case L1 ->
+    //     MathUtil.isNear(WristPositions.L1, wristPosition, tolerance);
+    //   case L2 ->
+    //     MathUtil.isNear(WristPositions.L2, wristPosition, tolerance);
+    //   case L3 ->
+    //     MathUtil.isNear(WristPositions.L3, wristPosition, tolerance);
+    //   case CAPPED_L4 ->
+    //     MathUtil.isNear(WristPositions.CAPPED_L4, wristPosition, tolerance);
+    //   case L4_TRANSITION ->
+    //     MathUtil.isNear(WristPositions.L4_TRANSITION, wristPosition, tolerance);
+    //   case CORAL_STATION ->
+    //     MathUtil.isNear(WristPositions.CORAL_STATION, wristPosition, tolerance);
+    //   case HOME_WRIST ->
+    //     motorCurrent > WristConstants.homingStallCurrent;
+    //   case L4_WRIST ->
+    //     MathUtil.isNear(WristPositions.L4_WRIST, wristPosition, tolerance);
+    //   case INVERTED_CORAL_STATION ->
+    //     MathUtil.isNear(WristPositions.INVERTED_CORAL_STATION, wristPosition, tolerance);
+    //   case PRE_ALGAE_SCORE ->
+    //     MathUtil.isNear(WristPositions.PRE_ALGAE_SCORE, wristPosition, tolerance);
+    //   case SCORE_ALGAE ->
+    //     MathUtil.isNear(WristPositions.ALGAE_SCORE, wristPosition, tolerance);
+    //   case INTAKE_ALGAE ->
+    //     MathUtil.isNear(WristPositions.ALGAE_INTAKE, wristPosition, tolerance);
+    //   case ALGAE_FLICK ->
+    //     MathUtil.isNear(WristPositions.ALGAE_FLICK, wristPosition, tolerance);
+    //   case CAGE_FLIP ->
+    //     MathUtil.isNear(WristPositions.CAGE_FLIP, wristPosition, tolerance);
+    //   case PROCESSOR ->
+    //     MathUtil.isNear(WristPositions.PROCESSOR, wristPosition, tolerance);
+    //   case DISABLED->
+    //     true;
+    // };
   }
 
   public void setState(WristState newState) {
@@ -111,9 +121,9 @@ public class WristSubsystem extends StateMachine<WristState>{
     return getState() == WristState.INVERTED_IDLE;
   }
 
-  public void syncEncoder(){
-    wristMotor.setPosition(absolutePosition);
-  }
+  // public void syncEncoder(){
+  //   wristMotor.setPosition(absolutePosition);
+  // }
 
 
     @Override
@@ -142,7 +152,7 @@ public class WristSubsystem extends StateMachine<WristState>{
         brakeModeEnabled = true;
       }
       if (RobotManager.getInstance().getState() == RobotState.INVERTED_IDLE && RobotManager.getInstance().timeout(1) && !isSynced) {
-        syncEncoder();
+        // syncEncoder();
         isSynced = true;
       }
       else if (RobotManager.getInstance().getState() != RobotState.INVERTED_IDLE) {
@@ -151,7 +161,8 @@ public class WristSubsystem extends StateMachine<WristState>{
   }
 
   public void setWristPosition(double position){
-    wristMotor.setControl(motor_request.withPosition(position));
+    // wristMotor.setControl(motor_request.withPosition(position));
+    wristMotor.setControl(motor_request.withPosition(0.376));
     DogLog.log(getName() + "/Wrist Setpoint", position);
   }
 

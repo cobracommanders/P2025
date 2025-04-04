@@ -4,8 +4,10 @@ import static edu.wpi.first.wpilibj2.command.Commands.none;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.commands.RobotMode.CycleMode;
 import frc.robot.commands.RobotMode.GameMode;
 import frc.robot.Controls;
+import frc.robot.FieldConstants;
 import frc.robot.FlagManager;
 import frc.robot.StateMachine;
 import frc.robot.subsystems.climber.ClimberState;
@@ -31,6 +33,7 @@ public class RobotManager extends StateMachine<RobotState> {
 
   public boolean isHeightCapped = true;
   public GameMode currentGameMode = GameMode.CORAL;
+  public CycleMode currentCycleMode = CycleMode.REGULAR_CYCLE;
   public boolean isInverted = false;
   public Timer timer = new Timer();
 
@@ -64,6 +67,12 @@ public class RobotManager extends StateMachine<RobotState> {
           break;
         case CORAL_MODE:
           currentGameMode = GameMode.CORAL;
+          break;
+        case SUPERCYCLE:
+          currentCycleMode = CycleMode.SUPERCYCLE;
+          break;
+        case REGULAR_CYCLE:
+          currentCycleMode = CycleMode.REGULAR_CYCLE;
           break;
         case APPLY_HEIGHT_CAP:
           isHeightCapped = true;
@@ -335,23 +344,62 @@ public class RobotManager extends StateMachine<RobotState> {
         }
         break;
       case SCORE_L1:
-        if (timeout(1)) {
-          nextState = RobotState.PREPARE_INVERTED_IDLE;
+        if ((timeout(2) && DriverStation.isTeleop()) || (timeout(0.35) && DriverStation.isAutonomous())) {
+          nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
         }
         break;
       case SCORE_L2:
-        if (timeout(1)) {
-          nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+        if ((timeout(2) && DriverStation.isTeleop()) || (timeout(0.35) && DriverStation.isAutonomous())) {
+          if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isTeleop()) {
+            if (FieldConstants.getInstance().isNearHighAlgae()) {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_HIGH;
+              currentGameMode = GameMode.ALGAE;
+            } else {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_LOW;
+              currentGameMode = GameMode.ALGAE;
+            }
+          } else if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isAutonomous()) {
+            nextState = RobotState.IDLE;
+            currentGameMode = GameMode.ALGAE;
+          } else {
+            nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+          }
         }
         break;
       case SCORE_L3:
-        if (timeout(1)) {
-          nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+        if ((timeout(2) && DriverStation.isTeleop()) || (timeout(0.35) && DriverStation.isAutonomous())) {
+          if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isTeleop()) {
+            if (FieldConstants.getInstance().isNearHighAlgae()) {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_HIGH;
+              currentGameMode = GameMode.ALGAE;
+            } else {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_LOW;
+              currentGameMode = GameMode.ALGAE;
+            }
+          } else if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isAutonomous()) {
+            nextState = RobotState.IDLE;
+            currentGameMode = GameMode.ALGAE;
+          } else {
+            nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+          }
         }
         break;
       case SCORE_L4:
         if ((timeout(2) && DriverStation.isTeleop()) || (timeout(0.35) && DriverStation.isAutonomous())) {
-          nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+          if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isTeleop()) {
+            if (FieldConstants.getInstance().isNearHighAlgae()) {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_HIGH;
+              currentGameMode = GameMode.ALGAE;
+            } else {
+              nextState = RobotState.PREPARE_REMOVE_ALGAE_LOW;
+              currentGameMode = GameMode.ALGAE;
+            }
+          } else if (currentCycleMode == CycleMode.SUPERCYCLE && DriverStation.isAutonomous()) {
+            nextState = RobotState.IDLE;
+            currentGameMode = GameMode.ALGAE;
+          } else {
+            nextState = RobotState.PREPARE_INVERTED_FROM_IDLE;
+          }
         }
         break;
       case REMOVE_ALGAE_HIGH:
@@ -696,16 +744,16 @@ public class RobotManager extends StateMachine<RobotState> {
             elevator.setState(ElevatorState.L4_MAX);
             climber.setState(ClimberState.IDLE);
             manipulator.setState(ManipulatorState.INTAKE_ALGAE);
-            wrist.setState(WristState.SCORE_ALGAE);
+            wrist.setState(WristState.PRE_ALGAE_SCORE);
             elbow.setState(ElbowState.L4);
           }
-          
+
 
           case SCORE_ALGAE -> {
             elevator.setState(ElevatorState.L4_MAX);
             climber.setState(ClimberState.IDLE);
-            manipulator.setState(ManipulatorState.SCORE_ALGAE);
-            wrist.setState(WristState.ALGAE_FLICK);
+            manipulator.setState(ManipulatorState.INTAKE_ALGAE);
+            wrist.setState(WristState.SCORE_ALGAE);
             elbow.setState(ElbowState.L4);
           }
           
@@ -754,6 +802,9 @@ public class RobotManager extends StateMachine<RobotState> {
     super.periodic(); 
     DogLog.log(getName() + "/is Coral Mode", RobotMode.getInstance().inCoralMode());
     DogLog.log(getName() + "/Is capped", isHeightCapped);
+    if (RobotManager.getInstance().getState() == RobotState.SCORE_ALGAE && timeout(0.20)) {
+      manipulator.setState(ManipulatorState.SCORE_ALGAE);
+    }
     //DogLog.log(getName() + "Active Command", elevator.getCurrentCommand().toString());
   }
 
@@ -855,6 +906,14 @@ public class RobotManager extends StateMachine<RobotState> {
 
   public void coralModeRequest(){
     flags.check(RobotFlag.CORAL_MODE);
+  }
+
+  public void supercycleRequest(){
+    flags.check(RobotFlag.SUPERCYCLE);
+  }
+
+  public void regularCycleRequest(){
+    flags.check(RobotFlag.REGULAR_CYCLE);
   }
 
   public void autoReefAlignRequest(){

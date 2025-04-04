@@ -4,11 +4,10 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.RobotMode;
 import frc.robot.commands.RobotMode.GameMode;
 import frc.robot.drivers.Xbox;
-import frc.robot.subsystems.climber.ClimberState;
-import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drivetrain.DrivetrainState;
+import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.drivetrain.TunerConstants;
-import frc.robot.subsystems.elevator.ElevatorPositions;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
@@ -45,7 +44,7 @@ public class Controls {
             driver.leftTrigger().onFalse(Robot.robotCommands.idleCommand());
         driver.rightBumper().onTrue(Robot.robotCommands.autoAlignCommand());
         driver.rightTrigger().onTrue(Robot.robotCommands.scoreCommand());
-            driver.rightTrigger().onFalse(Robot.robotCommands.idleCommand());
+            driver.rightTrigger().onFalse(Robot.robotCommands.scoreIdleCommand());
         driver.leftBumper().onTrue(Robot.robotCommands.removeHeightCapCommand());
             driver.leftBumper().onFalse(Robot.robotCommands.applyHeightCapCommand());
         // driver.B().onTrue(Robot.robotCommands.autoCoralStationAlign());
@@ -61,7 +60,8 @@ public class Controls {
         driver.Y().onFalse(Robot.robotCommands.climbIdleCommand());
         driver.POV0().onTrue(runOnce(() -> ElevatorSubsystem.getInstance().increaseSetpoint()));
         driver.POV180().onTrue(runOnce(() -> ElevatorSubsystem.getInstance().decreaseSetpoint()));
-
+        driver.POV90().onTrue(runOnce(()-> DrivetrainSubsystem.getInstance().teleopReefSnap = true));
+        driver.POVMinus90().onTrue(runOnce(()-> DrivetrainSubsystem.getInstance().teleopReefSnap = false));
     }
 
     public void configureOperatorCommands(){
@@ -69,7 +69,10 @@ public class Controls {
         operator.rightBumper().onTrue(Robot.robotCommands.algaeIdleCommand());
         operator.start().and(operator.back()).onTrue(Robot.robotCommands.homeCommand());
         operator.POV180().onTrue(Robot.robotCommands.coralModeCommand());
+        operator.POVMinus90().onTrue(Robot.robotCommands.L1ToggleCommand());
         operator.POV0().onTrue(Robot.robotCommands.algaeModeCommand());
+        //operator.POV90().onTrue(runOnce(()-> DrivetrainSubsystem.getInstance().setState(DrivetrainState.TELEOP)));
+        operator.POV90().onTrue(Robot.robotCommands.cycleModeCommand());
         operator.Y().onTrue(Robot.robotCommands.LowReefCommand());
         operator.B().onTrue(Robot.robotCommands.HighReefCommand());
         operator.X().onTrue(Robot.robotCommands.L2MultiCommand());

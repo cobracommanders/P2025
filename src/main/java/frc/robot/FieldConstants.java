@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import frc.robot.subsystems.drivetrain.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainSubsystem;
 import frc.robot.subsystems.elbow.ElbowSubsystem;
 import frc.robot.vision.LimelightLocalization;
@@ -47,21 +48,39 @@ public final class FieldConstants {
   };
 
   public Pose2d[] algaePosesBlue = {
-    new Pose2d(4.074, 4.745, Rotation2d.fromDegrees(-60)), //L + K
-    new Pose2d(4.905, 4.745, Rotation2d.fromDegrees(-120)), //J + I
-    new Pose2d(5.321, 4.026, Rotation2d.fromDegrees(180)), //H + G
-    new Pose2d(4.905, 3.307, Rotation2d.fromDegrees(120)), //F + E
-    new Pose2d(4.074, 3.307, Rotation2d.fromDegrees(60)), //D + C
-    new Pose2d(3.658, 4.026, Rotation2d.fromDegrees(0)), //B + A
+    new Pose2d(4.074, 4.745, Rotation2d.fromDegrees(-60)), //L + K low
+    new Pose2d(4.905, 4.745, Rotation2d.fromDegrees(-120)), //J + I high
+    new Pose2d(5.321, 4.026, Rotation2d.fromDegrees(180)), //H + G low
+    new Pose2d(4.905, 3.307, Rotation2d.fromDegrees(120)), //F + E high
+    new Pose2d(4.074, 3.307, Rotation2d.fromDegrees(60)), //D + C low
+    new Pose2d(3.658, 4.026, Rotation2d.fromDegrees(0)), //B + A high
   };
+
   public Pose2d[] algaePosesRed = {
-    new Pose2d(13.47, 3.307, Rotation2d.fromDegrees(120)), //L + K
-    new Pose2d(12.643, 3.307, Rotation2d.fromDegrees(60)), //J + I
-    new Pose2d(12.227, 4.026, Rotation2d.fromDegrees(0)), //H + G
-    new Pose2d(12.643, 4.745, Rotation2d.fromDegrees(-60)), //F + E
-    new Pose2d(13.474, 4.745, Rotation2d.fromDegrees(-120)), //D + C
-    new Pose2d(13.884, 4.026, Rotation2d.fromDegrees(180)), //B + A
+    new Pose2d(13.47, 3.307, Rotation2d.fromDegrees(120)), //L + K low
+    new Pose2d(12.643, 3.307, Rotation2d.fromDegrees(60)), //J + I high
+    new Pose2d(12.227, 4.026, Rotation2d.fromDegrees(0)), //H + G low
+    new Pose2d(12.643, 4.745, Rotation2d.fromDegrees(-60)), //F + E high
+    new Pose2d(13.474, 4.745, Rotation2d.fromDegrees(-120)), //D + C low
+    new Pose2d(13.884, 4.026, Rotation2d.fromDegrees(180)), //B + A high
   };
+
+  // public Pose2d[] lowAlgaePoses = {
+  //   new Pose2d(4.074, 4.745, Rotation2d.fromDegrees(-60)), //L + K blue
+  //   new Pose2d(5.321, 4.026, Rotation2d.fromDegrees(180)), //H + G blue
+  //   new Pose2d(4.074, 3.307, Rotation2d.fromDegrees(60)), //D + C blue
+  //   new Pose2d(13.47, 3.307, Rotation2d.fromDegrees(120)), //L + K red 
+  //   new Pose2d(12.227, 4.026, Rotation2d.fromDegrees(0)), //H + G red
+  //   new Pose2d(13.474, 4.745, Rotation2d.fromDegrees(-120)), //D + C red
+  // };
+  // public Pose2d[] highAlgaePoses = {
+  //   new Pose2d(4.905, 4.745, Rotation2d.fromDegrees(-120)), //J + I blue
+  //   new Pose2d(4.905, 3.307, Rotation2d.fromDegrees(120)), //F + E blue
+  //   new Pose2d(3.658, 4.026, Rotation2d.fromDegrees(0)), //B + A blue
+  //   new Pose2d(12.643, 3.307, Rotation2d.fromDegrees(60)), //J + I red
+  //   new Pose2d(12.643, 4.745, Rotation2d.fromDegrees(-60)), //F + E red 
+  //   new Pose2d(13.884, 4.026, Rotation2d.fromDegrees(180)), //B + A red
+  // };
 
   public Pose2d[] coralStationPosesBlue = {
     // new Pose2d(1.129, 7.122, Rotation2d.fromDegrees(-50)), // tag 13 CS
@@ -90,17 +109,26 @@ public final class FieldConstants {
   }
 
   public Pose2d getNearestBranch() {
-      closestBranch = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(FieldConstants.getInstance().getReefPoses()));
+      closestBranch = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(getReefPoses()));
       return closestBranch;
   }
   public Pose2d getNearestCoralStation() {
-      closestCoralStation = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(FieldConstants.getInstance().getCoralStationPoses()));
+      closestCoralStation = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(getCoralStationPoses()));
       return closestCoralStation;
   }
   public Pose2d getNearestAlgae() {
-    closestAlgae = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(FieldConstants.getInstance().getAlgaePoses()));
+    closestAlgae = DrivetrainSubsystem.getInstance().drivetrain.getState().Pose.nearest(List.of(getAlgaePoses()));
     return closestAlgae;
-}
+  }
+
+  public boolean isNearHighAlgae() {
+    if (getNearestAlgae() == algaePosesBlue[1] || getNearestAlgae() == algaePosesBlue[3] || getNearestAlgae() == algaePosesBlue[5] ||
+        getNearestAlgae() == algaePosesRed[1] || getNearestAlgae() == algaePosesRed[3] || getNearestAlgae() == algaePosesRed[5]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   public void logBranches() {
     int i = 0;
